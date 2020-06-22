@@ -1,6 +1,5 @@
 from typing import Dict
 import joblib
-import numpy as np
 from sklearn import datasets
 
 from app_logger import logger
@@ -26,7 +25,7 @@ iris_classifier = IrisClassifier()
 sample = datasets.load_iris().data[0].reshape((1, -1))
 
 
-def test():
+def test() -> Dict[str, int]:
     y = iris_classifier.predict(sample).tolist()
     logger.info({"input": sample, "prediction": y})
     return {"prediction": y[0]}
