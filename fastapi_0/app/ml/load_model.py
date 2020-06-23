@@ -1,6 +1,9 @@
 import os
 from typing import List
 import constants
+import logging
+
+logger = logging.getLogger(__name__) 
 
 
 def get_model_files() -> List[str]:

@@ -2,7 +2,8 @@ imageName := sample_fastapi
 imageVersion := latest
 containerName := test
 dockerBuild := docker build -t $(imageName):$(imageVersion) .
-dockerRun := docker run -it -d -p 8888:8888 --name $(containerName) $(imageName):$(imageVersion)
+dockerRunGunicorn := docker run -it -d -p 8888:8888 -e GU=G --name $(containerName) $(imageName):$(imageVersion)
+dockerRunUvicorn := docker run -it -d -p 8888:8888 -e GU=U --name $(containerName) $(imageName):$(imageVersion)
 dockerRm := docker ps -q --filter "name=$(containerName)" | grep -q . && docker rm -f $(containerName)
 dockerRerun := docker restart $(containerName)
 requirements := requirements.txt
@@ -16,7 +17,10 @@ build: pip_freeze
 	$(dockerBuild)
 
 run:
-	$(dockerRun)
+	$(dockerRunGunicorn)
+
+runU:
+	$(dockerRunUvicorn)
 
 build_run: build run
 

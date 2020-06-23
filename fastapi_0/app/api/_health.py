@@ -1,4 +1,7 @@
 from typing import Dict
+import logging
+
+logger = logging.getLogger(__name__) 
 
 
 def health() -> Dict[str, str]:

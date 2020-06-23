@@ -2,9 +2,10 @@ from typing import Dict
 import joblib
 from sklearn import datasets
 
-from app_logger import logger
 from ml import load_model
+import logging
 
+logger = logging.getLogger(__name__) 
 IRIS_MODEL = "iris_svc.pkl"
 
 
@@ -29,3 +30,4 @@ def test() -> Dict[str, int]:
     y = iris_classifier.predict(sample).tolist()
     logger.info({"input": sample, "prediction": y})
     return {"prediction": y[0]}
+
