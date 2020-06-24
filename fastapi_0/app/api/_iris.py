@@ -1,23 +1,15 @@
-from typing import Dict, List
-import joblib
+from typing import Dict
 from sklearn import datasets
-from pydantic import BaseModel
 import numpy as np
 import uuid
 import os
 import json
 
-from ml import load_model
-from ml.iris.iris_predictor import IrisClassifier
+from ml.iris.iris_predictor import IrisClassifier, IrisData
 from constants import CONSTANTS
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-class IrisData(BaseModel):
-    data: List[float]
-
 
 iris_classifier = IrisClassifier(CONSTANTS.IRIS_MODEL)
 sample = datasets.load_iris().data[0].reshape((1, -1))

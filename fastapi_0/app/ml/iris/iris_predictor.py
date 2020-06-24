@@ -1,11 +1,17 @@
+from typing import List
 import joblib
-from sklearn import datasets
+from pydantic import BaseModel
 
 from ml import load_model
 from ml.abstract_predictor import Predictor
 import logging
 
+
 logger = logging.getLogger(__name__) 
+
+
+class IrisData(BaseModel):
+    data: List[float]
 
 
 class IrisClassifier(Predictor):

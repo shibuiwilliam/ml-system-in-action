@@ -7,5 +7,5 @@ class Predictor(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def predict(self, x):
+    def predict(self, data):
         pass

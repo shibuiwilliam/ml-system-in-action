@@ -15,12 +15,10 @@ def get_data() -> Dict[str, np.ndarray]:
         iris.target,
         shuffle=True,
         test_size=0.3)
-    return {
-            'x_train': x_train,
+    return {'x_train': x_train,
             'x_test': x_test,
             'y_train': y_train,
-            'y_test': y_test
-            }
+            'y_test': y_test}
 
 
 def define_pipeline() -> Pipeline:
