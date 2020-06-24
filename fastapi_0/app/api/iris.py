@@ -6,6 +6,19 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/test")
+@router.get('/test')
 def test():
-    return _iris.test()
+    prediction = _iris.test()
+    return prediction
+
+
+@router.post('/predict')
+def predict(iris_data: _iris.IrisData):
+    prediction = _iris.predict(iris_data)
+    return prediction
+
+
+@router.post('/predict_async')
+async def predict_async(iris_data: _iris.IrisData):
+    _id = await _iris.predict_async(iris_data)
+    return _id

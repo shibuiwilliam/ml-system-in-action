@@ -1,33 +1,43 @@
-from typing import Dict
+from typing import Dict, List
 import joblib
 from sklearn import datasets
+from pydantic import BaseModel
+import numpy as np
+import uuid
+import os
+import json
 
 from ml import load_model
+from ml.iris.iris_predictor import IrisClassifier
+from constants import CONSTANTS
 import logging
 
-logger = logging.getLogger(__name__) 
-IRIS_MODEL = "iris_svc.pkl"
+logger = logging.getLogger(__name__)
 
 
-class IrisClassifier(object):
-    def __init__(self, model_filename=IRIS_MODEL):
-        self.model_filename = model_filename
-        self.classifier = self.get_model()
-
-    def get_model(self):
-        model_filename = load_model.get_model_file(self.model_filename)
-        return joblib.load(model_filename) if model_filename else None
-
-    def predict(self, data):
-        return self.classifier.predict(data)
+class IrisData(BaseModel):
+    data: List[float]
 
 
-iris_classifier = IrisClassifier()
+iris_classifier = IrisClassifier(CONSTANTS.IRIS_MODEL)
 sample = datasets.load_iris().data[0].reshape((1, -1))
 
 
 def test() -> Dict[str, int]:
     y = iris_classifier.predict(sample).tolist()
-    logger.info({"input": sample, "prediction": y})
-    return {"prediction": y[0]}
+    return {'prediction': y[0]}
 
+
+def predict(iris_data: IrisData) -> Dict[str, int]:
+    data = np.array(iris_data.data).reshape((1, -1))
+    y = iris_classifier.predict(data).tolist()
+    return {'prediction': y[0]}
+
+
+async def predict_async(iris_data: IrisData) -> Dict[str, str]:
+    num_files = str(len(os.listdir(CONSTANTS.DATA_DIRECTORY)))
+    _id = f'{str(uuid.uuid4())}_{num_files}'
+    filePath = os.path.join(CONSTANTS.DATA_DIRECTORY, f'{_id}.json')
+    with open(filePath, 'w') as f:
+        json.dump(iris_data.data, f)
+    return {'id': _id}

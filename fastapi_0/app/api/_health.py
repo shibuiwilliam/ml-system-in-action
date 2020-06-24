@@ -1,16 +1,16 @@
 from typing import Dict
 import logging
 
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
 
 
 def health() -> Dict[str, str]:
-    return {"health": "ok"}
+    return {'health': 'ok'}
 
 
 def health_sync() -> Dict[str, str]:
     return health()
 
 
-def health_async() -> Dict[str, str]:
+async def health_async() -> Dict[str, str]:
     return health()

@@ -138,3 +138,6 @@ dmypy.json
 cython_debug/
 
 .python-version
+*.pkl
+*.h5
+*.hdf5

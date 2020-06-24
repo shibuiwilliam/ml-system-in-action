@@ -2,6 +2,7 @@ from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+import os
 import joblib
 import numpy as np
 from typing import Dict
@@ -15,10 +16,10 @@ def get_data() -> Dict[str, np.ndarray]:
         shuffle=True,
         test_size=0.3)
     return {
-            "x_train": x_train,
-            "x_test": x_test,
-            "y_train": y_train,
-            "y_test": y_test
+            'x_train': x_train,
+            'x_test': x_test,
+            'y_train': y_train,
+            'y_test': y_test
             }
 
 
@@ -48,9 +49,9 @@ def dump_model(model, name):
 def main():
     data = get_data()
     pipeline = define_pipeline()
-    train_model(pipeline, data["x_train"], data["y_train"])
-    evaluate_model(pipeline, data["x_test"], data["y_test"])
-    dump_model(pipeline, "./iris_svc.pkl")
+    train_model(pipeline, data['x_train'], data['y_train'])
+    evaluate_model(pipeline, data['x_test'], data['y_test'])
+    dump_model(pipeline, os.path.join('./ml/models/', 'iris_svc.pkl'))
 
 
 if __name__ == '__main__':
