@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-fastapi_0/container_files/data/*.json
-fastapi_0/container_files/logs/*
+# fastapi_0/container_files/data/*
+# fastapi_0/container_files/logs/*
