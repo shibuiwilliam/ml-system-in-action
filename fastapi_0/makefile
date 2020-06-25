@@ -24,7 +24,7 @@ dockerRerun := docker restart $(containerName)
 requirements := requirements.txt
 pipFreeze := pip freeze > $(requirements)
 
-.PHONY: build run build_run rerun clean pip_freeze
+.PHONY: build run build_run rerun clean pip_freeze dirs
 pip_freeze:
 	$(pipFreeze)
 
@@ -46,3 +46,10 @@ clean:
 	$(dockerRm)
 	docker rmi -f $(imageName):$(imageVersion)
 
+dirs:
+	mkdir -p container_files/logs
+	mkdir -p container_files/data
+	touch container_files/logs/gunicorn_error.log
+	touch container_files/logs/gunicorn_access.log
+	touch container_files/logs/uvicorn_error.log
+	touch container_files/logs/uvicorn_access.log

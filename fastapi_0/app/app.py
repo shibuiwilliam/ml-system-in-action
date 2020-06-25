@@ -9,10 +9,11 @@ TITLE = os.getenv('FASTAPI_TITLE', 'fastapi application')
 DESCRIPTION = os.getenv('FASTAPI_DESCRIPTION', 'fastapi description')
 VERSION = os.getenv('FASTAPI_VERSION', 'fastapi version')
 
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
 logger.info(f'Starts {TITLE}:{VERSION}')
 
 os.makedirs(CONSTANTS.DATA_DIRECTORY, exist_ok=True)
+os.makedirs(CONSTANTS.IRIS_DATA_DIRECTORY, exist_ok=True)
 
 
 app = FastAPI(
@@ -32,4 +33,3 @@ app.include_router(
     prefix='/iris',
     tags=['iris']
 )
-

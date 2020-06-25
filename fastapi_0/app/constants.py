@@ -17,6 +17,10 @@ class _Constants(object):
         return '/fastapi/app/data/'
 
     @constant
+    def IRIS_DATA_DIRECTORY():
+        return '/fastapi/app/data/iris/'
+
+    @constant
     def MODEL_EXTENTIONS():
         return ['pkl', 'h5', 'hdf5']
 

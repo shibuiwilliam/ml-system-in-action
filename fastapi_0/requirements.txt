@@ -1,3 +1,4 @@
+autopep8==1.5.3
 click==7.1.2
 fastapi==0.58.0
 gunicorn==20.0.4
@@ -5,11 +6,13 @@ h11==0.9.0
 httptools==0.1.1
 joblib==0.15.1
 numpy==1.18.5
+pycodestyle==2.6.0
 pydantic==1.5.1
 scikit-learn==0.23.1
 scipy==1.4.1
 starlette==0.13.4
 threadpoolctl==2.1.0
+toml==0.10.1
 typing==3.7.4.1
 uvicorn==0.11.5
 uvloop==0.14.0
