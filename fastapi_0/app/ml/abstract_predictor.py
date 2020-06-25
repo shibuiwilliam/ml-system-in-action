@@ -7,9 +7,9 @@ class Predictor(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def predict(self, data):
+    def predict_proba(self, data):
         pass
 
     @abstractmethod
-    def predict_proba(self, data):
+    def predict_proba_from_dict(self, data):
         pass

@@ -28,5 +28,9 @@ class _Constants(object):
     def IRIS_MODEL():
         return 'iris_svc.pkl'
 
+    @constant
+    def PREDICTION_DEFAULT():
+        return None
+
 
 CONSTANTS = _Constants()

@@ -24,5 +24,10 @@ def predict(iris_data: IrisData,
 @router.post('/predict_async')
 async def predict_async(iris_data: IrisData,
                         background_tasks: BackgroundTasks):
-    job_id = await _iris.predict_async(iris_data, background_tasks)
+    job_id = await _iris.predict_async_post(iris_data, background_tasks)
     return job_id
+
+
+@router.get('/predict_async/{job_id}')
+def predict_async(job_id: str):
+    return _iris.predict_async_get(job_id)

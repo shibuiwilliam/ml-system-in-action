@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 from fastapi import BackgroundTasks
 from sklearn import datasets
 import numpy as np
@@ -6,8 +6,8 @@ import uuid
 import os
 import json
 import logging
-from pydantic import BaseModel
 
+from api.jobs import save_data_job, predict_job
 from ml.iris.iris_predictor import IrisClassifier, IrisData
 from constants import CONSTANTS
 
@@ -20,50 +20,68 @@ logger.info(f'active model name: {iris_model}')
 iris_classifier = IrisClassifier(iris_model)
 
 sample_data = IrisData(
-    data=datasets.load_iris().data[0].reshape((1, -1))[0].tolist())
+    np_data=datasets.load_iris().data[0].reshape((1, -1))[0])
 
 
-class SaveDataJob(BaseModel):
-    job_id: str
-    directory: str
-    data: List[float]
-    is_completed: bool = False
+def _save_data_job(iris_data: IrisData,
+                   background_tasks: BackgroundTasks) -> str:
+    num_files = str(len(os.listdir(CONSTANTS.IRIS_DATA_DIRECTORY)))
+    job_id = f'{str(uuid.uuid4())}_{num_files}'
+    _proba = iris_data.prediction_proba.tolist(
+    ) if iris_data.prediction_proba is not None else None
+    data = {
+        "prediction": iris_data.prediction,
+        "prediction_proba": _proba,
+        "data": iris_data.data,
+    }
+    task = save_data_job.SaveDataJob(
+        job_id=job_id,
+        directory=CONSTANTS.IRIS_DATA_DIRECTORY,
+        data=data)
+    background_tasks.add_task(task)
+    return job_id
 
-    def __call__(self):
-        jobs[self.job_id] = self
-        filePath = os.path.join(self.directory, f'{self.job_id}.json')
-        with open(filePath, 'w') as f:
-            json.dump(self.data, f)
-        self.is_completed = True
-        logger.info(f'completed save data: {self.job_id}')
 
-
-jobs: Dict[str, SaveDataJob] = {}
+def _predict_job(job_id: str,
+                 iris_data: IrisData,
+                 background_tasks: BackgroundTasks) -> str:
+    file_path = os.path.join(CONSTANTS.IRIS_DATA_DIRECTORY, f'{job_id}.json')
+    task = predict_job.PredictJob(
+        job_id=job_id,
+        file_path=file_path,
+        predictor=iris_classifier
+    )
+    background_tasks.add_task(task)
+    return job_id
 
 
 def test() -> Dict[str, int]:
-    y = iris_classifier.predict(sample_data)
-    return {'prediction': y}
+    iris_classifier.predict(sample_data)
+    return {'prediction': sample_data.prediction}
 
 
 def predict(iris_data: IrisData,
             background_tasks: BackgroundTasks) -> Dict[str, int]:
-    num_files = str(len(os.listdir(CONSTANTS.IRIS_DATA_DIRECTORY)))
-    job_id = f'{str(uuid.uuid4())}_{num_files}'
-    task = SaveDataJob(job_id=job_id,
-                       directory=CONSTANTS.IRIS_DATA_DIRECTORY,
-                       data=iris_data.data)
-    background_tasks.add_task(task)
-    y = iris_classifier.predict(iris_data)
-    return {'prediction': y}
+    _proba = iris_classifier.predict_proba(iris_data)
+    iris_data.prediction = int(np.argmax(_proba[0]))
+    _save_data_job(iris_data, background_tasks)
+    return {'prediction': iris_data.prediction}
 
 
-async def predict_async(iris_data: IrisData,
-                        background_tasks: BackgroundTasks) -> Dict[str, str]:
-    num_files = str(len(os.listdir(CONSTANTS.IRIS_DATA_DIRECTORY)))
-    job_id = f'{str(uuid.uuid4())}_{num_files}'
-    task = SaveDataJob(job_id=job_id,
-                       directory=CONSTANTS.IRIS_DATA_DIRECTORY,
-                       data=iris_data.data)
-    background_tasks.add_task(task)
+async def predict_async_post(
+        iris_data: IrisData,
+        background_tasks: BackgroundTasks) -> Dict[str, str]:
+    job_id = _save_data_job(iris_data, background_tasks)
+    job_id = _predict_job(job_id, iris_data, background_tasks)
     return {'job_id': job_id}
+
+
+def predict_async_get(job_id: str) -> Dict[str, int]:
+    file_path = job_id + '.json'
+    if file_path not in os.listdir(CONSTANTS.IRIS_DATA_DIRECTORY):
+        return {job_id: CONSTANTS.PREDICTION_DEFAULT}
+    with open(os.path.join(CONSTANTS.IRIS_DATA_DIRECTORY, file_path), 'r') as f:
+        iris_dict = json.load(f)
+    if iris_dict.get('prediction', CONSTANTS.PREDICTION_DEFAULT) == CONSTANTS.PREDICTION_DEFAULT:
+        return {job_id: CONSTANTS.PREDICTION_DEFAULT}
+    return {job_id: iris_dict['prediction']}
