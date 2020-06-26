@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get('/')
+@router.get('')
 def health():
     return _health.health()
 
