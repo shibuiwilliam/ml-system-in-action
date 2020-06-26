@@ -2,18 +2,27 @@ import os
 from fastapi import FastAPI
 import logging
 
-from api import health, iris
+from api import health, predict
 from constants import CONSTANTS
 
 TITLE = os.getenv('FASTAPI_TITLE', 'fastapi application')
 DESCRIPTION = os.getenv('FASTAPI_DESCRIPTION', 'fastapi description')
-VERSION = os.getenv('FASTAPI_VERSION', 'fastapi version')
+VERSION = os.getenv('FASTAPI_VERSION', '0.1')
+
+# can be docker, docker_compose, or kubernetes
+PLATFORM = os.getenv('PLATFORM', CONSTANTS.PLATFORM_DOCKER)
+PLATFORM = PLATFORM if PLATFORM in (
+    CONSTANTS.PLATFORM_DOCKER,
+    CONSTANTS.PLATFORM_DOCKER_COMPOSE,
+    CONSTANTS.PLATFORM_KUBERNETES) else CONSTANTS.PLATFORM_DOCKER
 
 logger = logging.getLogger(__name__)
-logger.info(f'Starts {TITLE}:{VERSION}')
+logger.info(f'starts {TITLE}:{VERSION} in {PLATFORM}')
 
 os.makedirs(CONSTANTS.DATA_DIRECTORY, exist_ok=True)
-os.makedirs(CONSTANTS.IRIS_DATA_DIRECTORY, exist_ok=True)
+
+if PLATFORM == CONSTANTS.PLATFORM_DOCKER:
+    os.makedirs(CONSTANTS.DATA_FILE_DIRECTORY, exist_ok=True)
 
 
 app = FastAPI(
@@ -29,7 +38,7 @@ app.include_router(
 )
 
 app.include_router(
-    iris.router,
-    prefix='/iris',
-    tags=['iris']
+    predict.router,
+    prefix='/predict',
+    tags=['predict']
 )

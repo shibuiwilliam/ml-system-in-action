@@ -9,6 +9,18 @@ def constant(f):
 
 class _Constants(object):
     @constant
+    def PLATFORM_DOCKER():
+        return 'docker'
+
+    @constant
+    def PLATFORM_DOCKER_COMPOSE():
+        return 'docker_compose'
+
+    @constant
+    def PLATFORM_KUBERNETES():
+        return 'kubernetes'
+
+    @constant
     def MODEL_DIRECTORY():
         return './ml/models/'
 
@@ -17,12 +29,16 @@ class _Constants(object):
         return '/fastapi/app/data/'
 
     @constant
-    def IRIS_DATA_DIRECTORY():
-        return '/fastapi/app/data/iris/'
+    def DATA_FILE_DIRECTORY():
+        return '/fastapi/app/data/file/'
 
     @constant
     def MODEL_EXTENTIONS():
         return ['pkl', 'h5', 'hdf5']
+
+    @constant
+    def REDIS_INCREMENTS():
+        return 'increments'
 
     @constant
     def IRIS_MODEL():
@@ -30,7 +46,7 @@ class _Constants(object):
 
     @constant
     def PREDICTION_DEFAULT():
-        return None
+        return -1
 
 
 CONSTANTS = _Constants()
