@@ -2,7 +2,7 @@ from fastapi import APIRouter, BackgroundTasks
 import logging
 
 from . import _predict
-from ml.iris.iris_predictor import IrisData
+from ml.base_predictor import Data
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -15,16 +15,16 @@ def test():
 
 
 @router.post('')
-def predict(iris_data: IrisData,
+def predict(data: Data,
             background_tasks: BackgroundTasks):
-    prediction = _predict.predict(iris_data, background_tasks)
+    prediction = _predict.predict(data, background_tasks)
     return prediction
 
 
 @router.post('/async')
-async def predict_async(iris_data: IrisData,
+async def predict_async(data: Data,
                         background_tasks: BackgroundTasks):
-    job_id = await _predict.predict_async_post(iris_data, background_tasks)
+    job_id = await _predict.predict_async_post(data, background_tasks)
     return job_id
 
 

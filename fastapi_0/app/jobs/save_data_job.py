@@ -54,7 +54,7 @@ class SaveDataFileJob(SaveDataJob):
     def __call__(self):
         save_data_jobs[self.job_id] = self
         logger.info(
-            f'registered job: {self.job_id} in {self.__class__.__name__} as {id(self)}')
+            f'registered job: {self.job_id} in {self.__class__.__name__}')
         self.is_completed = save_data_file_job(
             self.job_id, self.directory, self.data)
         logger.info(f'completed save data: {self.job_id}')
@@ -68,7 +68,7 @@ class SaveDataRedisJob(SaveDataJob):
     def __call__(self):
         save_data_jobs[self.job_id] = self
         logger.info(
-            f'registered job: {self.job_id} in {self.__class__.__name__} as {id(self)}')
+            f'registered job: {self.job_id} in {self.__class__.__name__}')
         self.is_completed = save_data_redis_job(self.job_id, self.data)
         logger.info(f'completed save data: {self.job_id}')
 
