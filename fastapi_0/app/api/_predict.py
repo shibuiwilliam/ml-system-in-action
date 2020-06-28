@@ -9,13 +9,13 @@ import logging
 
 from jobs import save_data_job, predict_job
 from ml.iris.iris_predictor import IrisClassifier, IrisData
-from constants import CONSTANTS
+from constants import CONSTANTS, PLATFORM_ENUM
 from middleware import redis
 
 
 logger = logging.getLogger(__name__)
 
-PLATFORM = os.getenv('PLATFORM', CONSTANTS.PLATFORM_DOCKER)
+PLATFORM = os.getenv('PLATFORM', PLATFORM_ENUM.DOCKER.value)
 
 default_iris_model = CONSTANTS.IRIS_MODEL
 iris_model = os.getenv('IRIS_MODEL', CONSTANTS.IRIS_MODEL)
@@ -29,11 +29,15 @@ sample_data = IrisData(
 
 def _save_data_job(iris_data: IrisData,
                    background_tasks: BackgroundTasks) -> str:
-    if PLATFORM == CONSTANTS.PLATFORM_DOCKER:
+    if PLATFORM == PLATFORM_ENUM.DOCKER.value:
         num_files = str(len(os.listdir(CONSTANTS.DATA_FILE_DIRECTORY)))
-    elif PLATFORM == CONSTANTS.PLATFORM_DOCKER_COMPOSE:
+    elif PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         incr = redis.redis_connector.get(CONSTANTS.REDIS_INCREMENTS)
         num_files = 0 if incr is None else incr
+    elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
+        pass
+    else:
+        pass
 
     job_id = f'{str(uuid.uuid4())}_{num_files}'
     _proba = iris_data.prediction_proba.tolist(
@@ -44,15 +48,19 @@ def _save_data_job(iris_data: IrisData,
         'data': iris_data.data,
     }
 
-    if PLATFORM == CONSTANTS.PLATFORM_DOCKER:
+    if PLATFORM == PLATFORM_ENUM.DOCKER.value:
         task = save_data_job.SaveDataFileJob(
             job_id=job_id,
             directory=CONSTANTS.DATA_FILE_DIRECTORY,
             data=data)
-    elif PLATFORM == CONSTANTS.PLATFORM_DOCKER_COMPOSE:
+    elif PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         task = save_data_job.SaveDataRedisJob(
             job_id=job_id,
             data=data)
+    elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
+        pass
+    else:
+        pass
     background_tasks.add_task(task)
     return job_id
 
@@ -60,17 +68,22 @@ def _save_data_job(iris_data: IrisData,
 def _predict_job(job_id: str,
                  iris_data: IrisData,
                  background_tasks: BackgroundTasks) -> str:
-    if PLATFORM == CONSTANTS.PLATFORM_DOCKER:
+    if PLATFORM == PLATFORM_ENUM.DOCKER.value:
         task = predict_job.PredictFromFileJob(
             job_id=job_id,
             directory=CONSTANTS.DATA_FILE_DIRECTORY,
             predictor=iris_classifier
         )
-    if PLATFORM == CONSTANTS.PLATFORM_DOCKER_COMPOSE:
+    elif PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         task = predict_job.PredictFromRedisJob(
             job_id=job_id,
             predictor=iris_classifier
         )
+    elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
+        pass
+    else:
+        pass
+
     background_tasks.add_task(task)
     return job_id
 
@@ -98,16 +111,21 @@ async def predict_async_post(
 
 
 def predict_async_get(job_id: str) -> Dict[str, int]:
-    if PLATFORM == CONSTANTS.PLATFORM_DOCKER:
-        file_path = os.path.join(CONSTANTS.DATA_FILE_DIRECTORY, job_id + '.json')
+    if PLATFORM == PLATFORM_ENUM.DOCKER.value:
+        file_path = os.path.join(
+            CONSTANTS.DATA_FILE_DIRECTORY, job_id + '.json')
         if not os.path.exists(file_path):
             return {job_id: CONSTANTS.PREDICTION_DEFAULT}
         with open(file_path, 'r') as f:
             data_dict = json.load(f)
-        return {job_id: data_dict.get('prediction', CONSTANTS.PREDICTION_DEFAULT)}
+        return {
+            job_id: data_dict.get('prediction', CONSTANTS.PREDICTION_DEFAULT)
+        }
 
-    elif PLATFORM == CONSTANTS.PLATFORM_DOCKER_COMPOSE:
+    elif PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = redis.redis_connector.hgetall(job_id)
         if data_dict is None:
             return {job_id: CONSTANTS.PREDICTION_DEFAULT}
-        return {job_id: data_dict.get('prediction', CONSTANTS.PREDICTION_DEFAULT)}
+        return {job_id: int(data_dict.get(
+                'prediction', CONSTANTS.PREDICTION_DEFAULT))
+                }

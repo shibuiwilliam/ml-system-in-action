@@ -1,3 +1,12 @@
+import enum
+
+
+class PLATFORM_ENUM(enum.Enum):
+    DOCKER = 'docker'
+    DOCKER_COMPOSE = 'docker_compose'
+    KUBERNETES = 'kubernetes'
+
+
 def constant(f):
     def fset(self, value):
         raise TypeError
@@ -8,18 +17,6 @@ def constant(f):
 
 
 class _Constants(object):
-    @constant
-    def PLATFORM_DOCKER():
-        return 'docker'
-
-    @constant
-    def PLATFORM_DOCKER_COMPOSE():
-        return 'docker_compose'
-
-    @constant
-    def PLATFORM_KUBERNETES():
-        return 'kubernetes'
-
     @constant
     def MODEL_DIRECTORY():
         return './ml/models/'
@@ -47,6 +44,10 @@ class _Constants(object):
     @constant
     def PREDICTION_DEFAULT():
         return -1
+
+    @constant
+    def SEPARATOR():
+        return ';'
 
 
 CONSTANTS = _Constants()

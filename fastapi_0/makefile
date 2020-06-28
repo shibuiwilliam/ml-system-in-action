@@ -64,7 +64,7 @@ clean:
 	$(dockerRm)
 	docker rmi -f $(imageName):$(imageVersion)
 
-compose_build:
+compose_build: pip_freeze
 	$(composeBuild)
 
 compose_up:

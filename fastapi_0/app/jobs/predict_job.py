@@ -60,23 +60,31 @@ class PredictFromRedisJob(PredictJob):
             logger.info(data_dict)
             if data_dict is None:
                 continue
-            if 'prediction' in data_dict.keys() and data_dict['prediction'] != CONSTANTS.PREDICTION_DEFAULT:
-                break
+            if 'prediction' in data_dict.keys():
+                if int(data_dict['prediction']) !=\
+                        CONSTANTS.PREDICTION_DEFAULT:
+                    break
+            _data_dict = {}
             for k, v in data_dict.items():
                 if v.startswith('list_'):
                     _v = v.split('_')
                     _type = _v[1]
+                    _value = _v[2]
                     if _type == 'int':
-                        data_dict[k] = [int(n) for n in _v.split(',')]
+                        _data_dict[k] = [int(n) for n in _value.split(
+                            CONSTANTS.SEPARATOR)]
                     elif _type == 'float':
-                        data_dict[k] = [float(n) for n in _v.split(',')]
+                        _data_dict[k] = [float(n) for n in _value.split(
+                            CONSTANTS.SEPARATOR)]
                     elif _type == 'str':
-                        data_dict[k] = _v.split(',')
-            logger.info(data_dict)
-            _proba = self.predictor.predict_proba_from_dict(data_dict)
-            data_dict['prediction'] = int(np.argmax(_proba[0]))
-            data_dict['prediction_proba'] = _proba.tolist()
-            save_data_job.save_data_redis_job(self.job_id, data_dict)
+                        _data_dict[k] = _value.split(CONSTANTS.SEPARATOR)
+                else:
+                    _data_dict[k] = v
+            logger.info(_data_dict)
+            _proba = self.predictor.predict_proba_from_dict(_data_dict)
+            _data_dict['prediction'] = int(np.argmax(_proba[0]))
+            _data_dict['prediction_proba'] = _proba[0].tolist()
+            save_data_job.save_data_redis_job(self.job_id, _data_dict)
             self.is_completed = True
             break
         logger.info(f'completed prediction: {self.job_id}')

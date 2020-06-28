@@ -15,9 +15,10 @@ logger = logging.getLogger(__name__)
 class IrisData(BaseModel):
     data: List[float] = None
     np_data: np.ndarray = None
-    input_shape: Tuple[int] = (1, 4)
+    data_shape: Tuple[int] = (1, 4)
     prediction: int = CONSTANTS.PREDICTION_DEFAULT
     prediction_proba: np.ndarray = None
+    proba_shape: Tuple[int] = (1, 3)
 
     class Config:
         arbitrary_types_allowed = True
@@ -45,13 +46,19 @@ class IrisClassifier(Predictor):
 
     def predict_proba(self, iris_data: IrisData) -> np.ndarray:
         logger.info(f'predict proba {self.__class__.__name__}')
+
         if iris_data.np_data is None:
             iris_data.np_data = np.array(iris_data.data).astype(np.float64)
-        if iris_data.np_data.shape != iris_data.input_shape:
+        if iris_data.np_data.shape != iris_data.data_shape:
             iris_data.np_data = iris_data.np_data.reshape(
-                iris_data.input_shape)
+                iris_data.data_shape)
+
         iris_data.prediction_proba = self.classifier.predict_proba(
             iris_data.np_data)
+        if iris_data.prediction_proba.shape != iris_data.proba_shape:
+            iris_data.prediction_proba = iris_data.prediction_proba.reshape(
+                iris_data.proba_shape)
+
         logger.info({
             'prediction': {
                 'data': iris_data.np_data,
