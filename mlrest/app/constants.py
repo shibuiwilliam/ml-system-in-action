@@ -2,9 +2,13 @@ import enum
 
 
 class PLATFORM_ENUM(enum.Enum):
-    DOCKER = 'docker'
     DOCKER_COMPOSE = 'docker_compose'
     KUBERNETES = 'kubernetes'
+
+
+class PHYSICAL_SAVE_DATA(enum.Enum):
+    NO_SAVE = 0
+    SAVE = 1
 
 
 def constant(f):
@@ -19,7 +23,7 @@ def constant(f):
 class _Constants(object):
     @constant
     def MODEL_DIRECTORY():
-        return './ml/models/'
+        return '/fastapi/app/ml/models/'
 
     @constant
     def DATA_DIRECTORY():
@@ -36,10 +40,6 @@ class _Constants(object):
     @constant
     def REDIS_INCREMENTS():
         return 'increments'
-
-    @constant
-    def IRIS_MODEL():
-        return 'iris_svc.pkl'
 
     @constant
     def PREDICTION_DEFAULT():

@@ -19,7 +19,7 @@ def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
 
 def save_data_redis_job(job_id: str, data: Any) -> bool:
     redis.redis_connector.incr(CONSTANTS.REDIS_INCREMENTS)
-    logger.info(data)
+    logger.info({job_id: data})
     _data = {}
     for k, v in data.items():
         if isinstance(v, List) or isinstance(v, Tuple):

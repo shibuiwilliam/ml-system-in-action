@@ -2,7 +2,7 @@ from fastapi import APIRouter, BackgroundTasks
 import logging
 
 from . import _predict
-from ml.base_predictor import Data
+from ml.active_predictor import Data
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

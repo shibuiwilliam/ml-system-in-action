@@ -2,16 +2,16 @@
 
 set -eu
 
-GU=${GU:-"G"}
+GUNICORN_UVICORN=${GUNICORN_UVICORN:-"GUNICORN"}
 HOST=${HOST:-"0.0.0.0"}
 PORT=${PORT:-8888}
-WORKERS=${WORKER:-4}
+WORKERS=${WORKERS:-4}
 UVICORN_WORKER=${UVICORN_WORKER:-"uvicorn.workers.UvicornWorker"}
 LOGLEVEL=${LOGLEVEL:-"debug"}
 LOGCONFIG=${LOGCONFIG:-"./logging.conf"}
 
 
-if [ ${GU} = "G" ]; then
+if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
     gunicorn app:app \
         -b ${HOST}:${PORT} \
         -w ${WORKERS} \

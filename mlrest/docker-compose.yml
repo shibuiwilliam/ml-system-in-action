@@ -2,10 +2,12 @@ version: '3'
 
 services:
   app:
-    container_name: fastapi_0_app
+    container_name: mlrest_app
     build: ./
     environment:
       - PLATFORM=docker_compose
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
     volumes:
       - ./container_files/logs/gunicorn_error.log:/var/log/gunicorn_error.log
       - ./container_files/logs/uvicorn_error.log:/var/log/uvicorn_error.log
@@ -17,6 +19,7 @@ services:
     command: ./run.sh
 
   redis:
+    container_name: mlrest_redis
     image: "redis:latest"
     ports:
       - "6379:6379"
