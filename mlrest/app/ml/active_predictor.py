@@ -1,5 +1,5 @@
-from ml.iris.iris_predictor import IrisClassifier, IrisData
-from configurations import configurations
+from app.ml.iris.iris_predictor import IrisClassifier, IrisData
+from app.configurations import configurations
 import logging
 
 

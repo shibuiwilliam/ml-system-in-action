@@ -1,10 +1,10 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import joblib
 import numpy as np
 
-from constants import CONSTANTS
-from ml import load_model
-from ml.abstract_predictor import BaseData, BasePredictor
+from app.constants import CONSTANTS
+from app.ml import load_model
+from app.ml.abstract_predictor import BaseData, BasePredictor
 import logging
 
 
@@ -12,7 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class IrisData(BaseData):
-    test_data: List[float] = [[5.1, 3.5, 1.4, 0.2]]
+    test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+    data_shape: Tuple[int] = (1, 4)
+    proba_shape: Tuple[int] = (1, 3)
 
 
 class IrisClassifier(BasePredictor):
@@ -38,6 +40,8 @@ class IrisClassifier(BasePredictor):
         logger.info(f'run predict proba in {self.__class__.__name__}')
 
         if iris_data.np_data is None:
+            if iris_data.data is None:
+                raise ValueError()
             iris_data.np_data = np.array(iris_data.data).astype(np.float64)
         if iris_data.np_data.shape != iris_data.data_shape:
             iris_data.np_data = iris_data.np_data.reshape(

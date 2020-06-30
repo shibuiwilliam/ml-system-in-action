@@ -8,11 +8,11 @@ PORT=${PORT:-8888}
 WORKERS=${WORKERS:-4}
 UVICORN_WORKER=${UVICORN_WORKER:-"uvicorn.workers.UvicornWorker"}
 LOGLEVEL=${LOGLEVEL:-"debug"}
-LOGCONFIG=${LOGCONFIG:-"./logging.conf"}
+LOGCONFIG=${LOGCONFIG:-"./app/logging.conf"}
 
 
 if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
-    gunicorn app:app \
+    gunicorn app.app:app \
         -b ${HOST}:${PORT} \
         -w ${WORKERS} \
         -k ${UVICORN_WORKER}  \
@@ -20,7 +20,7 @@ if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
         --log-config ${LOGCONFIG}
 
 else
-    uvicorn app:app \
+    uvicorn app.app:app \
         --host ${HOST} \
         --port ${PORT} \
         --workers ${WORKERS} \

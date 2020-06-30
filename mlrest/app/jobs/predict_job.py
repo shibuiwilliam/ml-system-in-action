@@ -5,8 +5,8 @@ import numpy as np
 from pydantic import BaseModel
 import json
 
-from constants import CONSTANTS
-from middleware import redis
+from app.constants import CONSTANTS
+from app.middleware import redis
 from . import save_data_job
 
 logger = logging.getLogger(__name__)

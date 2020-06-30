@@ -7,10 +7,10 @@ import os
 import json
 import logging
 
-from jobs import save_data_job, predict_job
-from ml.active_predictor import Data, predictor
-from constants import CONSTANTS, PLATFORM_ENUM
-from middleware import redis
+from app.jobs import save_data_job, predict_job
+from app.ml.active_predictor import Data, predictor
+from app.constants import CONSTANTS, PLATFORM_ENUM
+from app.middleware import redis
 
 
 logger = logging.getLogger(__name__)

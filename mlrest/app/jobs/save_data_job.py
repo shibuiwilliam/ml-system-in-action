@@ -4,8 +4,8 @@ import logging
 from pydantic import BaseModel
 import json
 
-from constants import CONSTANTS
-from middleware import redis
+from app.constants import CONSTANTS
+from app.middleware import redis
 
 logger = logging.getLogger(__name__)
 

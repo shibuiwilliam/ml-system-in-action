@@ -1,6 +1,6 @@
 import os
 from typing import List
-from constants import CONSTANTS
+from app.constants import CONSTANTS
 import logging
 
 logger = logging.getLogger(__name__)

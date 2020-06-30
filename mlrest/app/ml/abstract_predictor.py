@@ -1,74 +1,21 @@
 from abc import ABCMeta, abstractmethod
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 from typing import List, Tuple
 import numpy as np
 
 
-class BaseData(BaseModel, metaclass=ABCMeta):
+class BaseData(BaseModel):
+    data: List[float] = None
+    np_data: np.ndarray = None
+    data_shape: Tuple[int] = None
+    prediction: int = None
+    proba_shape: Tuple[int] = None
+    prediction_proba: np.ndarray = None
 
-    @abstractmethod
-    def __init__(self):
-        raise NotImplementedError()
+    class Config:
+        arbitrary_types_allowed = True
+        extra = Extra.allow
 
-    @property
-    def data_shape(self):
-        return self._data_shape
-
-    @data_shape.setter
-    def data_shape(self, value):
-        if not isinstance(value, Tuple[int]):
-            raise TypeError(value)
-        self._data_shape = value
-
-    @property
-    def data(self):
-        return self._data
-
-    @data.setter
-    def data(self, value):
-        if not isinstance(value, List[float]):
-            raise TypeError(value)
-        self._data = value
-
-    @property
-    def np_data(self):
-        return self._np_data
-
-    @np_data.setter
-    def np_data(self, value):
-        if not isinstance(value, np.ndarray):
-            raise TypeError(value)
-        self._np_data = value
-
-    @property
-    def prediction(self):
-        return self._prediction
-
-    @prediction.setter
-    def prediction(self, value):
-        if not isinstance(value, int):
-            raise TypeError(value)
-        self._prediction = value
-
-    @property
-    def proba_shape(self):
-        return self._proba_shape
-
-    @proba_shape.setter
-    def proba_shape(self, value):
-        if not isinstance(value, Tuple[int]):
-            raise TypeError(value)
-        self._proba_shape = value
-
-    @property
-    def prediction_proba(self):
-        return self._prediction_proba
-
-    @prediction_proba.setter
-    def prediction_proba(self, value):
-        if not isinstance(value, np.ndarray):
-            raise TypeError(value)
-        self._prediction_proba = value
 
 
 class BasePredictor(metaclass=ABCMeta):

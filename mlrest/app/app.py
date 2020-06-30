@@ -2,8 +2,8 @@ import os
 from fastapi import FastAPI
 import logging
 
-from api import health, predict
-from constants import CONSTANTS, PLATFORM_ENUM
+from app.api import health, predict
+from app.constants import CONSTANTS, PLATFORM_ENUM
 
 TITLE = os.getenv('FASTAPI_TITLE', 'ML Rest')
 DESCRIPTION = os.getenv('FASTAPI_DESCRIPTION', 'ML rest description')

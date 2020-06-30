@@ -1,5 +1,5 @@
 import os
-from constants import PHYSICAL_SAVE_DATA
+from app.constants import PHYSICAL_SAVE_DATA
 
 
 class _Configurations():
