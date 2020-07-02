@@ -22,7 +22,12 @@ def save_data_redis_job(job_id: str, data: Any) -> bool:
     logger.info({job_id: data})
     _data = {}
     for k, v in data.items():
-        if isinstance(v, List) or isinstance(v, Tuple):
+        if v is None:
+            if k == 'prediction':
+                _data[k] = CONSTANTS.PREDICTION_DEFAULT
+            else:
+                _data[k] = 'None'
+        elif isinstance(v, List) or isinstance(v, Tuple):
             if isinstance(v[0], int):
                 _type = 'int'
             elif isinstance(v[0], float):

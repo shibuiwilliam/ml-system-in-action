@@ -1,9 +1,36 @@
-# import pytest
-# from app.ml import load_model
+import pytest
+from app.ml.load_model import get_model_files, get_model_file
 
 
-# def test_ml_load_model(mocker):
-#     files_mock = mocker.Mock()
-#     files_mock.patch('os.listdir', return_value=[])
-#     files = load_model.get_model_files()
-#     assert files == []
+@pytest.mark.parametrize(
+    ('name', 'fallback_name', 'model_directory', 'expected'),
+    [('a.pkl', 'b.pkl', '/tmp/', ['a.pkl', 'b.pkl']),
+     ('a.pkl', 'b.pkl', '/tmp/', ['c.pkl', 'd.pkl'])]
+)
+def test_get_model_files(
+        mocker,
+        name,
+        fallback_name,
+        model_directory,
+        expected):
+    mocker.patch('os.listdir', return_value=[expected[0], expected[1]])
+    files = get_model_files(model_directory)
+    assert files == expected
+
+
+@pytest.mark.parametrize(
+    ('name', 'fallback_name', 'model_directory', 'files', 'expected'),
+    [('a.pkl', 'b.pkl', '/tmp/', ['a.pkl', 'b.pkl'], '/tmp/a.pkl'),
+     ('a.pkl', 'b.pkl', '/tmp/', ['b.pkl'], '/tmp/b.pkl')]
+)
+def test_get_model_file(
+        mocker,
+        name,
+        fallback_name,
+        model_directory,
+        files,
+        expected):
+    mocker.patch('app.ml.load_model.get_model_files',
+                 return_value=files)
+    found_model_filepath = get_model_file(name, fallback_name, model_directory)
+    assert found_model_filepath == expected
