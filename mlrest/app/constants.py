@@ -46,6 +46,18 @@ class _Constants(object):
         return -1
 
     @constant
+    def NONE_DEFAULT():
+        return 'NONEDEFAULT'
+
+    @constant
+    def NONE_DEFAULT_LIST():
+        return ['NONEDEFAULT']
+
+    @constant
+    def NONE_DEFAULT_LIST_CONVERTED():
+        return 'list_str_NONEDEFAULT'
+
+    @constant
     def SEPARATOR():
         return ';'
 

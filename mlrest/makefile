@@ -1,7 +1,13 @@
 absolutePath := $(shell pwd)
+dockerfileDir := dockerfiles
+
 imageName := mlrest_app
 imageVersion := latest
 containerName := mlrest_app
+
+testContainerFile := DockerfileTest
+testImageVersion := test
+testContainerName := test
 
 composeBuild := docker-compose build
 composeUp := docker-compose up -d
@@ -10,7 +16,11 @@ composeDown := docker-compose down
 requirements := requirements.txt
 pipFreeze := pip freeze > $(requirements)
 
-.PHONY: clean pip_freeze dirs compose_build compose_up compose_down
+pytest := pytest -v -s ./tests/
+pytestD := docker build -t $(imageName):$(testImageVersion) -f $(dockerfileDir)/$(testContainerFile) . && \
+ 		   docker run --rm --name $(testContainerName) $(imageName):$(testImageVersion) $(pytest)
+
+.PHONY: clean pip_freeze dirs compose_build compose_up compose_down test test_d
 dirs:
 	mkdir -p container_files/logs
 	mkdir -p container_files/data
@@ -33,3 +43,9 @@ compose_up:
 
 compose_down:
 	$(composeDown)
+
+test:
+	$(pytest)
+
+test_d: pip_freeze dirs
+	$(pytestD)

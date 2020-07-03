@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from pydantic import BaseModel, Extra
-from typing import List, Tuple
+from typing import List, Tuple, Any
 import numpy as np
 
 
@@ -17,16 +17,15 @@ class BaseData(BaseModel):
         extra = Extra.allow
 
 
-
 class BasePredictor(metaclass=ABCMeta):
     @abstractmethod
     def load_model(self):
         raise NotImplementedError()
 
     @abstractmethod
-    def predict_proba(self, data):
+    def predict_proba(self, data) -> Any:
         raise NotImplementedError()
 
     @abstractmethod
-    def predict_proba_from_dict(self, data):
+    def predict_proba_from_dict(self, data) -> Any:
         raise NotImplementedError()

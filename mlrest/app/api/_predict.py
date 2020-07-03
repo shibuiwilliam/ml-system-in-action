@@ -24,8 +24,9 @@ def _save_data_job(data: Data,
         incr = redis.redis_connector.get(CONSTANTS.REDIS_INCREMENTS)
         num_files = 0 if incr is None else incr
         job_id = f'{str(uuid.uuid4())}_{num_files}'
-        _proba = data.prediction_proba.tolist(
-        ) if data.prediction_proba is not None else [-0.1]
+        _proba = data.prediction_proba.tolist() \
+            if data.prediction_proba is not None \
+            else CONSTANTS.NONE_DEFAULT_LIST
         data = {
             'prediction': data.prediction,
             'prediction_proba': _proba,
@@ -85,13 +86,13 @@ async def predict_async_post(
 
 
 def predict_async_get(job_id: str) -> Dict[str, int]:
-    result = {job_id: {'prediction': CONSTANTS.PREDICTION_DEFAULT}}
+    result = {job_id: {'prediction': CONSTANTS.NONE_DEFAULT}}
     if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = redis.redis_connector.hgetall(job_id)
         result[job_id]['prediction'] = int(
             data_dict.get(
                 'prediction',
-                CONSTANTS.PREDICTION_DEFAULT)) if data_dict is not None else CONSTANTS.PREDICTION_DEFAULT
+                CONSTANTS.NONE_DEFAULT)) if data_dict is not None else CONSTANTS.NONE_DEFAULT
         return result
 
     elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:

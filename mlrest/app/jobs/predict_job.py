@@ -1,15 +1,65 @@
 import os
-from typing import Dict, Any
+from typing import Dict, Any, List
 import logging
 import numpy as np
 from pydantic import BaseModel
 import json
 
 from app.constants import CONSTANTS
-from app.middleware import redis
+from app.middleware import redis, redis_utils
 from . import save_data_job
 
 logger = logging.getLogger(__name__)
+
+
+def predict_from_file(job_id: str,
+                      directory: str,
+                      predictor: Any) -> Dict[str, Any]:
+    file_path = os.path.join(directory, f'{job_id}.json')
+    if not os.path.exists(file_path):
+        return None
+    with open(file_path, 'r') as f:
+        data_dict = json.load(f)
+    if 'prediction_proba' in data_dict.keys() and \
+            data_dict['prediction_proba'] != CONSTANTS.NONE_DEFAULT_LIST:
+        data_dict['prediction'] = int(
+            np.argmax(
+                data_dict['prediction_proba']
+                if isinstance(data_dict['prediction_proba'], np.ndarray)
+                else np.array(data_dict['prediction_proba'])))
+    if 'prediction' in data_dict.keys() and \
+            data_dict['prediction'] != CONSTANTS.NONE_DEFAULT:
+        return data_dict
+    else:
+        if 'data' not in data_dict.keys() or data_dict.get('data', None) is None:
+            return None
+        _proba = predictor.predict_proba_from_dict(data_dict)
+        data_dict['prediction'] = int(np.argmax(_proba[0]))
+        data_dict['prediction_proba'] = _proba[0].tolist()
+        return data_dict
+
+
+def predict_from_redis_cache(job_id: str, predictor: Any) -> Dict[str, Any]:
+    data_dict = redis.redis_connector.hgetall(job_id)
+    logger.info(data_dict)
+    if data_dict is None:
+        return None
+    _data_dict = redis_utils.revert_cache(data_dict)
+    if 'prediction_proba' in _data_dict.keys() and \
+            _data_dict['prediction_proba'] != CONSTANTS.NONE_DEFAULT_LIST:
+        _data_dict['prediction'] = int(
+            np.argmax(np.array(_data_dict['prediction_proba'])))
+    if 'prediction' in _data_dict.keys() and \
+            _data_dict['prediction'] != CONSTANTS.NONE_DEFAULT:
+        return _data_dict
+    else:
+        if 'data' not in _data_dict.keys() or _data_dict.get('data', None) is None:
+            return None
+        logger.info(_data_dict)
+        _proba = predictor.predict_proba_from_dict(_data_dict)
+        _data_dict['prediction'] = int(np.argmax(_proba[0]))
+        _data_dict['prediction_proba'] = _proba[0].tolist()
+        return _data_dict
 
 
 class PredictJob(BaseModel):
@@ -28,21 +78,29 @@ class PredictFromFileJob(PredictJob):
         predict_jobs[self.job_id] = self
         logger.info(
             f'registered job: {self.job_id} in {self.__class__.__name__}')
-        file_path = os.path.join(self.directory, f'{self.job_id}.json')
         while True:
-            if not os.path.exists(file_path):
-                continue
-            with open(file_path, 'r') as f:
-                data_dict = json.load(f)
-            if data_dict['prediction'] != CONSTANTS.PREDICTION_DEFAULT:
+            data_dict = predict_from_file(
+                self.job_id, self.directory, self.predictor)
+            if data_dict is not None:
                 break
-            _proba = self.predictor.predict_proba_from_dict(data_dict)
-            data_dict['prediction'] = int(np.argmax(_proba[0]))
-            data_dict['prediction_proba'] = _proba.tolist()
-            save_data_job.save_data_file_job(
-                self.job_id, self.directory, data_dict)
-            self.is_completed = True
-            break
+        save_data_job.save_data_file_job(
+            self.job_id, self.directory, data_dict)
+        # file_path = os.path.join(self.directory, f'{self.job_id}.json')
+        # while True:
+        #     if not os.path.exists(file_path):
+        #         continue
+        #     with open(file_path, 'r') as f:
+        #         data_dict = json.load(f)
+        #     if data_dict['prediction'] != CONSTANTS.NONE_DEFAULT:
+        #         break
+        #     _proba = self.predictor.predict_proba_from_dict(data_dict)
+        #     data_dict['prediction'] = int(np.argmax(_proba[0]))
+        #     data_dict['prediction_proba'] = _proba.tolist()
+        #     save_data_job.save_data_file_job(
+        #         self.job_id, self.directory, data_dict)
+        #     self.is_completed = True
+        #     break
+        self.is_completed = True
         logger.info(f'completed prediction: {self.job_id}')
 
 
@@ -56,37 +114,27 @@ class PredictFromRedisJob(PredictJob):
         logger.info(
             f'registered job: {self.job_id} in {self.__class__.__name__}')
         while True:
-            data_dict = redis.redis_connector.hgetall(self.job_id)
-            logger.info(data_dict)
-            if data_dict is None:
-                continue
-            if 'prediction' in data_dict.keys():
-                if int(data_dict['prediction']) !=\
-                        CONSTANTS.PREDICTION_DEFAULT:
-                    break
-            _data_dict = {}
-            for k, v in data_dict.items():
-                if v.startswith('list_'):
-                    _v = v.split('_')
-                    _type = _v[1]
-                    _value = _v[2]
-                    if _type == 'int':
-                        _data_dict[k] = [int(n) for n in _value.split(
-                            CONSTANTS.SEPARATOR)]
-                    elif _type == 'float':
-                        _data_dict[k] = [float(n) for n in _value.split(
-                            CONSTANTS.SEPARATOR)]
-                    elif _type == 'str':
-                        _data_dict[k] = _value.split(CONSTANTS.SEPARATOR)
-                else:
-                    _data_dict[k] = v
-            logger.info(_data_dict)
-            _proba = self.predictor.predict_proba_from_dict(_data_dict)
-            _data_dict['prediction'] = int(np.argmax(_proba[0]))
-            _data_dict['prediction_proba'] = _proba[0].tolist()
-            save_data_job.save_data_redis_job(self.job_id, _data_dict)
-            self.is_completed = True
-            break
+            data_dict = predict_from_redis_cache(self.job_id, self.predictor)
+            if data_dict is not None:
+                break
+        save_data_job.save_data_redis_job(self.job_id, data_dict)
+        # while True:
+        #     data_dict = redis.redis_connector.hgetall(self.job_id)
+        #     logger.info(data_dict)
+        #     if data_dict is None:
+        #         continue
+        #     if 'prediction' in data_dict.keys() and \
+        #             data_dict['prediction'] != CONSTANTS.NONE_DEFAULT:
+        #         break
+        #     _data_dict = redis_utils.revert_cache(data_dict)
+        #     logger.info(_data_dict)
+        #     _proba = self.predictor.predict_proba_from_dict(_data_dict)
+        #     _data_dict['prediction'] = int(np.argmax(_proba[0]))
+        #     _data_dict['prediction_proba'] = _proba[0].tolist()
+        #     save_data_job.save_data_redis_job(self.job_id, _data_dict)
+        #     self.is_completed = True
+        #     break
+        self.is_completed = True
         logger.info(f'completed prediction: {self.job_id}')
 
 
