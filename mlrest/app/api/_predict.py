@@ -87,10 +87,10 @@ def _predict_async_get(job_id: str) -> Dict[str, int]:
     result = {job_id: {'prediction': CONSTANTS.NONE_DEFAULT}}
     if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = redis.redis_connector.hgetall(job_id)
-        result[job_id]['prediction'] = int(
-            data_dict.get(
-                'prediction',
-                CONSTANTS.NONE_DEFAULT)) if data_dict is not None else CONSTANTS.NONE_DEFAULT
+        if data_dict is None or 'prediction' not in data_dict.keys():
+            result[job_id]['prediction'] = CONSTANTS.NONE_DEFAULT
+            return result
+        result[job_id]['prediction'] = data_dict['prediction']
         return result
 
     elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:

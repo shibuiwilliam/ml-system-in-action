@@ -101,3 +101,36 @@ def test_predict(mocker, proba, expected):
     mocker.patch('app.api._predict._save_data_job', return_value=job_id)
     result = _predict(MockData(), mock_BackgroundTasks)
     assert result['prediction'] == expected['prediction']
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ('job_id'),
+    [(job_id)]
+)
+async def test_predict_async_post(mocker, job_id):
+    mocker.patch('app.api._predict._save_data_job', return_value=job_id)
+    mocker.patch('app.api._predict._predict_job', return_value=job_id)
+    result = await _predict_async_post(MockData(), mock_BackgroundTasks)
+    assert result['job_id'] == job_id
+
+
+@pytest.mark.parametrize(
+    ('job_id', 'data_dict', 'expected'),
+    [(job_id,
+      {'data': [1.0, -1.0], 'prediction': 0, 'prediction_proba': np.array([[0.9, 0.1]])},
+      {job_id: {'prediction': 0}}),
+     (job_id,
+      None,
+      {job_id: {'prediction': CONSTANTS.NONE_DEFAULT}}),
+     (job_id,
+      {'data': [1.0, -1.0], 'prediction_proba': np.array([[0.9, 0.1]])},
+      {job_id: {'prediction': CONSTANTS.NONE_DEFAULT}})]
+)
+def test_predict_async_get(mocker, job_id, data_dict, expected):
+    app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
+    mocker.patch(
+        'app.middleware.redis.redis_connector.hgetall',
+        return_value=data_dict)
+    result = _predict_async_get(job_id)
+    assert result == expected

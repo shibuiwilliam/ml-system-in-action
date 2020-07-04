@@ -4,7 +4,7 @@ import numpy as np
 
 from app.constants import CONSTANTS
 from app.ml import load_model
-from app.ml.abstract_predictor import BaseData, BasePredictor
+from app.ml.abstract_predictor import BaseData, BaseDataExtension, BasePredictor
 import logging
 
 
@@ -14,7 +14,12 @@ logger = logging.getLogger(__name__)
 class IrisData(BaseData):
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
     data_shape: Tuple[int] = (1, 4)
+    np_datatype = 'np.float64'
     proba_shape: Tuple[int] = (1, 3)
+
+
+class IrisDataExtension(BaseDataExtension):
+    pass
 
 
 class IrisClassifier(BasePredictor):

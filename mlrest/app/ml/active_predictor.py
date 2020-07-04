@@ -1,14 +1,19 @@
-from app.ml.iris.iris_predictor import IrisClassifier, IrisData
+from app.ml.iris.iris_predictor import IrisClassifier, IrisData, IrisDataExtension
 from app.configurations import configurations
 import logging
 
 
 logger = logging.getLogger(__name__)
 ActiveData = IrisData
+ActiveDataExtension = IrisDataExtension
 ActivePredictor = IrisClassifier
 
 
 class Data(ActiveData):
+    pass
+
+
+class DataExtension(ActiveDataExtension):
     pass
 
 
