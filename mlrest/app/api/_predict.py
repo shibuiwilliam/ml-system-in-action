@@ -1,13 +1,12 @@
 from typing import Dict
 from fastapi import BackgroundTasks
-from sklearn import datasets
 import numpy as np
 import uuid
 import os
-import json
 import logging
 
 from app.jobs import save_data_job, predict_job
+from app.ml.abstract_predictor import BaseData
 from app.ml.active_predictor import Data, predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
 from app.middleware import redis
@@ -25,7 +24,8 @@ def _save_data_job(data: Data,
         num_files = 0 if incr is None else incr
         job_id = f'{str(uuid.uuid4())}_{num_files}'
         _proba = data.prediction_proba.tolist() \
-            if data.prediction_proba is not None \
+            if data.prediction_proba is not None and \
+            data.prediction_proba != CONSTANTS.NONE_DEFAULT_LIST \
             else CONSTANTS.NONE_DEFAULT_LIST
         data = {
             'prediction': data.prediction,
@@ -45,7 +45,6 @@ def _save_data_job(data: Data,
 
 
 def _predict_job(job_id: str,
-                 data: Data,
                  background_tasks: BackgroundTasks) -> str:
     if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         task = predict_job.PredictFromRedisJob(
@@ -61,31 +60,30 @@ def _predict_job(job_id: str,
     return job_id
 
 
-def test() -> Dict[str, int]:
-    sample_data = Data()
-    sample_data.data = sample_data.test_data
-    _proba = predictor.predict_proba(sample_data)
-    sample_data.prediction = int(np.argmax(_proba[0]))
-    return {'prediction': sample_data.prediction}
+def _test(data: BaseData = Data()) -> Dict[str, int]:
+    data.data = data.test_data
+    _proba = predictor.predict_proba(data)
+    data.prediction = int(np.argmax(_proba[0]))
+    return {'prediction': data.prediction}
 
 
-def predict(data: Data,
-            background_tasks: BackgroundTasks) -> Dict[str, int]:
+def _predict(data: Data,
+             background_tasks: BackgroundTasks) -> Dict[str, int]:
     _proba = predictor.predict_proba(data)
     data.prediction = int(np.argmax(_proba[0]))
     _save_data_job(data, background_tasks)
     return {'prediction': data.prediction}
 
 
-async def predict_async_post(
+async def _predict_async_post(
         data: Data,
         background_tasks: BackgroundTasks) -> Dict[str, str]:
     job_id = _save_data_job(data, background_tasks)
-    job_id = _predict_job(job_id, data, background_tasks)
+    job_id = _predict_job(job_id, background_tasks)
     return {'job_id': job_id}
 
 
-def predict_async_get(job_id: str) -> Dict[str, int]:
+def _predict_async_get(job_id: str) -> Dict[str, int]:
     result = {job_id: {'prediction': CONSTANTS.NONE_DEFAULT}}
     if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = redis.redis_connector.hgetall(job_id)

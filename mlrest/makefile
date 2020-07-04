@@ -5,7 +5,7 @@ imageName := mlrest_app
 imageVersion := latest
 containerName := mlrest_app
 
-testContainerFile := DockerfileTest
+testContainerFile := TestDockerfile
 testImageVersion := test
 testContainerName := test
 
@@ -20,7 +20,9 @@ pytest := pytest -v -s ./tests/
 pytestD := docker build -t $(imageName):$(testImageVersion) -f $(dockerfileDir)/$(testContainerFile) . && \
  		   docker run --rm --name $(testContainerName) $(imageName):$(testImageVersion) $(pytest)
 
-.PHONY: clean pip_freeze dirs compose_build compose_up compose_down test test_d
+trainIris := python app/ml/iris/iris_trainer.py 
+
+.PHONY: clean pip_freeze dirs compose_build compose_up compose_down test test_d train_iris
 dirs:
 	mkdir -p container_files/logs
 	mkdir -p container_files/data
@@ -49,3 +51,6 @@ test:
 
 test_d: pip_freeze dirs
 	$(pytestD)
+
+train_iris:
+	$(trainIris)
