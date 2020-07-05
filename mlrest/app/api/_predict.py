@@ -6,8 +6,7 @@ import os
 import logging
 
 from app.jobs import save_data_job, predict_job
-from app.ml.abstract_predictor import BaseData
-from app.ml.active_predictor import Data, predictor
+from app.ml.active_predictor import Data, DataExtension, predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
 from app.middleware import redis
 
@@ -60,7 +59,7 @@ def _predict_job(job_id: str,
     return job_id
 
 
-def _test(data: BaseData = Data()) -> Dict[str, int]:
+def _test(data: Data = Data()) -> Dict[str, int]:
     data.data = data.test_data
     _proba = predictor.predict_proba(data)
     data.prediction = int(np.argmax(_proba[0]))

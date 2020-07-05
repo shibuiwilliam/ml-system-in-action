@@ -1,6 +1,8 @@
-from app.ml.iris.iris_predictor import IrisClassifier, IrisData, IrisDataExtension
-from app.configurations import configurations
+from typing import Tuple
 import logging
+
+from app.ml.iris.iris_predictor import IrisClassifier, IrisData, IrisDataExtension
+from app.configurations import _Configurations
 
 
 logger = logging.getLogger(__name__)
@@ -10,7 +12,10 @@ ActivePredictor = IrisClassifier
 
 
 class Data(ActiveData):
-    pass
+    input_shape: Tuple[int] = _Configurations().io_interface['input_shape']
+    input_type: str = _Configurations().io_interface['input_type']
+    output_shape: Tuple[int] = _Configurations().io_interface['output_shape']
+    output_type: str = _Configurations().io_interface['output_type']
 
 
 class DataExtension(ActiveDataExtension):
@@ -21,5 +26,4 @@ class Predictor(ActivePredictor):
     pass
 
 
-predictor = Predictor(configurations.model_filename,
-                      configurations.fallback_model_filname)
+predictor = Predictor(_Configurations().model_filepath)

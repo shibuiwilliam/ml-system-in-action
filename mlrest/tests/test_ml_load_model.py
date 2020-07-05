@@ -19,18 +19,16 @@ def test_get_model_files(
 
 
 @pytest.mark.parametrize(
-    ('name', 'fallback_name', 'model_directory', 'files', 'expected'),
-    [('a.pkl', 'b.pkl', '/tmp/', ['a.pkl', 'b.pkl'], '/tmp/a.pkl'),
-     ('a.pkl', 'b.pkl', '/tmp/', ['b.pkl'], '/tmp/b.pkl')]
+    ('name', 'model_directory', 'files', 'expected'),
+    [('a.pkl', '/tmp/', ['a.pkl', 'b.pkl'], '/tmp/a.pkl'),
+     ('a.pkl', '/tmp/', ['b.pkl'], '/tmp/a.pkl')]
 )
 def test_get_model_file(
         mocker,
         name,
-        fallback_name,
         model_directory,
         files,
         expected):
-    mocker.patch('app.ml.load_model.get_model_files',
-                 return_value=files)
-    found_model_filepath = get_model_file(name, fallback_name, model_directory)
+    mocker.patch('app.ml.load_model.get_model_files', return_value=files)
+    found_model_filepath = get_model_file(name, model_directory)
     assert found_model_filepath == expected

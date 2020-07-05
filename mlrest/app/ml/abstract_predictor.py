@@ -1,60 +1,52 @@
 from abc import ABCMeta, abstractmethod
 from pydantic import BaseModel, Extra
-from typing import List, Tuple, Any
+from typing import List, Any, Tuple
 import numpy as np
+
+from app.ml.extract_np_type import type_name_to_np_type
 
 
 class BaseData(BaseModel):
     data: List[float] = None
     np_data: np.ndarray = None
-    data_shape: Tuple[int] = None
-    np_datatype: str = None
+    input_shape: Tuple[int] = None
+    input_type: str = None
     prediction: int = None
-    proba_shape: Tuple[int] = None
     prediction_proba: np.ndarray = None
+    output_shape: Tuple[int] = None
+    output_type: str = None
 
     class Config:
         arbitrary_types_allowed = True
         extra = Extra.allow
 
 
-class BaseDataExtension(object):
+class BaseDataExtension(metaclass=ABCMeta):
     def __init__(self, data_object: BaseData):
         self.data_object = data_object
+        self._input_type = type_name_to_np_type(self.data_object.input_type)
+        self._output_type = type_name_to_np_type(self.data_object.output_type)
 
-    def convert_data_to_np_data(self):
-        self.data_object.np_data = self._astype(self._reshape((np.array(self.data_object.data))))
+    def convert_input_data_to_np_data(self):
+        self.data_object.np_data = np.array(self.data_object.data)
+        self._reshape_input()
+        self._astype_input()
+        
+    def _reshape_input(self):
+        self.data_object.np_data = self.data_object.np_data.reshape(self.data_object.input_shape)
 
-    def _reshape(self, np_data: np.ndarray) -> np.ndarray:
-        if self.data_object.data_shape is None:
-            return np_data
-        else:
-            return np_data.reshape(self.data_object.data_shape)
+    def _astype_input(self):
+        self.data_object.np_data = self.data_object.np_data.astype(self._input_type)
 
-    def _astype(self, np_data: np.ndarray) -> np.ndarray:
-        if self.data_object.np_datatype is None:
-            return np_data
-        else:
-            if self.data_object.np_datatype == 'int':
-                return np_data.astype(np.int)
-            elif self.data_object.np_datatype == 'int8':
-                return np_data.astype(np.int8)
-            elif self.data_object.np_datatype == 'int16':
-                return np_data.astype(np.int16)
-            elif self.data_object.np_datatype == 'int32':
-                return np_data.astype(np.int32)
-            elif self.data_object.np_datatype == 'int64':
-                return np_data.astype(np.int64)
-            elif self.data_object.np_datatype == 'float':
-                return np_data.astype(np.float)
-            elif self.data_object.np_datatype == 'float16':
-                return np_data.astype(np.float16)
-            elif self.data_object.np_datatype == 'float32':
-                return np_data.astype(np.float32)
-            elif self.data_object.np_datatype == 'float64':
-                return np_data.astype(np.float64)
-            else:
-                return np_data
+    def convert_output_to_np(self):
+        self._reshape_output()
+        self._astype_output()
+
+    def _reshape_output(self):
+        self.data_object.prediction_proba = self.data_object.prediction_proba.reshape(self.data_object.output_shape)
+
+    def _astype_output(self):
+        self.data_object.prediction_proba = self.data_object.prediction_proba.astype(self._output_type)
 
 
 class BasePredictor(metaclass=ABCMeta):

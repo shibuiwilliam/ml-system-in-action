@@ -33,8 +33,10 @@ class MockPredictor(BasePredictor):
 
 class MockData(BaseData):
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
-    data_shape: Tuple[int] = (1, 4)
-    proba_shape: Tuple[int] = (1, 3)
+    input_shape: Tuple[int] = (1, 4)
+    input_type: str = 'float64'
+    output_shape: Tuple[int] = (1, 3)
+    output_type: str = 'int64'
 
 
 class MockJob():

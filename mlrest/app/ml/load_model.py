@@ -14,11 +14,8 @@ def get_model_files(
 
 def get_model_file(
         name: str,
-        fallback_name: str,
         model_directory: str = CONSTANTS.MODEL_DIRECTORY) -> str:
-    is_file_exist = True if name in get_model_files(model_directory) else False
-    found_model_filepath = os.path.join(
-        model_directory, name) if is_file_exist else os.path.join(
-        model_directory, fallback_name)
+    found_model_filepath = name if model_directory in name else \
+        os.path.join(model_directory, name)
     logger.info(f'found: {found_model_filepath}')
     return found_model_filepath
