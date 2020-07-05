@@ -4,7 +4,7 @@ import numpy as np
 
 from app.constants import CONSTANTS
 from app.ml import load_model
-from app.ml.abstract_predictor import BaseData, BaseDataExtension, BasePredictor
+from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
 import logging
 
 
@@ -38,18 +38,9 @@ class IrisClassifier(BasePredictor):
         logger.info(f'run predict proba in {self.__class__.__name__}')
 
         if iris_data.np_data is None:
-            if iris_data.data is None:
-                raise ValueError()
-            iris_data.np_data = np.array(iris_data.data).astype(np.float64)
-        if iris_data.np_data.shape != iris_data.input_shape:
-            iris_data.np_data = iris_data.np_data.reshape(
-                iris_data.input_shape)
+            raise ValueError()
 
-        iris_data.prediction_proba = self.classifier.predict_proba(
-            iris_data.np_data)
-        if iris_data.prediction_proba.shape != iris_data.output_shape:
-            iris_data.prediction_proba = iris_data.prediction_proba.reshape(
-                iris_data.output_shape)
+        iris_data.prediction_proba = self.classifier.predict_proba(iris_data.np_data)
 
         logger.info({
             'prediction': {
@@ -65,5 +56,4 @@ class IrisClassifier(BasePredictor):
 
         iris_data = IrisData()
         iris_data.data = iris_dict.get('data', None)
-        iris_data.np_data = iris_dict.get('np_data', None)
         return self.predict_proba(iris_data)

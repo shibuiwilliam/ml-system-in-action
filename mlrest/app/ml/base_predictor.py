@@ -1,19 +1,19 @@
 from abc import ABCMeta, abstractmethod
 from pydantic import BaseModel, Extra
-from typing import List, Any, Tuple
+from typing import List, Any, Sequence, Union
 import numpy as np
 
 from app.ml.extract_np_type import type_name_to_np_type
 
 
 class BaseData(BaseModel):
-    data: List[float] = None
+    data: Union[List[float], List[List[float]]] = None
     np_data: np.ndarray = None
-    input_shape: Tuple[int] = None
+    input_shape: Sequence[int] = None
     input_type: str = None
     prediction: int = None
     prediction_proba: np.ndarray = None
-    output_shape: Tuple[int] = None
+    output_shape: Sequence[int] = None
     output_type: str = None
 
     class Config:

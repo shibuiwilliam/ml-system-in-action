@@ -5,7 +5,7 @@ import uuid
 import os
 import logging
 
-from app.jobs import save_data_job, predict_job
+from app.jobs import store_data_job, predict_job
 from app.ml.active_predictor import Data, DataExtension, predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
 from app.middleware import redis
@@ -22,18 +22,12 @@ def _save_data_job(data: Data,
         incr = redis.redis_connector.get(CONSTANTS.REDIS_INCREMENTS)
         num_files = 0 if incr is None else incr
         job_id = f'{str(uuid.uuid4())}_{num_files}'
-        _proba = data.prediction_proba.tolist() \
-            if data.prediction_proba is not None and \
-            data.prediction_proba != CONSTANTS.NONE_DEFAULT_LIST \
-            else CONSTANTS.NONE_DEFAULT_LIST
-        data = {
-            'prediction': data.prediction,
-            'prediction_proba': _proba,
-            'data': data.data,
-        }
-        task = save_data_job.SaveDataRedisJob(
+        data_dict = {}
+        for k, v in data.__dict__.items():
+            data_dict[k] = v.tolist() if isinstance(v, np.ndarray) else v
+        task = store_data_job.SaveDataRedisJob(
             job_id=job_id,
-            data=data)
+            data=data_dict)
 
     elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
         pass
@@ -59,17 +53,23 @@ def _predict_job(job_id: str,
     return job_id
 
 
+def __predict(data: Data):
+    data_extension = DataExtension(data)
+    data_extension.convert_input_data_to_np_data()
+    data.prediction_proba = predictor.predict_proba(data)
+    data_extension.convert_output_to_np()
+    data.prediction = int(np.argmax(data.prediction_proba[0]))
+
+
 def _test(data: Data = Data()) -> Dict[str, int]:
     data.data = data.test_data
-    _proba = predictor.predict_proba(data)
-    data.prediction = int(np.argmax(_proba[0]))
+    __predict(data)
     return {'prediction': data.prediction}
 
 
 def _predict(data: Data,
              background_tasks: BackgroundTasks) -> Dict[str, int]:
-    _proba = predictor.predict_proba(data)
-    data.prediction = int(np.argmax(_proba[0]))
+    __predict(data)
     _save_data_job(data, background_tasks)
     return {'prediction': data.prediction}
 

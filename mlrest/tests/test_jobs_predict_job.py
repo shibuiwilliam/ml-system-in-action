@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from app.jobs import predict_job
 from app.constants import CONSTANTS
-from app.ml.abstract_predictor import BasePredictor
+from app.ml.base_predictor import BasePredictor
 
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
@@ -154,7 +154,7 @@ def test_PredictFromFileJob(mocker, job_id, directory, data_dict):
         'app.jobs.predict_job.predict_from_file',
         return_value=data_dict)
     mocker.patch(
-        'app.jobs.save_data_job.save_data_file_job',
+        'app.jobs.store_data_job.save_data_file_job',
         return_value=True)
     predict_from_file_job = predict_job.PredictFromFileJob(
         job_id=job_id, directory=directory, predictor=mock_predictor)
@@ -173,7 +173,7 @@ def test_PredictFromRedisJob(mocker, job_id, data_dict):
         'app.jobs.predict_job.predict_from_redis_cache',
         return_value=data_dict)
     mocker.patch(
-        'app.jobs.save_data_job.save_data_redis_job',
+        'app.jobs.store_data_job.save_data_redis_job',
         return_value=True)
     predict_from_redis_job = predict_job.PredictFromRedisJob(
         job_id=job_id, predictor=mock_predictor)

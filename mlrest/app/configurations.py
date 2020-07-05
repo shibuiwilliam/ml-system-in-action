@@ -3,6 +3,9 @@ import yaml
 from typing import Dict, Any
 from app.constants import CONSTANTS, PHYSICAL_SAVE_DATA
 from app.ml import extract_interface
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class _Configurations():
@@ -21,3 +24,6 @@ class _Configurations():
     io_interface = interface_dict[model_name]
 
     physical_save_data = os.getenv('PHYSICAL_SAVE_DATA', PHYSICAL_SAVE_DATA.SAVE)
+
+
+logger.info(f'configurations: {_Configurations.__dict__}')

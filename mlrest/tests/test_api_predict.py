@@ -4,11 +4,12 @@ from typing import List, Tuple
 import numpy as np
 
 from app.constants import CONSTANTS, PLATFORM_ENUM
-from app.ml.abstract_predictor import BaseData, BasePredictor
+from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
 import app
 from app.api._predict import (
     _save_data_job,
     _predict_job,
+    __predict,
     _test,
     _predict,
     _predict_async_post,
@@ -32,11 +33,16 @@ class MockPredictor(BasePredictor):
 
 
 class MockData(BaseData):
+    data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
     input_shape: Tuple[int] = (1, 4)
     input_type: str = 'float64'
     output_shape: Tuple[int] = (1, 3)
-    output_type: str = 'int64'
+    output_type: str = 'float64'
+
+
+class MockDataExtension(BaseDataExtension):
+    pass
 
 
 class MockJob():
@@ -58,7 +64,7 @@ def test_save_data_job(mocker, _uuid, data, num, expected):
     mocker.patch('app.middleware.redis.redis_connector.get', return_value=num)
     mocker.patch('uuid.uuid4', return_value=_uuid)
     mocker.patch(
-        'app.jobs.save_data_job.SaveDataRedisJob',
+        'app.jobs.store_data_job.SaveDataRedisJob',
         return_value=mock_job)
     job_id = _save_data_job(data, mock_BackgroundTasks)
     assert job_id == expected
@@ -80,7 +86,22 @@ def test_predict_job(mocker, job_id, expected):
 
 @pytest.mark.parametrize(
     ('proba', 'expected'),
-    [(np.array([[0.9, 0.1]]), {'prediction': 0}),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': 0}),
+     (np.array([[0.2, 0.1, 0.7]]), {'prediction': 2})]
+)
+def test__predict(mocker, proba, expected):
+    mock_data = MockData()
+    mocker.patch(
+        'app.ml.active_predictor.predictor.predict_proba',
+        return_value=proba)
+    __predict(data=mock_data)
+    # print(mock_data.prediction_proba)
+    assert mock_data.prediction == expected['prediction']
+
+
+@pytest.mark.parametrize(
+    ('proba', 'expected'),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': 0}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': 2})]
 )
 def test_test(mocker, proba, expected):
@@ -93,7 +114,7 @@ def test_test(mocker, proba, expected):
 
 @pytest.mark.parametrize(
     ('proba', 'expected'),
-    [(np.array([[0.9, 0.1]]), {'prediction': 0}),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': 0}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': 2})]
 )
 def test_predict(mocker, proba, expected):
