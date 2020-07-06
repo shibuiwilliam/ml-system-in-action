@@ -33,8 +33,8 @@ class MockPredictor(BasePredictor):
 
 
 class MockData(BaseData):
-    data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
-    test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+    data: List[List[float]] = [[5.1, 3.5, 1.4, 0.2]]
+    test_data: List[List[float]] = [[5.1, 3.5, 1.4, 0.2]]
     input_shape: Tuple[int] = (1, 4)
     input_type: str = 'float64'
     output_shape: Tuple[int] = (1, 3)
@@ -55,8 +55,7 @@ class MockJob():
     [(test_uuid, MockData(), 0, f'{test_uuid}_0'),
      (test_uuid, MockData(), 1, f'{test_uuid}_1'),
      (test_uuid, MockData(), None, f'{test_uuid}_0'),
-     (test_uuid, MockData(prediction_proba=np.array(CONSTANTS.NONE_DEFAULT_LIST)), 0, f'{test_uuid}_0'),
-     (test_uuid, MockData(prediction_proba=np.array([[0.1, 0.2, 0.7]])), 0, f'{test_uuid}_0')]
+     (test_uuid, MockData(output=np.array([[0.1, 0.2, 0.7]])), 0, f'{test_uuid}_0')]
 )
 def test_save_data_job(mocker, _uuid, data, num, expected):
     mock_job = MockJob()
@@ -85,42 +84,42 @@ def test_predict_job(mocker, job_id, expected):
 
 
 @pytest.mark.parametrize(
-    ('proba', 'expected'),
-    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': 0}),
-     (np.array([[0.2, 0.1, 0.7]]), {'prediction': 2})]
+    ('output', 'expected'),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
+     (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
-def test__predict(mocker, proba, expected):
+def test__predict(mocker, output, expected):
     mock_data = MockData()
     mocker.patch(
         'app.ml.active_predictor.predictor.predict_proba',
-        return_value=proba)
+        return_value=output)
     __predict(data=mock_data)
-    # print(mock_data.prediction_proba)
+    # print(mock_data.output)
     assert mock_data.prediction == expected['prediction']
 
 
 @pytest.mark.parametrize(
-    ('proba', 'expected'),
-    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': 0}),
-     (np.array([[0.2, 0.1, 0.7]]), {'prediction': 2})]
+    ('output', 'expected'),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
+     (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
-def test_test(mocker, proba, expected):
+def test_test(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.predictor.predict_proba',
-        return_value=proba)
+        return_value=output)
     result = _test(data=MockData())
     assert result['prediction'] == expected['prediction']
 
 
 @pytest.mark.parametrize(
-    ('proba', 'expected'),
-    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': 0}),
-     (np.array([[0.2, 0.1, 0.7]]), {'prediction': 2})]
+    ('output', 'expected'),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
+     (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
-def test_predict(mocker, proba, expected):
+def test_predict(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.predictor.predict_proba',
-        return_value=proba)
+        return_value=output)
     mocker.patch('app.api._predict._save_data_job', return_value=job_id)
     result = _predict(MockData(), mock_BackgroundTasks)
     assert result['prediction'] == expected['prediction']
@@ -139,21 +138,18 @@ async def test_predict_async_post(mocker, job_id):
 
 
 @pytest.mark.parametrize(
-    ('job_id', 'data_dict', 'expected'),
+    ('job_id', 'data_dict', 'data', 'expected'),
     [(job_id,
-      {'data': [1.0, -1.0], 'prediction': 0, 'prediction_proba': np.array([[0.9, 0.1]])},
-      {job_id: {'prediction': 0}}),
-     (job_id,
-      None,
-      {job_id: {'prediction': CONSTANTS.NONE_DEFAULT}}),
-     (job_id,
-      {'data': [1.0, -1.0], 'prediction_proba': np.array([[0.9, 0.1]])},
-      {job_id: {'prediction': CONSTANTS.NONE_DEFAULT}})]
+      {'data': [[5.1, 3.5, 1.4, 0.2]], 'output': np.array([[0.8, 0.1, 0.1]])},
+      MockData(output=np.array([[0.8, 0.1, 0.1]])),
+      {job_id: {'prediction': [[0.8, 0.1, 0.1]]}})]
 )
-def test_predict_async_get(mocker, job_id, data_dict, expected):
+def test_predict_async_get(mocker, job_id, data_dict, data, expected):
     app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
     mocker.patch(
-        'app.middleware.redis.redis_connector.hgetall',
+        'app.jobs.store_data_job.load_data_redis',
         return_value=data_dict)
+    mocker.patch('app.ml.active_predictor.Data', return_value=data)
+    mocker.patch('app.ml.active_predictor.DataExtension', return_value=MockDataExtension(data))
     result = _predict_async_get(job_id)
     assert result == expected

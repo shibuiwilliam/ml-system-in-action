@@ -1,11 +1,14 @@
 import pytest
 import numpy as np
+from typing import List, Tuple
+
 from app.jobs import predict_job
-from app.constants import CONSTANTS
-from app.ml.base_predictor import BasePredictor
+from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
 
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
+f_proba = [0.9, 0.1]
+f_data = [[5.1, 3.5, 1.4, 0.2]]
 
 
 class MockPredictor(BasePredictor):
@@ -19,163 +22,78 @@ class MockPredictor(BasePredictor):
         return None
 
 
-@pytest.mark.parametrize(('job_id',
-                          'directory',
-                          'data',
-                          'expected'),
-                         [(test_job_id,
-                           '/tmp/',
-                           {'data': [1.0, -1.0],
-                            'prediction': CONSTANTS.NONE_DEFAULT,
-                            'prediction_proba': CONSTANTS.NONE_DEFAULT_LIST},
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([[0.9, 0.1]])}),
-                          (test_job_id,
-                           '/tmp/',
-                           {'data': [1.0, -1.0],
-                            'prediction': CONSTANTS.NONE_DEFAULT,
-                            'prediction_proba': np.array([0.9, 0.1])},
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([[0.9, 0.1]])}),
-                          (test_job_id,
-                           '/tmp/',
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([0.9, 0.1])},
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([[0.9, 0.1]])})])
-def test_predict_from_file(mocker, tmpdir, job_id, directory, data, expected):
-    file_path = tmpdir.mkdir('/tmp/').join('test.json')
-    file_path.write('a')
-    mocker.patch('os.path.join', return_value=file_path)
-    mocker.patch('os.path.exists', return_value=True)
-    mocker.patch('json.load', return_value=data)
-
-    mock_predictor = MockPredictor()
-    mocker.patch.object(
-        mock_predictor,
-        'predict_proba_from_dict',
-        return_value=expected['prediction_proba'])
-
-    data_dict = predict_job.predict_from_file(
-        job_id, directory, mock_predictor)
-    assert expected['prediction'] == data_dict['prediction']
-    np.testing.assert_equal(
-        expected['prediction_proba'][0],
-        data_dict['prediction_proba'])
+class MockData(BaseData):
+    data: List[List[float]] = f_data
+    input_shape: Tuple[int] = (1, 4)
+    input_type: str = 'float64'
+    output_shape: Tuple[int] = (1, 3)
+    output_type: str = 'float64'
 
 
-@pytest.mark.parametrize(('job_id',
-                          'directory',
-                          'data',
-                          'expected'),
-                         [(test_job_id,
-                           '/tmp/',
-                           {},
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([[0.9, 0.1]])})])
-def test_predict_from_file_none(
-        mocker,
-        tmpdir,
-        job_id,
-        directory,
-        data,
-        expected):
-    file_path = tmpdir.mkdir('/tmp/').join('test.json')
-    file_path.write('a')
-    mocker.patch('os.path.join', return_value=file_path)
-    mocker.patch('os.path.exists', return_value=True)
-    mocker.patch('json.load', return_value=data)
-
-    mock_predictor = MockPredictor()
-    mocker.patch.object(
-        mock_predictor,
-        'predict_proba_from_dict',
-        return_value=expected['prediction_proba'])
-
-    data_dict = predict_job.predict_from_file(
-        job_id, directory, mock_predictor)
-    assert data_dict is None
+class MockDataExtension(BaseDataExtension):
+    pass
 
 
 @pytest.mark.parametrize(('job_id',
                           'data',
                           'expected'),
                          [(test_job_id,
-                           {'data': 'list_float_1.0;-1.0',
-                            'prediction': CONSTANTS.NONE_DEFAULT,
-                            'prediction_proba': CONSTANTS.NONE_DEFAULT_LIST_CONVERTED},
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([[0.9, 0.1]])}),
+                           {'data': f_data},
+                           {'data': f_data,
+                            'np_data': np.array(f_data),
+                            'prediction': [f_proba],
+                            'output': np.array([f_proba])}),
                           (test_job_id,
-                           {'data': 'list_float_1.0;-1.0',
-                            'prediction': CONSTANTS.NONE_DEFAULT,
-                            'prediction_proba': 'list_float_0.9;0.1'},
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([[0.9, 0.1]])}),
+                           {'data': f_data},
+                           {'data': f_data,
+                            'np_data': np.array(f_data),
+                            'prediction': [f_proba],
+                            'output': np.array([f_proba])}),
                           (test_job_id,
-                           {'data': 'list_float_1.0;-1.0',
-                            'prediction': 0,
-                            'prediction_proba': 'list_float_0.9;0.1'},
-                           {'data': [1.0, -1.0],
-                            'prediction': 0,
-                            'prediction_proba': np.array([[0.9, 0.1]])})])
+                           {'data': f_data},
+                           {'data': f_data,
+                            'np_data': np.array(f_data),
+                            'prediction': [f_proba],
+                            'output': np.array([f_proba])})])
 def test_predict_from_redis_cache(mocker, job_id, data, expected):
-    mocker.patch('app.middleware.redis.redis_connector.hgetall',
-                 return_value=data)
+    mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data)
 
     mock_predictor = MockPredictor()
     mocker.patch.object(
         mock_predictor,
-        'predict_proba_from_dict',
-        return_value=expected['prediction_proba'])
+        'predict_proba',
+        return_value=expected['output'])
 
-    data_dict = predict_job.predict_from_redis_cache(job_id, mock_predictor)
-    assert expected['prediction'] == data_dict['prediction']
-    np.testing.assert_equal(
-        expected['prediction_proba'][0],
-        data_dict['prediction_proba'])
+    result = predict_job.predict_from_redis_cache(
+        job_id, mock_predictor, MockData, MockDataExtension)
 
-
-@pytest.mark.parametrize(
-    ('job_id', 'directory', 'data_dict'),
-    [(test_job_id, '/tmp/',
-      {'data': [1.0, -1.0], 'prediction': 0, 'prediction_proba': np.array([[0.9, 0.1]])})]
-)
-def test_PredictFromFileJob(mocker, job_id, directory, data_dict):
-    mock_predictor = MockPredictor()
-    mocker.patch(
-        'app.jobs.predict_job.predict_from_file',
-        return_value=data_dict)
-    mocker.patch(
-        'app.jobs.store_data_job.save_data_file_job',
-        return_value=True)
-    predict_from_file_job = predict_job.PredictFromFileJob(
-        job_id=job_id, directory=directory, predictor=mock_predictor)
-    predict_from_file_job()
-    assert predict_from_file_job.is_completed
+    assert expected['data'] == result.data
+    np.testing.assert_equal(expected['np_data'], result.np_data)
+    np.testing.assert_equal(expected['output'], result.output)
 
 
 @pytest.mark.parametrize(
-    ('job_id', 'data_dict'),
+    ('job_id', 'data'),
     [(test_job_id,
-      {'data': [1.0, -1.0], 'prediction': 0, 'prediction_proba': np.array([[0.9, 0.1]])})]
+      MockData(
+          np_data=np.array(f_data),
+          output=np.array([f_proba])
+      ))]
 )
-def test_PredictFromRedisJob(mocker, job_id, data_dict):
+def test_PredictFromRedisJob(mocker, job_id, data):
     mock_predictor = MockPredictor()
     mocker.patch(
         'app.jobs.predict_job.predict_from_redis_cache',
-        return_value=data_dict)
+        return_value=data)
     mocker.patch(
         'app.jobs.store_data_job.save_data_redis_job',
         return_value=True)
+
     predict_from_redis_job = predict_job.PredictFromRedisJob(
-        job_id=job_id, predictor=mock_predictor)
+        job_id=job_id,
+        predictor=mock_predictor,
+        baseData=MockData,
+        baseDataExtentions=MockDataExtension
+    )
     predict_from_redis_job()
     assert predict_from_redis_job.is_completed

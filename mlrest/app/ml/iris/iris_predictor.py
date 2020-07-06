@@ -36,24 +36,15 @@ class IrisClassifier(BasePredictor):
 
     def predict_proba(self, iris_data: IrisData) -> np.ndarray:
         logger.info(f'run predict proba in {self.__class__.__name__}')
-
         if iris_data.np_data is None:
             raise ValueError()
 
-        iris_data.prediction_proba = self.classifier.predict_proba(iris_data.np_data)
+        iris_data.output = self.classifier.predict_proba(iris_data.np_data)
 
         logger.info({
             'prediction': {
                 'data': iris_data.np_data,
-                'prediction_proba': iris_data.prediction_proba
+                'output': iris_data.output
             }
         })
-        return iris_data.prediction_proba
-
-    def predict_proba_from_dict(self, iris_dict: Dict) -> np.ndarray:
-        logger.info(
-            f'run predict proba from dict in {self.__class__.__name__}')
-
-        iris_data = IrisData()
-        iris_data.data = iris_dict.get('data', None)
-        return self.predict_proba(iris_data)
+        return iris_data.output

@@ -3,9 +3,11 @@ from typing import Dict, Any
 import logging
 from pydantic import BaseModel
 import json
+import numpy as np
 
 from app.constants import CONSTANTS
-from app.middleware import redis, redis_utils
+from app.middleware import redis
+from app.ml.base_predictor import BaseData
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +24,11 @@ def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
     return True
 
 
-def save_data_redis_job(job_id: str, data: Any) -> bool:
-    redis.redis_connector.incr(CONSTANTS.REDIS_INCREMENTS)
-    logger.info({job_id: data})
-    _data = redis_utils.convert_dict(data, CONSTANTS.NONE_DEFAULT)
-    redis.redis_connector.hmset(job_id, _data)
-    return True
+def save_data_redis_job(job_id: str, data: BaseData) -> bool:
+    data_dict = {}
+    for k, v in data.__dict__.items():
+        data_dict[k] = v.tolist() if isinstance(v, np.ndarray) else v
+    return save_data_dict_redis_job(job_id, data_dict)
 
 
 def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
@@ -64,7 +65,13 @@ class SaveDataRedisJob(SaveDataJob):
         save_data_jobs[self.job_id] = self
         logger.info(
             f'registered job: {self.job_id} in {self.__class__.__name__}')
-        self.is_completed = save_data_dict_redis_job(self.job_id, self.data)
+        if isinstance(self.data, Dict):
+            self.is_completed = save_data_dict_redis_job(self.job_id, self.data)
+        elif isinstance(self.data, BaseData):
+            self.is_completed = save_data_redis_job(self.job_id, self.data)
+        else:
+            logger.error(f'unsupported data format: {type(self.data)}')
+            raise TypeError
         logger.info(f'completed save data: {self.job_id}')
 
 

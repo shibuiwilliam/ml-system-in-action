@@ -11,8 +11,8 @@ class BaseData(BaseModel):
     np_data: np.ndarray = None
     input_shape: Sequence[int] = None
     input_type: str = None
-    prediction: int = None
-    prediction_proba: np.ndarray = None
+    prediction: Union[List[float], List[List[float]], float] = None
+    output: np.ndarray = None
     output_shape: Sequence[int] = None
     output_type: str = None
 
@@ -31,7 +31,7 @@ class BaseDataExtension(metaclass=ABCMeta):
         self.data_object.np_data = np.array(self.data_object.data)
         self._reshape_input()
         self._astype_input()
-        
+
     def _reshape_input(self):
         self.data_object.np_data = self.data_object.np_data.reshape(self.data_object.input_shape)
 
@@ -43,10 +43,10 @@ class BaseDataExtension(metaclass=ABCMeta):
         self._astype_output()
 
     def _reshape_output(self):
-        self.data_object.prediction_proba = self.data_object.prediction_proba.reshape(self.data_object.output_shape)
+        self.data_object.output = self.data_object.output.reshape(self.data_object.output_shape)
 
     def _astype_output(self):
-        self.data_object.prediction_proba = self.data_object.prediction_proba.astype(self._output_type)
+        self.data_object.output = self.data_object.output.astype(self._output_type)
 
 
 class BasePredictor(metaclass=ABCMeta):
@@ -56,8 +56,4 @@ class BasePredictor(metaclass=ABCMeta):
 
     @ abstractmethod
     def predict_proba(self, data) -> Any:
-        raise NotImplementedError()
-
-    @ abstractmethod
-    def predict_proba_from_dict(self, data) -> Any:
         raise NotImplementedError()

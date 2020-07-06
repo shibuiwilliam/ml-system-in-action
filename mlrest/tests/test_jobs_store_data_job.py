@@ -1,10 +1,33 @@
 import pytest
 import json
+from typing import List, Tuple
 
 from app.jobs import store_data_job
+from app.ml.base_predictor import BaseData
 
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
+
+
+class MockData(BaseData):
+    data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+    test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+    input_shape: Tuple[int] = (1, 4)
+    input_type: str = 'float64'
+    output_shape: Tuple[int] = (1, 3)
+    output_type: str = 'float64'
+
+
+@pytest.mark.parametrize(
+    ('key', 'data'),
+    [(test_job_id, {'data': [1.0, -1.0], 'prediction': None})]
+)
+def test_load_data_redis(mocker, key, data):
+    mocker.patch('app.middleware.redis.redis_connector.get', return_value=data)
+    mocker.patch('json.loads', return_value=data)
+    result = store_data_job.load_data_redis(key)
+    assert result['data'] == data['data']
+    assert result['prediction'] == data['prediction']
 
 
 @pytest.mark.parametrize(
@@ -25,7 +48,7 @@ class Test:
 
     @pytest.mark.parametrize(
         ('job_id', 'data'),
-        [(test_job_id, {'data': [1.0, -1.0], 'prediction': None})]
+        [(test_job_id, MockData())]
     )
     def test_save_data_redis_job(self, mocker, job_id, data) -> None:
         def set(key, value):
@@ -37,7 +60,7 @@ class Test:
             'app.middleware.redis.redis_connector.incr',
             return_value=0)
         mocker.patch(
-            'app.middleware.redis.redis_connector.hmset').side_effect = set
+            'app.middleware.redis.redis_connector.set').side_effect = set
 
         result = store_data_job.save_data_redis_job(job_id, data)
         assert result
@@ -83,7 +106,8 @@ def test_SaveDataFileJob(mocker, job_id, directory, data):
 
 @pytest.mark.parametrize(
     ('job_id', 'data'),
-    [(test_job_id, {'data': [1.0, -1.0], 'prediction': None})]
+    [(test_job_id, {'data': [1.0, -1.0], 'prediction': None}),
+     (test_job_id, MockData())]
 )
 def test_SaveDataRedisJob(mocker, job_id, data):
     save_data_redis_job = store_data_job.SaveDataRedisJob(

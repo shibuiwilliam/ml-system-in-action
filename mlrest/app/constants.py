@@ -45,17 +45,17 @@ class _Constants(object):
     def PREDICTION_DEFAULT():
         return -1
 
-    @constant
-    def NONE_DEFAULT():
-        return 'NONEDEFAULT'
+    # @constant
+    # def NONE_DEFAULT():
+    #     return 'NONEDEFAULT'
 
-    @constant
-    def NONE_DEFAULT_LIST():
-        return ['NONEDEFAULT']
+    # @constant
+    # def NONE_DEFAULT_LIST():
+    #     return ['NONEDEFAULT']
 
-    @constant
-    def NONE_DEFAULT_LIST_CONVERTED():
-        return 'list_str_NONEDEFAULT'
+    # @constant
+    # def NONE_DEFAULT_LIST_CONVERTED():
+    #     return 'list_str_NONEDEFAULT'
 
     @constant
     def SEPARATOR():
