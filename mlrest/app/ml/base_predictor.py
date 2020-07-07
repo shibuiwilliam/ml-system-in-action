@@ -55,5 +55,5 @@ class BasePredictor(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @ abstractmethod
-    def predict_proba(self, data) -> Any:
+    def predict(self, data) -> Any:
         raise NotImplementedError()

@@ -1,8 +1,7 @@
-from typing import List, Dict
+from typing import List
 import joblib
 import numpy as np
 
-from app.constants import CONSTANTS
 from app.ml import load_model
 from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
 import logging
@@ -34,7 +33,7 @@ class IrisClassifier(BasePredictor):
         logger.info(
             f'initialized {self.__class__.__name__} for {self.active_model}')
 
-    def predict_proba(self, iris_data: IrisData) -> np.ndarray:
+    def predict(self, iris_data: IrisData) -> np.ndarray:
         logger.info(f'run predict proba in {self.__class__.__name__}')
         if iris_data.np_data is None:
             raise ValueError()

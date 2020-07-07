@@ -15,10 +15,7 @@ class MockPredictor(BasePredictor):
     def load_model(self):
         pass
 
-    def predict_proba(self, data):
-        return None
-
-    def predict_proba_from_dict(self, data):
+    def predict(self, data):
         return None
 
 
@@ -61,7 +58,7 @@ def test_predict_from_redis_cache(mocker, job_id, data, expected):
     mock_predictor = MockPredictor()
     mocker.patch.object(
         mock_predictor,
-        'predict_proba',
+        'predict',
         return_value=expected['output'])
 
     result = predict_job.predict_from_redis_cache(

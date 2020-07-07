@@ -20,7 +20,7 @@ def predict_from_redis_cache(
     data = baseData(**data_dict)
     data_extension = baseDataExtentions(data)
     data_extension.convert_input_data_to_np_data()
-    data.output = predictor.predict_proba(data)
+    data.output = predictor.predict(data)
     return data
 
 
@@ -39,8 +39,7 @@ class PredictFromRedisJob(PredictJob):
 
     def __call__(self):
         predict_jobs[self.job_id] = self
-        logger.info(
-            f'registered job: {self.job_id} in {self.__class__.__name__}')
+        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
         while True:
             data = predict_from_redis_cache(
                 self.job_id,

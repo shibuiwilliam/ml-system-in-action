@@ -3,7 +3,7 @@ from app.ml import extract_interface
 from typing import Tuple
 
 
-filepath = 'app/ml/models/iris_svc/iris_svc.yaml'
+filepath = 'app/ml/models/iris_svc_sklearn.yaml'
 
 
 @pytest.mark.parametrize(
@@ -13,11 +13,10 @@ filepath = 'app/ml/models/iris_svc/iris_svc.yaml'
 def test_extract_interface_yaml(filepath):
     interface = extract_interface.extract_interface_yaml(filepath)
     model_name = list(interface.keys())[0]
-    input_shape = interface[model_name]['input_shape']
-    input_type = interface[model_name]['input_type']
-    output_shape = interface[model_name]['output_shape']
-    output_type = interface[model_name]['output_type']
-    assert isinstance(input_shape, Tuple)
-    assert isinstance(input_type, str)
-    assert isinstance(output_shape, Tuple)
-    assert isinstance(output_type, str)
+    assert isinstance(interface[model_name]['interface']['input_shape'], Tuple)
+    assert isinstance(interface[model_name]['interface']['input_type'], str)
+    assert isinstance(interface[model_name]['interface']['output_shape'], Tuple)
+    assert isinstance(interface[model_name]['interface']['output_type'], str)
+    assert isinstance(interface[model_name]['meta']['model_filename'], str)
+    assert isinstance(interface[model_name]['meta']['prediction_type'], str)
+    assert isinstance(interface[model_name]['meta']['prediction_runtime'], str)

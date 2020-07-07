@@ -20,7 +20,7 @@ pytest := pytest -v -s ./tests/
 pytestD := docker build -t $(imageName):$(testImageVersion) -f $(dockerfileDir)/$(testContainerFile) . && \
  		   docker run --rm --name $(testContainerName) $(imageName):$(testImageVersion) $(pytest)
 
-trainIris := python app/ml/iris/iris_trainer.py 
+trainIris := PYTHONPATH=$(absolutePath) python app/ml/iris/iris_trainer.py 
 
 .PHONY: clean pip_freeze dirs compose_build compose_up compose_down test test_d train_iris
 dirs:

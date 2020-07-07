@@ -11,6 +11,16 @@ class PHYSICAL_SAVE_DATA(enum.Enum):
     SAVE = 1
 
 
+class PREDICTION_TYPE(enum.Enum):
+    CLASSIFICATION = 'classification'
+    REGRESSION = 'regression'
+
+
+class PREDICTION_RUNTIME(enum.Enum):
+    SKLEARN = 'sklearn'
+    ONNX_RUNTIME = 'onnx_runtime'
+
+
 def constant(f):
     def fset(self, value):
         raise TypeError
@@ -44,18 +54,6 @@ class _Constants(object):
     @constant
     def PREDICTION_DEFAULT():
         return -1
-
-    # @constant
-    # def NONE_DEFAULT():
-    #     return 'NONEDEFAULT'
-
-    # @constant
-    # def NONE_DEFAULT_LIST():
-    #     return ['NONEDEFAULT']
-
-    # @constant
-    # def NONE_DEFAULT_LIST_CONVERTED():
-    #     return 'list_str_NONEDEFAULT'
 
     @constant
     def SEPARATOR():

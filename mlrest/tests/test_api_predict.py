@@ -25,10 +25,7 @@ class MockPredictor(BasePredictor):
     def load_model(self):
         pass
 
-    def predict_proba(self, data):
-        return None
-
-    def predict_proba_from_dict(self, data):
+    def predict(self, data):
         return None
 
 
@@ -91,7 +88,7 @@ def test_predict_job(mocker, job_id, expected):
 def test__predict(mocker, output, expected):
     mock_data = MockData()
     mocker.patch(
-        'app.ml.active_predictor.predictor.predict_proba',
+        'app.ml.active_predictor.predictor.predict',
         return_value=output)
     __predict(data=mock_data)
     # print(mock_data.output)
@@ -105,7 +102,7 @@ def test__predict(mocker, output, expected):
 )
 def test_test(mocker, output, expected):
     mocker.patch(
-        'app.ml.active_predictor.predictor.predict_proba',
+        'app.ml.active_predictor.predictor.predict',
         return_value=output)
     result = _test(data=MockData())
     assert result['prediction'] == expected['prediction']
@@ -118,7 +115,7 @@ def test_test(mocker, output, expected):
 )
 def test_predict(mocker, output, expected):
     mocker.patch(
-        'app.ml.active_predictor.predictor.predict_proba',
+        'app.ml.active_predictor.predictor.predict',
         return_value=output)
     mocker.patch('app.api._predict._save_data_job', return_value=job_id)
     result = _predict(MockData(), mock_BackgroundTasks)
@@ -138,18 +135,15 @@ async def test_predict_async_post(mocker, job_id):
 
 
 @pytest.mark.parametrize(
-    ('job_id', 'data_dict', 'data', 'expected'),
+    ('job_id', 'data_dict', 'expected'),
     [(job_id,
-      {'data': [[5.1, 3.5, 1.4, 0.2]], 'output': np.array([[0.8, 0.1, 0.1]])},
-      MockData(output=np.array([[0.8, 0.1, 0.1]])),
+      {'data': [[5.1, 3.5, 1.4, 0.2]], 'output': [[0.8, 0.1, 0.1]]},
       {job_id: {'prediction': [[0.8, 0.1, 0.1]]}})]
 )
-def test_predict_async_get(mocker, job_id, data_dict, data, expected):
+def test_predict_async_get(mocker, job_id, data_dict, expected):
     app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
     mocker.patch(
         'app.jobs.store_data_job.load_data_redis',
         return_value=data_dict)
-    mocker.patch('app.ml.active_predictor.Data', return_value=data)
-    mocker.patch('app.ml.active_predictor.DataExtension', return_value=MockDataExtension(data))
     result = _predict_async_get(job_id)
     assert result == expected

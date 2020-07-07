@@ -141,3 +141,4 @@ cython_debug/
 *.pkl
 *.h5
 *.hdf5
+*.onnx

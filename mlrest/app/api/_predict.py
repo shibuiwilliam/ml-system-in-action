@@ -59,7 +59,7 @@ def _predict_job(job_id: str,
 def __predict(data: Data):
     data_extension = DataExtension(data)
     data_extension.convert_input_data_to_np_data()
-    data.output = predictor.predict_proba(data)
+    data.output = predictor.predict(data)
     data_extension.convert_output_to_np()
     data.prediction = data.output.tolist()
 
@@ -89,10 +89,7 @@ def _predict_async_get(job_id: str) -> Dict[str, int]:
     result = {job_id: {'prediction': []}}
     if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = store_data_job.load_data_redis(job_id)
-        data = Data(**data_dict)
-        data_extension = DataExtension(data)
-        data_extension.convert_output_to_np()
-        result[job_id]['prediction'] = data.output.tolist()
+        result[job_id]['prediction'] = data_dict['output']
         return result
 
     elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
