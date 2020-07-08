@@ -3,7 +3,7 @@ from fastapi import BackgroundTasks
 from typing import List, Tuple
 import numpy as np
 
-from app.constants import CONSTANTS, PLATFORM_ENUM
+from app.constants import PLATFORM_ENUM
 from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
 import app
 from app.api._predict import (
@@ -88,7 +88,7 @@ def test_predict_job(mocker, job_id, expected):
 def test__predict(mocker, output, expected):
     mock_data = MockData()
     mocker.patch(
-        'app.ml.active_predictor.predictor.predict',
+        'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     __predict(data=mock_data)
     # print(mock_data.output)
@@ -102,7 +102,7 @@ def test__predict(mocker, output, expected):
 )
 def test_test(mocker, output, expected):
     mocker.patch(
-        'app.ml.active_predictor.predictor.predict',
+        'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     result = _test(data=MockData())
     assert result['prediction'] == expected['prediction']
@@ -115,7 +115,7 @@ def test_test(mocker, output, expected):
 )
 def test_predict(mocker, output, expected):
     mocker.patch(
-        'app.ml.active_predictor.predictor.predict',
+        'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     mocker.patch('app.api._predict._save_data_job', return_value=job_id)
     result = _predict(MockData(), mock_BackgroundTasks)

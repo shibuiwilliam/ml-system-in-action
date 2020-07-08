@@ -52,6 +52,10 @@ class _Constants(object):
         return 'increments'
 
     @constant
+    def REDIS_QUEUE():
+        return 'queue'
+
+    @constant
     def PREDICTION_DEFAULT():
         return -1
 

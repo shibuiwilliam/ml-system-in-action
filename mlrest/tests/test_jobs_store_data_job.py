@@ -2,6 +2,7 @@ import pytest
 import json
 from typing import List, Tuple
 
+from app.constants import CONSTANTS
 from app.jobs import store_data_job
 from app.ml.base_predictor import BaseData
 
@@ -16,6 +17,37 @@ class MockData(BaseData):
     input_type: str = 'float64'
     output_shape: Tuple[int] = (1, 3)
     output_type: str = 'float64'
+
+
+@pytest.mark.parametrize(
+    ('queue_name', 'key'),
+    [(CONSTANTS.REDIS_QUEUE, 'abc')]
+)
+def test_left_push_queue(mocker, queue_name, key):
+    mocker.patch('app.middleware.redis.redis_connector.lpush', return_value=None)
+    store_data_job.left_push_queue(queue_name, key)
+
+
+@pytest.mark.parametrize(
+    ('queue_name', 'num', 'key'),
+    [(CONSTANTS.REDIS_QUEUE, 1, 'abc')]
+)
+def test_right_pop_queue(mocker, queue_name, num, key):
+    mocker.patch('app.middleware.redis.redis_connector.llen', return_value=num)
+    mocker.patch('app.middleware.redis.redis_connector.rpop', return_value=key)
+    result = store_data_job.right_pop_queue(queue_name)
+    assert result == key
+
+
+@pytest.mark.parametrize(
+    ('queue_name', 'num'),
+    [(CONSTANTS.REDIS_QUEUE, 0)]
+)
+def test_right_pop_queue_none(mocker, queue_name, num):
+    mocker.patch('app.middleware.redis.redis_connector.llen', return_value=num)
+    mocker.patch('app.middleware.redis.redis_connector.rpop', return_value=None)
+    result = store_data_job.right_pop_queue(queue_name)
+    assert result is None
 
 
 @pytest.mark.parametrize(
@@ -106,8 +138,7 @@ def test_SaveDataFileJob(mocker, job_id, directory, data):
 
 @pytest.mark.parametrize(
     ('job_id', 'data'),
-    [(test_job_id, {'data': [1.0, -1.0], 'prediction': None}),
-     (test_job_id, MockData())]
+    [(test_job_id, MockData())]
 )
 def test_SaveDataRedisJob(mocker, job_id, data):
     save_data_redis_job = store_data_job.SaveDataRedisJob(
@@ -115,7 +146,7 @@ def test_SaveDataRedisJob(mocker, job_id, data):
         data=data
     )
     mocker.patch(
-        'app.jobs.store_data_job.save_data_dict_redis_job',
+        'app.jobs.store_data_job.save_data_redis_job',
         return_value=True)
     save_data_redis_job()
     assert save_data_redis_job.is_completed

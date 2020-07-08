@@ -6,14 +6,25 @@ import json
 import numpy as np
 
 from app.constants import CONSTANTS
-from app.middleware import redis
+from app.middleware.redis import redis_connector
 from app.ml.base_predictor import BaseData
 
 logger = logging.getLogger(__name__)
 
 
+def left_push_queue(queue_name: str, key: str):
+    redis_connector.lpush(queue_name, key)
+
+
+def right_pop_queue(queue_name: str) -> Any:
+    if redis_connector.llen(queue_name) > 0:
+        return redis_connector.rpop(queue_name)
+    else:
+        return None
+
+
 def load_data_redis(key: str) -> Dict[str, Any]:
-    data_dict = json.loads(redis.redis_connector.get(key))
+    data_dict = json.loads(redis_connector.get(key))
     return data_dict
 
 
@@ -32,15 +43,15 @@ def save_data_redis_job(job_id: str, data: BaseData) -> bool:
 
 
 def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
-    redis.redis_connector.incr(CONSTANTS.REDIS_INCREMENTS)
+    redis_connector.incr(CONSTANTS.REDIS_INCREMENTS)
     logger.info({job_id: data})
-    redis.redis_connector.set(job_id, json.dumps(data))
+    redis_connector.set(job_id, json.dumps(data))
     return True
 
 
 class SaveDataJob(BaseModel):
     job_id: str
-    data: Any
+    data: BaseData
     is_completed: bool = False
 
     def __call__(self):
@@ -65,13 +76,7 @@ class SaveDataRedisJob(SaveDataJob):
         save_data_jobs[self.job_id] = self
         logger.info(
             f'registered job: {self.job_id} in {self.__class__.__name__}')
-        if isinstance(self.data, Dict):
-            self.is_completed = save_data_dict_redis_job(self.job_id, self.data)
-        elif isinstance(self.data, BaseData):
-            self.is_completed = save_data_redis_job(self.job_id, self.data)
-        else:
-            logger.error(f'unsupported data format: {type(self.data)}')
-            raise TypeError
+        self.is_completed = save_data_redis_job(self.job_id, self.data)
         logger.info(f'completed save data: {self.job_id}')
 
 

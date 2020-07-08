@@ -98,6 +98,7 @@ def save_onnx(model,
         print("output name='{}' and shape={} and type={}".format(out.name, out.shape, out.type))
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: x_test.astype(np.float32)})
+        print(pred_onx)
         score = metrics.accuracy_score(y_test, pred_onx[0])
         print(score)
 
@@ -170,7 +171,7 @@ def main():
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
-                   model_filename,
+                   onnx_filename,
                    PREDICTION_TYPE.CLASSIFICATION,
                    PREDICTION_RUNTIME.ONNX_RUNTIME)
 
@@ -208,7 +209,7 @@ def main():
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
-                   model_filename,
+                   onnx_filename,
                    PREDICTION_TYPE.CLASSIFICATION,
                    PREDICTION_RUNTIME.ONNX_RUNTIME)
 

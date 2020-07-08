@@ -1,8 +1,13 @@
 from typing import Sequence
 import logging
 
-from app.ml.iris.iris_predictor import IrisClassifier, IrisData, IrisDataExtension
+from app.constants import PREDICTION_RUNTIME
 from app.configurations import _Configurations
+
+if _Configurations().prediction_runtime == PREDICTION_RUNTIME.ONNX_RUNTIME.value:
+    from app.ml.iris.iris_predictor_onnx import IrisClassifier, IrisData, IrisDataExtension
+elif _Configurations().prediction_runtime == PREDICTION_RUNTIME.SKLEARN.value:
+    from app.ml.iris.iris_predictor_sklearn import IrisClassifier, IrisData, IrisDataExtension
 
 
 logger = logging.getLogger(__name__)
@@ -26,4 +31,4 @@ class Predictor(ActivePredictor):
     pass
 
 
-predictor = Predictor(_Configurations().model_filepath)
+active_predictor = Predictor(_Configurations().model_filepath)

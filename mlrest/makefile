@@ -1,9 +1,9 @@
 absolutePath := $(shell pwd)
 dockerfileDir := dockerfiles
 
-imageName := mlrest_app
+imageName := mlrest_api
 imageVersion := latest
-containerName := mlrest_app
+containerName := mlrest_api
 
 testContainerFile := TestDockerfile
 testImageVersion := test
@@ -15,6 +15,7 @@ composeDown := docker-compose down
 
 requirements := requirements.txt
 pipFreeze := pip freeze > $(requirements)
+pipInstall := pip install -r $(requirements)
 
 pytest := pytest -v -s ./tests/
 pytestD := docker build -t $(imageName):$(testImageVersion) -f $(dockerfileDir)/$(testContainerFile) . && \
@@ -53,4 +54,5 @@ test_d: pip_freeze dirs
 	$(pytestD)
 
 train_iris:
+	$(pipInstall)
 	$(trainIris)

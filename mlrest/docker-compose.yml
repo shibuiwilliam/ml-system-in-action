@@ -1,11 +1,11 @@
 version: '3'
 
 services:
-  app:
-    container_name: mlrest_app
+  api:
+    container_name: mlrest_api
     build: 
       context: .
-      dockerfile: dockerfiles/Dockerfile
+      dockerfile: dockerfiles/Dockerfile_api
     environment:
       - PLATFORM=docker_compose
       - GUNICORN_UVICORN=GUNICORN
@@ -18,7 +18,16 @@ services:
       - ./container_files/data/:/fastapi/app/data/
     ports:
       - "8888:8888"
-    command: ./run.sh
+    command: ./run_api.sh
+
+  backend:
+    container_name: mlrest_backend
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_backend
+    environment:
+      - PLATFORM=docker_compose
+    command: ./run_backend.sh
 
   redis:
     container_name: mlrest_redis

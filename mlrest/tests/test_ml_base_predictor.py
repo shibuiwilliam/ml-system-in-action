@@ -71,8 +71,8 @@ def test_BaseDataDict(
     np.testing.assert_equal(mock_data.output, data_dict['output'])
     assert mock_data.input_shape == data_dict['input_shape']
     assert mock_data.output_shape == data_dict['output_shape']
-    print(MockData.__dict__)
-    print(mock_data.__dict__)
+    # print(MockData.__dict__)
+    # print(mock_data.__dict__)
 
 
 @pytest.mark.parametrize(

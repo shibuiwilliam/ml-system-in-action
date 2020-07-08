@@ -33,20 +33,24 @@ class BaseDataExtension(metaclass=ABCMeta):
         self._astype_input()
 
     def _reshape_input(self):
-        self.data_object.np_data = self.data_object.np_data.reshape(self.data_object.input_shape)
+        self.data_object.np_data = self.data_object.np_data.reshape(
+            self.data_object.input_shape)
 
     def _astype_input(self):
-        self.data_object.np_data = self.data_object.np_data.astype(self._input_type)
+        self.data_object.np_data = self.data_object.np_data.astype(
+            self._input_type)
 
     def convert_output_to_np(self):
         self._reshape_output()
         self._astype_output()
 
     def _reshape_output(self):
-        self.data_object.output = self.data_object.output.reshape(self.data_object.output_shape)
+        self.data_object.output = self.data_object.output.reshape(
+            self.data_object.output_shape)
 
     def _astype_output(self):
-        self.data_object.output = self.data_object.output.astype(self._output_type)
+        self.data_object.output = self.data_object.output.astype(
+            self._output_type)
 
 
 class BasePredictor(metaclass=ABCMeta):

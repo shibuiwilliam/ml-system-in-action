@@ -2,7 +2,6 @@ from typing import List
 import joblib
 import numpy as np
 
-from app.ml import load_model
 from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
 import logging
 
@@ -19,19 +18,15 @@ class IrisDataExtension(BaseDataExtension):
 
 
 class IrisClassifier(BasePredictor):
-    def __init__(self,
-                 model_filename):
-        self.model_filename = model_filename
-        self.active_model = None
+    def __init__(self, model_path):
+        self.model_path = model_path
         self.classifier = None
         self.load_model()
 
     def load_model(self):
         logger.info(f'run load model in {self.__class__.__name__}')
-        self.active_model = load_model.get_model_file(self.model_filename)
-        self.classifier = joblib.load(self.active_model)
-        logger.info(
-            f'initialized {self.__class__.__name__} for {self.active_model}')
+        self.classifier = joblib.load(self.model_path)
+        logger.info(f'initialized {self.__class__.__name__}')
 
     def predict(self, iris_data: IrisData) -> np.ndarray:
         logger.info(f'run predict proba in {self.__class__.__name__}')
