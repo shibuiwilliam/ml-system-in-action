@@ -33,7 +33,7 @@ def _predict_from_redis_cache(
 
 def prediction_loop():
     while True:
-        sleep(2)
+        sleep(1)
         job_id = right_pop_queue(CONSTANTS.REDIS_QUEUE)
         logger.info(job_id)
         if job_id is not None:
