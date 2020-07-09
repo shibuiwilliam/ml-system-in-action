@@ -12,8 +12,12 @@ from app.ml.base_predictor import BaseData
 logger = logging.getLogger(__name__)
 
 
-def left_push_queue(queue_name: str, key: str):
-    redis_connector.lpush(queue_name, key)
+def left_push_queue(queue_name: str, key: str) -> bool:
+    try:
+        redis_connector.lpush(queue_name, key)
+        return True
+    except Exception:
+        return False
 
 
 def right_pop_queue(queue_name: str) -> Any:
@@ -77,6 +81,7 @@ class SaveDataRedisJob(SaveDataJob):
         logger.info(
             f'registered job: {self.job_id} in {self.__class__.__name__}')
         self.is_completed = save_data_redis_job(self.job_id, self.data)
+        self.is_completed = left_push_queue(CONSTANTS.REDIS_QUEUE, self.job_id)
         logger.info(f'completed save data: {self.job_id}')
 
 

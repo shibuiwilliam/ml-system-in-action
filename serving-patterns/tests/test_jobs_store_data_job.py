@@ -20,12 +20,13 @@ class MockData(BaseData):
 
 
 @pytest.mark.parametrize(
-    ('queue_name', 'key'),
-    [(CONSTANTS.REDIS_QUEUE, 'abc')]
+    ('queue_name', 'key', 'expected'),
+    [(CONSTANTS.REDIS_QUEUE, 'abc', True)]
 )
-def test_left_push_queue(mocker, queue_name, key):
-    mocker.patch('app.middleware.redis.redis_connector.lpush', return_value=None)
-    store_data_job.left_push_queue(queue_name, key)
+def test_left_push_queue(mocker, queue_name, key, expected):
+    mocker.patch('app.middleware.redis.redis_connector.lpush', return_value=expected)
+    result = store_data_job.left_push_queue(queue_name, key)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -145,6 +146,9 @@ def test_SaveDataRedisJob(mocker, job_id, data):
         job_id=job_id,
         data=data
     )
+    mocker.patch(
+        'app.jobs.store_data_job.left_push_queue',
+        return_value=True)
     mocker.patch(
         'app.jobs.store_data_job.save_data_redis_job',
         return_value=True)

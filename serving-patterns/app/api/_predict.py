@@ -1,25 +1,23 @@
 from typing import Dict
 from fastapi import BackgroundTasks
 import uuid
-import os
 import logging
 
 from app.middleware.profiler import do_cprofile
 from app.jobs import store_data_job, predict_job
 from app.ml.active_predictor import Data, DataExtension, active_predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
+from app.configurations import _PlatformConfigurations
 from app.middleware import redis
 
 
 logger = logging.getLogger(__name__)
 
-PLATFORM = os.getenv('PLATFORM', PLATFORM_ENUM.DOCKER_COMPOSE.value)
-
 
 @do_cprofile
 def _save_data_job(data: Data,
                    background_tasks: BackgroundTasks) -> str:
-    if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         incr = redis.redis_connector.get(CONSTANTS.REDIS_INCREMENTS)
         num_files = 0 if incr is None else incr
         job_id = f'{str(uuid.uuid4())}_{num_files}'
@@ -27,7 +25,7 @@ def _save_data_job(data: Data,
             job_id=job_id,
             data=data)
 
-    elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
         pass
     else:
         pass
@@ -38,14 +36,14 @@ def _save_data_job(data: Data,
 @do_cprofile
 def _predict_job(job_id: str,
                  background_tasks: BackgroundTasks) -> str:
-    if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         task = predict_job.PredictFromRedisJob(
             job_id=job_id,
             predictor=active_predictor,
             baseData=Data,
             baseDataExtentions=DataExtension
         )
-    elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
         pass
     else:
         pass
@@ -83,19 +81,19 @@ async def _predict_async_post(
         data: Data,
         background_tasks: BackgroundTasks) -> Dict[str, str]:
     job_id = _save_data_job(data, background_tasks)
-    job_id = _predict_job(job_id, background_tasks)
+    # job_id = _predict_job(job_id, background_tasks)
     return {'job_id': job_id}
 
 
 @do_cprofile
 def _predict_async_get(job_id: str) -> Dict[str, int]:
     result = {job_id: {'prediction': []}}
-    if PLATFORM == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = store_data_job.load_data_redis(job_id)
         result[job_id]['prediction'] = data_dict['output']
         return result
 
-    elif PLATFORM == PLATFORM_ENUM.KUBERNETES.value:
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
         pass
 
     else:

@@ -129,7 +129,6 @@ def test_predict(mocker, output, expected):
 )
 async def test_predict_async_post(mocker, job_id):
     mocker.patch('app.api._predict._save_data_job', return_value=job_id)
-    mocker.patch('app.api._predict._predict_job', return_value=job_id)
     result = await _predict_async_post(MockData(), mock_BackgroundTasks)
     assert result['job_id'] == job_id
 

@@ -24,21 +24,13 @@ pytestD := docker build -t $(imageName):$(testImageVersion) -f $(dockerfileDir)/
 trainIris := PYTHONPATH=$(absolutePath) python app/ml/iris/iris_trainer.py 
 
 .PHONY: clean pip_freeze dirs compose_build compose_up compose_down test test_d train_iris
-dirs:
-	mkdir -p container_files/logs
-	mkdir -p container_files/data
-	touch container_files/logs/gunicorn_error.log
-	touch container_files/logs/gunicorn_access.log
-	touch container_files/logs/uvicorn_error.log
-	touch container_files/logs/uvicorn_access.log
-
 pip_freeze:
 	$(pipFreeze)
 
 clean:
 	$(composeDown)
 
-compose_build: pip_freeze dirs
+compose_build: pip_freeze
 	$(composeBuild)
 
 compose_up:
@@ -50,7 +42,7 @@ compose_down:
 test:
 	$(pytest)
 
-test_d: pip_freeze dirs
+test_d: pip_freeze
 	$(pytestD)
 
 train_iris:

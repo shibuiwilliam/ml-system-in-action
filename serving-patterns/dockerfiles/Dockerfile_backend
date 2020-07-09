@@ -8,6 +8,7 @@ RUN apt-get -y update && \
     pip install -r requirements.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
-COPY ./run_api.sh ${PROJECT_DIR}run_api.sh
-RUN chmod +x run_api.sh
-CMD ['./run_api.sh']
+ENV RUN_FILE run_backend.sh
+COPY ./${RUN_FILE} ${PROJECT_DIR}${RUN_FILE}
+RUN chmod +x ${RUN_FILE}
+CMD ['./${RUN_FILE}']
