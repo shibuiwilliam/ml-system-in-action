@@ -3,7 +3,7 @@ import logging
 from pydantic import BaseModel
 
 from app.ml.base_predictor import BaseData
-from . import store_data_job
+from app.jobs import store_data_job
 
 logger = logging.getLogger(__name__)
 
@@ -14,13 +14,13 @@ def predict_from_redis_cache(
         baseData: Any,
         baseDataExtentions: Any) -> BaseData:
     data_dict = store_data_job.load_data_redis(job_id)
-    logger.info(data_dict)
     if data_dict is None:
         return None
     data = baseData(**data_dict)
     data_extension = baseDataExtentions(data)
     data_extension.convert_input_data_to_np_data()
     data.output = predictor.predict(data)
+    logger.info(f'prediction: {job_id} {data.__dict__}')
     return data
 
 

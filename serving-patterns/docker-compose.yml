@@ -53,6 +53,7 @@ services:
       dockerfile: dockerfiles/Dockerfile_backend
     environment:
       - PLATFORM=docker_compose
+      - NUM_PROCS=4
     command: ./run_backend.sh
 
   redis:
