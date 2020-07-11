@@ -24,7 +24,7 @@ class MockData(BaseData):
     [(CONSTANTS.REDIS_QUEUE, 'abc', True)]
 )
 def test_left_push_queue(mocker, queue_name, key, expected):
-    mocker.patch('app.middleware.redis.redis_connector.lpush', return_value=expected)
+    mocker.patch('app.middleware.redis_client.redis_client.lpush', return_value=expected)
     result = store_data_job.left_push_queue(queue_name, key)
     assert result == expected
 
@@ -34,8 +34,8 @@ def test_left_push_queue(mocker, queue_name, key, expected):
     [(CONSTANTS.REDIS_QUEUE, 1, 'abc')]
 )
 def test_right_pop_queue(mocker, queue_name, num, key):
-    mocker.patch('app.middleware.redis.redis_connector.llen', return_value=num)
-    mocker.patch('app.middleware.redis.redis_connector.rpop', return_value=key)
+    mocker.patch('app.middleware.redis_client.redis_client.llen', return_value=num)
+    mocker.patch('app.middleware.redis_client.redis_client.rpop', return_value=key)
     result = store_data_job.right_pop_queue(queue_name)
     assert result == key
 
@@ -45,8 +45,8 @@ def test_right_pop_queue(mocker, queue_name, num, key):
     [(CONSTANTS.REDIS_QUEUE, 0)]
 )
 def test_right_pop_queue_none(mocker, queue_name, num):
-    mocker.patch('app.middleware.redis.redis_connector.llen', return_value=num)
-    mocker.patch('app.middleware.redis.redis_connector.rpop', return_value=None)
+    mocker.patch('app.middleware.redis_client.redis_client.llen', return_value=num)
+    mocker.patch('app.middleware.redis_client.redis_client.rpop', return_value=None)
     result = store_data_job.right_pop_queue(queue_name)
     assert result is None
 
@@ -56,7 +56,7 @@ def test_right_pop_queue_none(mocker, queue_name, num):
     [(test_job_id, {'data': [1.0, -1.0], 'prediction': None})]
 )
 def test_load_data_redis(mocker, key, data):
-    mocker.patch('app.middleware.redis.redis_connector.get', return_value=data)
+    mocker.patch('app.middleware.redis_client.redis_client.get', return_value=data)
     mocker.patch('json.loads', return_value=data)
     result = store_data_job.load_data_redis(key)
     assert result['data'] == data['data']
@@ -90,10 +90,10 @@ class Test:
         def get(key):
             return self.mock_redis_cache.get(key, None)
         mocker.patch(
-            'app.middleware.redis.redis_connector.incr',
+            'app.middleware.redis_client.redis_client.incr',
             return_value=0)
         mocker.patch(
-            'app.middleware.redis.redis_connector.set').side_effect = set
+            'app.middleware.redis_client.redis_client.set').side_effect = set
 
         result = store_data_job.save_data_redis_job(job_id, data)
         assert result
@@ -110,10 +110,10 @@ class Test:
         def get(key):
             return self.mock_redis_cache.get(key, None)
         mocker.patch(
-            'app.middleware.redis.redis_connector.incr',
+            'app.middleware.redis_client.redis_client.incr',
             return_value=0)
         mocker.patch(
-            'app.middleware.redis.redis_connector.set').side_effect = set
+            'app.middleware.redis_client.redis_client.set').side_effect = set
 
         result = store_data_job.save_data_dict_redis_job(job_id, data)
         assert result

@@ -28,17 +28,7 @@ class IrisClassifier(BasePredictor):
         self.classifier = joblib.load(self.model_path)
         logger.info(f'initialized {self.__class__.__name__}')
 
-    def predict(self, iris_data: IrisData) -> np.ndarray:
+    def predict(self, input: np.ndarray) -> np.ndarray:
         logger.info(f'run predict proba in {self.__class__.__name__}')
-        if iris_data.np_data is None:
-            raise ValueError()
-
-        iris_data.output = self.classifier.predict_proba(iris_data.np_data)
-
-        logger.info({
-            'prediction': {
-                'data': iris_data.np_data,
-                'output': iris_data.output
-            }
-        })
-        return iris_data.output
+        output = self.classifier.predict_proba(input)
+        return output

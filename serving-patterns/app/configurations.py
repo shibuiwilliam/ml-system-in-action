@@ -14,6 +14,16 @@ class _PlatformConfigurations():
         PLATFORM_ENUM.KUBERNETES.value) else PLATFORM_ENUM.DOCKER_COMPOSE.value
 
 
+class _CacheConfigurations():
+    cache_host = os.getenv('CACHE_HOST', 'redis')
+    cache_port = int(os.getenv('CACHE_PORT', 6379))
+
+
+class _RedisCacheConfigurations(_CacheConfigurations):
+    redis_db = int(os.getenv('REDIS_DB', 0))
+    redis_decode_responses = bool(os.getenv('REDIS_DECODE_RESPONSES', True))
+
+
 class _FastAPIConfigurations():
     title = os.getenv('FASTAPI_TITLE', 'ML Rest')
     description = os.getenv('FASTAPI_DESCRIPTION', 'ML rest description')

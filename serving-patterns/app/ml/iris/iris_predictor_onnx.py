@@ -30,21 +30,11 @@ class IrisClassifier(BasePredictor):
         self.input_name = self.classifier.get_inputs()[0].name
         logger.info(f'initialized {self.__class__.__name__}')
 
-    def predict(self, iris_data: IrisData) -> np.ndarray:
+    def predict(self, input: np.ndarray) -> np.ndarray:
         logger.info(f'run predict proba in {self.__class__.__name__}')
-        if iris_data.np_data is None:
-            raise ValueError()
-
         _prediction = self.classifier.run(
             None,
-            {self.input_name: iris_data.np_data.astype(np.float32)}
+            {self.input_name: input.astype(np.float32)}
         )
-        iris_data.output = np.array(list(_prediction[1][0].values()))
-
-        logger.info({
-            'prediction': {
-                'data': iris_data.np_data,
-                'output': iris_data.output
-            }
-        })
-        return iris_data.output
+        output = np.array(list(_prediction[1][0].values()))
+        return output

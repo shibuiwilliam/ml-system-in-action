@@ -5,21 +5,20 @@ from concurrent.futures import ProcessPoolExecutor
 
 from app.constants import CONSTANTS
 from app.ml.active_predictor import Data, DataExtension, active_predictor
-from app.jobs.predict_job import predict_from_redis_cache
+from app.api._predict import _predict_from_redis_cache
 from app.jobs import store_data_job
+from app.middleware.profiler import do_cprofile
+
 
 logger = logging.getLogger('prediction_batch')
 
 
+@do_cprofile
 def _run_prediction_if_queue():
     job_id = store_data_job.right_pop_queue(CONSTANTS.REDIS_QUEUE)
     logger.info(f'predict job_id: {job_id}')
     if job_id is not None:
-        data = predict_from_redis_cache(
-            job_id,
-            active_predictor,
-            Data,
-            DataExtension)
+        data = _predict_from_redis_cache(job_id)
         if data is not None:
             store_data_job.save_data_redis_job(job_id, data)
         else:

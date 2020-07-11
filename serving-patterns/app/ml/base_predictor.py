@@ -8,11 +8,9 @@ from app.ml.extract_np_type import type_name_to_np_type
 
 class BaseData(BaseModel):
     data: Union[List[float], List[List[float]]] = None
-    np_data: np.ndarray = None
     input_shape: Sequence[int] = None
     input_type: str = None
     prediction: Union[List[float], List[List[float]], float] = None
-    output: np.ndarray = None
     output_shape: Sequence[int] = None
     output_type: str = None
 
@@ -27,30 +25,13 @@ class BaseDataExtension(metaclass=ABCMeta):
         self._input_type = type_name_to_np_type(self.data_object.input_type)
         self._output_type = type_name_to_np_type(self.data_object.output_type)
 
-    def convert_input_data_to_np_data(self):
-        self.data_object.np_data = np.array(self.data_object.data)
-        self._reshape_input()
-        self._astype_input()
+    def convert_input_data_to_np(self) -> np.ndarray:
+        np_data = np.array(self.data_object.data).astype(self._input_type).reshape(self.data_object.input_shape)
+        return np_data
 
-    def _reshape_input(self):
-        self.data_object.np_data = self.data_object.np_data.reshape(
-            self.data_object.input_shape)
-
-    def _astype_input(self):
-        self.data_object.np_data = self.data_object.np_data.astype(
-            self._input_type)
-
-    def convert_output_to_np(self):
-        self._reshape_output()
-        self._astype_output()
-
-    def _reshape_output(self):
-        self.data_object.output = self.data_object.output.reshape(
-            self.data_object.output_shape)
-
-    def _astype_output(self):
-        self.data_object.output = self.data_object.output.astype(
-            self._output_type)
+    def reshape_output(self, output: np.ndarray) -> np.ndarray:
+        np_data = output.astype(self._output_type).reshape(self.data_object.output_shape)
+        return np_data
 
 
 class BasePredictor(metaclass=ABCMeta):
