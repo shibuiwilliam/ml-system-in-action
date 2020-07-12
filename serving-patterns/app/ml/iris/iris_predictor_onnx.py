@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Sequence
 import numpy as np
 import onnxruntime as rt
 
-from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
+from app.ml.base_predictor import BaseData, BaseMetaData, BaseDataConverter, BasePredictor
 import logging
 
 
@@ -13,7 +13,11 @@ class IrisData(BaseData):
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
 
 
-class IrisDataExtension(BaseDataExtension):
+class IrisMetadata(BaseMetaData):
+    pass
+
+
+class IrisDataConverter(BaseDataConverter):
     pass
 
 

@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 from app.constants import CONSTANTS
 from app.jobs import store_data_job
-from app.ml.base_predictor import BaseData
+from app.ml.base_predictor import BaseData, BaseMetaData
 
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
@@ -13,6 +13,9 @@ test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
 class MockData(BaseData):
     data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+
+
+class MockMetaData(BaseMetaData):
     input_shape: Tuple[int] = (1, 4)
     input_type: str = 'float64'
     output_shape: Tuple[int] = (1, 3)

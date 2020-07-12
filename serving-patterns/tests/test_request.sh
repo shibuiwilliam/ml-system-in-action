@@ -24,7 +24,7 @@ function test_predict() {
 function predict() {
     curl -X POST \
         -H "Content-Type: application/json" \
-        -d '{"data": [5.2, 3.1, 0.1, 1.0]}' \
+        -d '{"input_data": [5.2, 3.1, 0.1, 1.0]}' \
         ${TARGET_HOST}:$1/${PREDICT}
     echo ""
 }

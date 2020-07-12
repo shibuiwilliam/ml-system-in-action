@@ -12,6 +12,7 @@ services:
       - WORKERS=4
       - APP_NAME=app.apps.app_web_single
       - PORT=8888
+      - PROFILE=0
     ports:
       - "8888:8888"
     command: ./run_api.sh
@@ -27,6 +28,7 @@ services:
       - WORKERS=4
       - APP_NAME=app.apps.app_synchronous
       - PORT=8889
+      - PROFILE=0
     ports:
       - "8889:8889"
     command: ./run_api.sh
@@ -42,6 +44,7 @@ services:
       - WORKERS=4
       - APP_NAME=app.apps.app_asynchronous
       - PORT=8890
+      - PROFILE=0
     ports:
       - "8890:8890"
     command: ./run_api.sh
@@ -54,6 +57,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - NUM_PROCS=4
+      - PROFILE=0
     command: ./run_backend.sh
 
   redis:

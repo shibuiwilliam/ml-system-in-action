@@ -7,30 +7,32 @@ from app.ml.extract_np_type import type_name_to_np_type
 
 
 class BaseData(BaseModel):
-    data: Union[List[float], List[List[float]]] = None
+    input_data: Union[List[float], List[List[float]]] = None
+    prediction: Union[List[float], List[List[float]], float] = None
+
+
+class BaseMetaData(BaseModel):
     input_shape: Sequence[int] = None
     input_type: str = None
-    prediction: Union[List[float], List[List[float]], float] = None
     output_shape: Sequence[int] = None
     output_type: str = None
 
-    class Config:
-        arbitrary_types_allowed = True
-        extra = Extra.allow
 
+class BaseDataConverter(BaseModel):
+    meta_data: BaseMetaData = None
 
-class BaseDataExtension(metaclass=ABCMeta):
-    def __init__(self, data_object: BaseData):
-        self.data_object = data_object
-        self._input_type = type_name_to_np_type(self.data_object.input_type)
-        self._output_type = type_name_to_np_type(self.data_object.output_type)
-
-    def convert_input_data_to_np(self) -> np.ndarray:
-        np_data = np.array(self.data_object.data).astype(self._input_type).reshape(self.data_object.input_shape)
+    @classmethod
+    def convert_input_data_to_np(cls, input_data: Any) -> np.ndarray:
+        np_data = np.array(input_data).astype(
+            cls.meta_data.input_type).reshape(
+            cls.meta_data.input_shape)
         return np_data
 
-    def reshape_output(self, output: np.ndarray) -> np.ndarray:
-        np_data = output.astype(self._output_type).reshape(self.data_object.output_shape)
+    @classmethod
+    def reshape_output(cls, output: np.ndarray) -> np.ndarray:
+        np_data = output.astype(
+            cls.meta_data.output_type).reshape(
+            cls.meta_data.output_shape)
         return np_data
 
 

@@ -27,6 +27,8 @@ def get_data() -> Dict[str, np.ndarray]:
         iris.target,
         shuffle=True,
         test_size=0.3)
+    x_train = x_train.astype(np.float32)
+    y_train = y_train.astype(np.float32)
     return {'x_train': x_train,
             'x_test': x_test,
             'y_train': y_train,
@@ -153,7 +155,7 @@ def main():
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
-                   'float64',
+                   'float32',
                    model_filename,
                    PREDICTION_TYPE.CLASSIFICATION,
                    PREDICTION_RUNTIME.SKLEARN)
@@ -191,7 +193,7 @@ def main():
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
-                   'float64',
+                   'float32',
                    model_filename,
                    PREDICTION_TYPE.CLASSIFICATION,
                    PREDICTION_RUNTIME.SKLEARN)

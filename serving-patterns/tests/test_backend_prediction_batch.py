@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from typing import List, Tuple
 
-from app.ml.base_predictor import BaseData, BaseDataExtension, BasePredictor
+from app.ml.base_predictor import BaseData, BaseMetaData, BaseDataConverter, BasePredictor
 from app.backend.prediction_batch import prediction_batch
 
 
@@ -12,40 +12,49 @@ f_data = [[5.1, 3.5, 1.4, 0.2]]
 
 
 class MockData(BaseData):
-    data: List[List[float]] = f_data
-    input_shape: Tuple[int] = (1, 4)
-    input_type: str = 'float64'
-    output_shape: Tuple[int] = (1, 3)
-    output_type: str = 'float64'
+    input_data: List[List[float]] = f_data
+    test_data: List[List[float]] = f_data
 
 
-class MockDataExtension(BaseDataExtension):
+class MockMetaData(BaseMetaData):
     pass
+
+MockMetaData.input_shape = (1, 4)
+MockMetaData.input_type = 'float32'
+MockMetaData.output_shape = (1, 3)
+MockMetaData.output_type = 'float32'
+
+
+class MockDataConverter(BaseDataConverter):
+    pass
+
+
+MockDataConverter.meta_data = MockMetaData
 
 
 @pytest.mark.parametrize(
     ('job_id', 'data'),
     [(test_job_id, MockData())]
 )
-def test_run_prediction_if_queue(mocker, job_id, data):
+def test_run_prediction(mocker, job_id, data):
     mocker.patch('app.jobs.store_data_job.right_pop_queue', return_value=job_id)
     mocker.patch('app.api._predict._predict_from_redis_cache', return_value=data)
     mocker.patch('app.jobs.store_data_job.save_data_redis_job', return_value=None)
     mocker.patch('app.jobs.store_data_job.left_push_queue', return_value=None)
     mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data.__dict__)
 
-    prediction_batch._run_prediction_if_queue()
+    prediction_batch._trigger_prediction_if_queue()
 
 
 @pytest.mark.parametrize(
     ('job_id', 'data'),
     [(None, None)]
 )
-def test_run_prediction_if_queue_none(mocker, job_id, data):
+def test_run_prediction_none(mocker, job_id, data):
     mocker.patch('app.jobs.store_data_job.right_pop_queue', return_value=job_id)
     mocker.patch('app.api._predict._predict_from_redis_cache', return_value=data)
     mocker.patch('app.jobs.store_data_job.save_data_redis_job', return_value=None)
     mocker.patch('app.jobs.store_data_job.left_push_queue', return_value=None)
     mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data)
 
-    prediction_batch._run_prediction_if_queue()
+    prediction_batch._trigger_prediction_if_queue()

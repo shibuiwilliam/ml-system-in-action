@@ -5,7 +5,7 @@ import logging
 
 from app.middleware.profiler import do_cprofile
 from app.jobs import store_data_job
-from app.ml.active_predictor import Data, DataExtension, active_predictor
+from app.ml.active_predictor import Data, MetaData, DataConverter, active_predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
 from app.configurations import _PlatformConfigurations
 from app.middleware.redis_client import redis_client
@@ -33,10 +33,9 @@ def _save_data_job(data: Data,
 
 
 def __predict(data: Data):
-    data_extension = DataExtension(data)
-    input_np = data_extension.convert_input_data_to_np()
+    input_np = DataConverter.convert_input_data_to_np(data.input_data)
     output_np = active_predictor.predict(input_np)
-    reshaped_output_nps = data_extension.reshape_output(output_np)
+    reshaped_output_nps = DataConverter.reshape_output(output_np)
     data.prediction = reshaped_output_nps.tolist()
     logger.info(f'prediction: {data.__dict__}')
 
@@ -51,7 +50,7 @@ def _predict_from_redis_cache(job_id: str) -> Data:
 
 
 def _test(data: Data = Data()) -> Dict[str, int]:
-    data.data = data.test_data
+    data.input_data = data.test_data
     __predict(data)
     return {'prediction': data.prediction}
 
