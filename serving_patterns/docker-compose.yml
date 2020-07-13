@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  web_single:
+    container_name: serving_patterns_web_single
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_api
+    environment:
+      - PLATFORM=docker_compose
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_web_single
+      - PORT=8888
+      - PROFILE=0
+    ports:
+      - "8888:8888"
+    command: ./run_api.sh
+
+  synchronous:
+    container_name: serving_patterns_synchronous
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_api
+    environment:
+      - PLATFORM=docker_compose
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_synchronous
+      - PORT=8889
+      - PROFILE=0
+    ports:
+      - "8889:8889"
+    command: ./run_api.sh
+
+  asynchronous:
+    container_name: serving_patterns_asynchronous
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_api
+    environment:
+      - PLATFORM=docker_compose
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_asynchronous
+      - PORT=8890
+      - PROFILE=0
+    ports:
+      - "8890:8890"
+    command: ./run_api.sh
+
+  backend:
+    container_name: serving_patterns_backend
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_backend
+    environment:
+      - PLATFORM=docker_compose
+      - NUM_PROCS=4
+      - BATCH_CODE=app.backend.prediction_batch
+      - PROFILE=0
+    command: ./run_backend.sh
+
+  redis:
+    container_name: serving_patterns_redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
