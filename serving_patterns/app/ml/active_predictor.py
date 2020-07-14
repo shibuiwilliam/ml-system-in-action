@@ -1,19 +1,16 @@
 import logging
+import importlib
 
-from app.constants import PREDICTION_RUNTIME
 from app.configurations import _ModelConfigurations
 
-if _ModelConfigurations().prediction_runtime == PREDICTION_RUNTIME.ONNX_RUNTIME.value:
-    from app.ml.iris.iris_predictor_onnx import IrisClassifier, IrisDataInterface, IrisData, IrisDataConverter
-elif _ModelConfigurations().prediction_runtime == PREDICTION_RUNTIME.SKLEARN.value:
-    from app.ml.iris.iris_predictor_sklearn import IrisClassifier, IrisDataInterface, IrisData, IrisDataConverter
+runner = importlib.import_module(_ModelConfigurations().runner)
 
 
 logger = logging.getLogger(__name__)
-ActiveData = IrisData
-ActiveDataInterface = IrisDataInterface
-ActiveDataConverter = IrisDataConverter
-ActivePredictor = IrisClassifier
+ActiveData = runner._Data
+ActiveDataInterface = runner._DataInterface
+ActiveDataConverter = runner._DataConverter
+ActivePredictor = runner._Classifier
 
 
 class Data(ActiveData):
@@ -38,6 +35,6 @@ DataInterface.output_shape = _ModelConfigurations().io['output_shape']
 DataInterface.output_type = _ModelConfigurations().io['output_type']
 DataInterface.data_type = _ModelConfigurations().io['data_type']
 
-DataConverter.meta_data = DataInterface
+DataConverter.data_interface = DataInterface
 
-active_predictor = Predictor(_ModelConfigurations().model_filepath)
+active_predictor = Predictor(_ModelConfigurations().model_runners)

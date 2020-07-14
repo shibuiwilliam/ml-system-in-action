@@ -20,20 +20,20 @@ class BaseDataInterface(BaseModel):
 
 
 class BaseDataConverter(BaseModel):
-    meta_data: BaseDataInterface = None
+    data_interface: BaseDataInterface = None
 
     @classmethod
     def convert_input_data_to_np(cls, input_data: Any) -> np.ndarray:
         np_data = np.array(input_data).astype(
-            cls.meta_data.input_type).reshape(
-            cls.meta_data.input_shape)
+            cls.data_interface.input_type).reshape(
+            cls.data_interface.input_shape)
         return np_data
 
     @classmethod
     def reshape_output(cls, output: np.ndarray) -> np.ndarray:
         np_data = output.astype(
-            cls.meta_data.output_type).reshape(
-            cls.meta_data.output_shape)
+            cls.data_interface.output_type).reshape(
+            cls.data_interface.output_shape)
         return np_data
 
 

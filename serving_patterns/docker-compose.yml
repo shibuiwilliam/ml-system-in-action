@@ -8,6 +8,7 @@ services:
       dockerfile: dockerfiles/Dockerfile_api
     environment:
       - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_svc_sklearn.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - APP_NAME=app.apps.app_web_single
@@ -16,6 +17,8 @@ services:
     ports:
       - "8888:8888"
     command: ./run_api.sh
+    depends_on:
+      - redis
 
   synchronous:
     container_name: serving_patterns_synchronous
@@ -24,6 +27,7 @@ services:
       dockerfile: dockerfiles/Dockerfile_api
     environment:
       - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - APP_NAME=app.apps.app_synchronous
@@ -32,6 +36,8 @@ services:
     ports:
       - "8889:8889"
     command: ./run_api.sh
+    depends_on:
+      - redis
 
   asynchronous:
     container_name: serving_patterns_asynchronous
@@ -40,6 +46,7 @@ services:
       dockerfile: dockerfiles/Dockerfile_api
     environment:
       - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - APP_NAME=app.apps.app_asynchronous
@@ -48,6 +55,9 @@ services:
     ports:
       - "8890:8890"
     command: ./run_api.sh
+    depends_on:
+      - backend
+      - redis
 
   backend:
     container_name: serving_patterns_backend
@@ -56,10 +66,30 @@ services:
       dockerfile: dockerfiles/Dockerfile_backend
     environment:
       - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
       - NUM_PROCS=4
       - BATCH_CODE=app.backend.prediction_batch
       - PROFILE=0
     command: ./run_backend.sh
+
+  web_single_image:
+    container_name: serving_patterns_web_single_image
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_api
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=imagenet_resnet50.yaml
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_web_single_image
+      - PORT=8891
+      - PROFILE=0
+    ports:
+      - "8891:8891"
+    command: ./run_api.sh
+    depends_on:
+      - redis
 
   redis:
     container_name: serving_patterns_redis

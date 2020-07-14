@@ -11,7 +11,8 @@ import numpy as np
 from typing import Dict, List, Union
 import yaml
 
-from app.constants import PREDICTION_TYPE, PREDICTION_RUNTIME, DATA_TYPE
+from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
+from app.ml.save_helper import save_interface
 
 
 MODEL_DIR = './app/ml/models/'
@@ -107,38 +108,6 @@ def save_onnx(model,
     test_run()
 
 
-def save_interface(modelname: str,
-                   filename: str,
-                   input_shape: List,
-                   input_type: str,
-                   output_shape: List,
-                   output_type: str,
-                   data_type: DATA_TYPE,
-                   model_filename: Union[List[str], str],
-                   prediction_type: PREDICTION_TYPE,
-                   prediction_runtime: PREDICTION_RUNTIME):
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    filepath = os.path.join(MODEL_DIR, filename)
-    model_filename_list = model_filename if isinstance(model_filename, List) else [model_filename]
-    with open(filepath, 'w') as f:
-        f.write(yaml.dump({
-            modelname: {
-                'data_interface': {
-                    'input_shape': input_shape,
-                    'input_type': input_type,
-                    'output_shape': output_shape,
-                    'output_type': output_type,
-                    'data_type': data_type.value
-                },
-                'meta': {
-                    'model_filename': model_filename_list,
-                    'prediction_type': prediction_type.value,
-                    'prediction_runtime': prediction_runtime.value
-                }
-            }
-        }, default_flow_style=False))
-
-
 def main():
     data = get_data()
 
@@ -153,16 +122,17 @@ def main():
                    data['y_train'],
                    data['x_test'],
                    data['y_test'])
-    save_interface(modelname,
+    save_interface(MODEL_DIR, 
+                   modelname,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   model_filename,
+                   [{model_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   PREDICTION_RUNTIME.SKLEARN)
+                   'app.ml.iris.iris_predictor_sklearn')
 
     onnx_filename = f'{modelname}.onnx'
     interface_filename = f'{modelname}_onnx_runtime.yaml'
@@ -171,16 +141,17 @@ def main():
               onnx_filename,
               data['x_test'],
               data['y_test'])
-    save_interface(modelname,
+    save_interface(MODEL_DIR, 
+                   modelname,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   onnx_filename,
+                   [{onnx_filename: MODEL_RUNTIME.ONNX_RUNTIME}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   PREDICTION_RUNTIME.ONNX_RUNTIME)
+                   'app.ml.iris.iris_predictor_onnx')
 
     tree_pipeline = define_tree_pipeline()
     modelname = 'iris_tree'
@@ -193,16 +164,17 @@ def main():
                    data['y_train'],
                    data['x_test'],
                    data['y_test'])
-    save_interface(modelname,
+    save_interface(MODEL_DIR, 
+                   modelname,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   model_filename,
+                   [{model_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   PREDICTION_RUNTIME.SKLEARN)
+                   'app.ml.iris.iris_predictor_sklearn')
 
     onnx_filename = f'{modelname}.onnx'
     interface_filename = f'{modelname}_onnx_runtime.yaml'
@@ -211,16 +183,17 @@ def main():
               onnx_filename,
               data['x_test'],
               data['y_test'])
-    save_interface(modelname,
+    save_interface(MODEL_DIR, 
+                   modelname,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   onnx_filename,
+                   [{onnx_filename: MODEL_RUNTIME.ONNX_RUNTIME}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   PREDICTION_RUNTIME.ONNX_RUNTIME)
+                   'app.ml.iris.iris_predictor_onnx')
 
 
 if __name__ == '__main__':

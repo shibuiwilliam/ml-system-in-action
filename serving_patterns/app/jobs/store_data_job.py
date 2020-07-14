@@ -4,6 +4,7 @@ import logging
 from pydantic import BaseModel
 import json
 import numpy as np
+import io
 
 from app.constants import CONSTANTS
 from app.middleware.redis_client import redis_client
@@ -42,7 +43,12 @@ def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
 def save_data_redis_job(job_id: str, data: BaseData) -> bool:
     data_dict = {}
     for k, v in data.__dict__.items():
-        data_dict[k] = v.tolist() if isinstance(v, np.ndarray) else v
+        if isinstance(v, np.ndarray):
+            data_dict[k] = v.tolist()
+        elif isinstance(v, io.BytesIO):
+            data_dict[k] = str(v.getvalue())
+        else:
+            data_dict[k] = v
     return save_data_dict_redis_job(job_id, data_dict)
 
 

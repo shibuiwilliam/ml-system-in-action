@@ -62,7 +62,7 @@ def test_BaseDataInterface(
 
 
 @pytest.mark.parametrize(
-    ('meta_data_dict'),
+    ('data_interface_data_dict'),
     [(
         {'input_shape': (1, 4),
          'input_type': 'float32',
@@ -78,18 +78,18 @@ def test_BaseDataInterface(
 )
 def test_BaseDataDict(
         mocker,
-        meta_data_dict):
+        data_interface_data_dict):
     class MockDataInterface(BaseDataInterface):
         pass
 
-    MockDataInterface.input_type = meta_data_dict['input_type']
-    MockDataInterface.input_shape = meta_data_dict['input_shape']
-    MockDataInterface.output_shape = meta_data_dict['output_shape']
-    MockDataInterface.output_type = meta_data_dict['output_type']
-    assert MockDataInterface.input_type == meta_data_dict['input_type']
-    assert MockDataInterface.input_shape == meta_data_dict['input_shape']
-    assert MockDataInterface.output_shape == meta_data_dict['output_shape']
-    assert MockDataInterface.output_type == meta_data_dict['output_type']
+    MockDataInterface.input_type = data_interface_data_dict['input_type']
+    MockDataInterface.input_shape = data_interface_data_dict['input_shape']
+    MockDataInterface.output_shape = data_interface_data_dict['output_shape']
+    MockDataInterface.output_type = data_interface_data_dict['output_type']
+    assert MockDataInterface.input_type == data_interface_data_dict['input_type']
+    assert MockDataInterface.input_shape == data_interface_data_dict['input_shape']
+    assert MockDataInterface.output_shape == data_interface_data_dict['output_shape']
+    assert MockDataInterface.output_type == data_interface_data_dict['output_type']
 
 
 @pytest.mark.parametrize(
@@ -125,16 +125,16 @@ def test_BaseDataConverter(
     MockDataInterface.output_shape = output_shape
     MockDataInterface.output_type = output_type
 
-    BaseDataConverter.meta_data = MockDataInterface
+    BaseDataConverter.data_interface = MockDataInterface
     np_data = BaseDataConverter.convert_input_data_to_np(mock_data.input_data)
     output = BaseDataConverter.reshape_output(np.array([mock_data.prediction]))
-    assert np_data.shape == BaseDataConverter.meta_data.input_shape
+    assert np_data.shape == BaseDataConverter.data_interface.input_shape
     assert np_data.dtype == expected_input_datatype
-    assert output.shape == BaseDataConverter.meta_data.output_shape
+    assert output.shape == BaseDataConverter.data_interface.output_shape
     assert output.dtype == expected_output_datatype
     # print()
     # print(MockDataInterface.__dict__)
-    # print(BaseDataConverter.meta_data.__dict__)
+    # print(BaseDataConverter.data_interface.__dict__)
     # print(MockDataInterface.input_shape)
     # print(MockDataInterface.output_shape)
     # print(np_data.shape)
@@ -180,20 +180,20 @@ def test_BaseDataConverter2(
     MockDataInterface.output_shape = output_shape
     MockDataInterface.output_type = output_type
 
-    MockDataConverter.meta_data = MockDataInterface
+    MockDataConverter.data_interface = MockDataInterface
     np_data = MockDataConverter.convert_input_data_to_np(mock_data.input_data)
     output = MockDataConverter.reshape_output(np.array([mock_data.prediction]))
-    assert np_data.shape == MockDataConverter.meta_data.input_shape
+    assert np_data.shape == MockDataConverter.data_interface.input_shape
     assert np_data.dtype == expected_input_datatype
-    assert output.shape == MockDataConverter.meta_data.output_shape
+    assert output.shape == MockDataConverter.data_interface.output_shape
     assert output.dtype == expected_output_datatype
     # print()
     # print(MockDataInterface.__dict__)
-    # print(MockDataConverter.meta_data.__dict__)
+    # print(MockDataConverter.data_interface.__dict__)
     # print(MockDataInterface.input_shape)
     # print(MockDataInterface.output_shape)
-    # print(MockDataConverter.meta_data.input_shape)
-    # print(MockDataConverter.meta_data.output_shape)
+    # print(MockDataConverter.data_interface.input_shape)
+    # print(MockDataConverter.data_interface.output_shape)
     # print(np_data.shape)
     # print(output.shape)
     # print(np_data.dtype)

@@ -1,0 +1,14 @@
+FROM python:3.7-slim
+
+ENV PROJECT_DIR /serving_patterns/
+WORKDIR ${PROJECT_DIR}
+ADD requirements.txt ${PROJECT_DIR}
+RUN apt-get -y update && \
+    apt-get -y install gcc && \
+    pip install -r requirements.txt
+
+COPY ./app/ ${PROJECT_DIR}app/
+ENV RUN_FILE run_extract_imagenet_resnet50.sh
+COPY ./scripts/${RUN_FILE} ${PROJECT_DIR}${RUN_FILE}
+RUN chmod +x ${RUN_FILE}
+CMD ./run_extract_imagenet_resnet50.sh

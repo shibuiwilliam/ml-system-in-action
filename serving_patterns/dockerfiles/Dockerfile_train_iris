@@ -8,7 +8,7 @@ RUN apt-get -y update && \
     pip install -r requirements.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
-ENV RUN_FILE run_train.sh
+ENV RUN_FILE run_train_iris.sh
 COPY ./scripts/${RUN_FILE} ${PROJECT_DIR}${RUN_FILE}
 RUN chmod +x ${RUN_FILE}
-CMD ./run_train.sh
+CMD ./run_train_iris.sh

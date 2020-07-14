@@ -9,27 +9,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class IrisData(BaseData):
+class _Data(BaseData):
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
 
 
-class IrisDataInterface(BaseDataInterface):
+class _DataInterface(BaseDataInterface):
     pass
 
 
-class IrisDataConverter(BaseDataConverter):
+class _DataConverter(BaseDataConverter):
     pass
 
 
-class IrisClassifier(BasePredictor):
-    def __init__(self, model_path):
-        self.model_path = model_path
+class _Classifier(BasePredictor):
+    def __init__(self, model_runners):
+        self.model_runners = model_runners
         self.classifier = None
         self.load_model()
 
     def load_model(self):
         logger.info(f'run load model in {self.__class__.__name__}')
-        self.classifier = joblib.load(self.model_path)
+        for k,v in self.model_runners[0].items():
+            self.classifier = joblib.load(k)
         logger.info(f'initialized {self.__class__.__name__}')
 
     def predict(self, input: np.ndarray) -> np.ndarray:

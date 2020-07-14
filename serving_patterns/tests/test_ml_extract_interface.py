@@ -1,6 +1,6 @@
 import pytest
 from app.ml import extract_interface
-from typing import Tuple
+from typing import Tuple, List
 
 
 filepath = 'app/ml/models/iris_svc_sklearn.yaml'
@@ -17,6 +17,6 @@ def test_extract_interface_yaml(filepath):
     assert isinstance(interface[model_name]['data_interface']['input_type'], str)
     assert isinstance(interface[model_name]['data_interface']['output_shape'], Tuple)
     assert isinstance(interface[model_name]['data_interface']['output_type'], str)
-    assert isinstance(interface[model_name]['meta']['model_filename'], str)
     assert isinstance(interface[model_name]['meta']['prediction_type'], str)
-    assert isinstance(interface[model_name]['meta']['prediction_runtime'], str)
+    assert isinstance(interface[model_name]['meta']['models'], List)
+    assert isinstance(interface[model_name]['meta']['runner'], str)

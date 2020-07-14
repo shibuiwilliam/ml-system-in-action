@@ -9,10 +9,15 @@ testContainerFile := TestDockerfile
 testImageVersion := test
 testContainerName := test
 
-trainContainerFile := Dockerfile_train
-trainImageName := serving_patterns_train_iris
-trainImageVersion := latest
-trainContainerName := serving_patterns_train_iris
+trainIrisContainerFile := Dockerfile_train_iris
+trainIrisImageName := serving_patterns_train_iris
+trainIrisImageVersion := latest
+trainIrisContainerName := serving_patterns_train_iris
+
+extractImagenetResnet50ContainerFile := Dockerfile_extract_imagenet_resnet50
+extractImagenetResnet50ImageName := serving_patterns_extract_imagenet_resnet50
+extractImagenetResnet50ImageVersion := latest
+extractImagenetResnet50ContainerName := serving_patterns_extract_imagenet_resnet50
 
 composeBuild := docker-compose build
 composeUp := docker-compose up -d
@@ -33,14 +38,22 @@ pytestD := docker build \
 testRequest := ./scripts/test_request.sh
 
 trainIris := docker build \
-				-t $(trainImageName):$(trainImageVersion) \
-				-f $(dockerfileDir)/$(trainContainerFile) . && \
+				-t $(trainIrisImageName):$(trainIrisImageVersion) \
+				-f $(dockerfileDir)/$(trainIrisContainerFile) . && \
  			 docker run --rm \
-				--name $(trainContainerName) \
+				--name $(trainIrisContainerName) \
 				-v $(absolutePath)/app/ml/models/:/serving_patterns/app/ml/models/ \
-				$(trainImageName):$(trainImageVersion)
+				$(trainIrisImageName):$(trainIrisImageVersion)
 
-.PHONY: clean pip_freeze compose_build compose_up compose_down test test_d train_iris test_request
+extractImagenetResnet50 := docker build \
+				-t $(extractImagenetResnet50ImageName):$(extractImagenetResnet50ImageVersion) \
+				-f $(dockerfileDir)/$(extractImagenetResnet50ContainerFile) . && \
+ 			 docker run --rm \
+				--name $(extractImagenetResnet50ContainerName) \
+				-v $(absolutePath)/app/ml/models/:/serving_patterns/app/ml/models/ \
+				$(extractImagenetResnet50ImageName):$(extractImagenetResnet50ImageVersion)
+
+.PHONY: clean pip_freeze compose_build compose_up compose_down test test_d train_iris test_request extract_imagenet_resnet50
 pip_freeze:
 	$(pipFreeze)
 
@@ -67,3 +80,6 @@ test_request:
 
 train_iris:
 	$(trainIris)
+
+extract_imagenet_resnet50:
+	$(extractImagenetResnet50)

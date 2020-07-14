@@ -16,7 +16,7 @@ class PREDICTION_TYPE(enum.Enum):
     REGRESSION = 'regression'
 
 
-class PREDICTION_RUNTIME(enum.Enum):
+class MODEL_RUNTIME(enum.Enum):
     SKLEARN = 'sklearn'
     ONNX_RUNTIME = 'onnx_runtime'
 
