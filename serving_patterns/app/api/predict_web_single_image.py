@@ -2,7 +2,6 @@ from fastapi import APIRouter, BackgroundTasks, UploadFile, File
 import logging
 
 from app.api import _predict_image
-from app.ml.active_predictor import Data
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

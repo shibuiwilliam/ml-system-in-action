@@ -1,11 +1,10 @@
-from typing import List, Sequence, Any
+from typing import List, Any
 import numpy as np
 import onnxruntime as rt
 from PIL import Image
 from collections import OrderedDict
 import joblib
 import os
-from sklearn.base import BaseEstimator, TransformerMixin
 
 from app.configurations import _ModelConfigurations
 from app.constants import MODEL_RUNTIME
@@ -47,18 +46,19 @@ class _Classifier(BasePredictor):
         logger.info(f'run load model in {self.__class__.__name__}')
         for m in self.model_runners:
             logger.info(f'{m.items()}')
-            for k,v in m.items():
-                if v==MODEL_RUNTIME.SKLEARN.value:
+            for k, v in m.items():
+                if v == MODEL_RUNTIME.SKLEARN.value:
                     self.classifiers[k] = {
                         'runner': v,
                         'predictor': joblib.load(k)
-                        }
-                elif v==MODEL_RUNTIME.ONNX_RUNTIME.value:
+                    }
+                elif v == MODEL_RUNTIME.ONNX_RUNTIME.value:
                     self.classifiers[k] = {
                         'runner': v,
                         'predictor': rt.InferenceSession(k)
-                        }
-                    self.input_name = self.classifiers[k]['predictor'].get_inputs()[0].name
+                    }
+                    self.input_name = self.classifiers[k]['predictor'].get_inputs()[
+                        0].name
                 else:
                     pass
         logger.info(f'initialized {self.__class__.__name__}')
@@ -67,11 +67,11 @@ class _Classifier(BasePredictor):
         logger.info(f'run predict proba in {self.__class__.__name__}')
         _prediction = input_data
         for k, v in self.classifiers.items():
-            if v['runner']==MODEL_RUNTIME.SKLEARN.value:
+            if v['runner'] == MODEL_RUNTIME.SKLEARN.value:
                 _prediction = np.array(v['predictor'].transform(_prediction))
-            elif v['runner']==MODEL_RUNTIME.ONNX_RUNTIME.value:
+            elif v['runner'] == MODEL_RUNTIME.ONNX_RUNTIME.value:
                 _prediction = np.array(v['predictor'].run(
-                    None, 
+                    None,
                     {self.input_name: _prediction.astype(np.float32)}
                 ))
         output = _prediction

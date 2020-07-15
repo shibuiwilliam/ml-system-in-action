@@ -1,15 +1,8 @@
 import onnxruntime as rt
 import os
-import json
 import joblib
 from PIL import Image
 import numpy as np
-from typing import Tuple, List, Union
-import yaml
-from skl2onnx import convert_sklearn, update_registered_converter
-from skl2onnx.common.data_types import FloatTensorType
-from sklearn.pipeline import Pipeline
-from sklearn.base import BaseEstimator, TransformerMixin
 
 from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 from app.ml.save_helper import save_interface, load_labels
