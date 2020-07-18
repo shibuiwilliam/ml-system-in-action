@@ -8,6 +8,7 @@ RUN apt-get -y update && \
     pip install -r requirements_api.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
+COPY ./models/ ${PROJECT_DIR}models/
 COPY ./scripts/get_imagenet_resnet50v2_onnx.sh ${PROJECT_DIR}get_imagenet_resnet50v2_onnx.sh
 COPY ./scripts/run_extract_imagenet_resnet50.sh ${PROJECT_DIR}run_extract_imagenet_resnet50.sh
 RUN chmod +x get_imagenet_resnet50v2_onnx.sh
