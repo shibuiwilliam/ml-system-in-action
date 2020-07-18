@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eu
-
 target_dir=./models
 target_tar=${target_dir}/resnet50v2.tar.gz
 target_extracted=${target_dir}/resnet50v2
