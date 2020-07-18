@@ -24,8 +24,8 @@ composeUp := docker-compose up -d
 composeDown := docker-compose down
 
 requirements_api := requirements_api.txt
-pipFreeze := pip freeze > $(dockerfileDir)/$(requirements_api)
-pipInstall := pip install -r $(dockerfileDir)/$(requirements_api)
+pipFreeze := pip freeze > requirements/$(requirements_api)
+pipInstall := pip install -r requirements/$(requirements_api)
 
 pytest := pytest -v -s ./tests/
 pytestD := docker build \
