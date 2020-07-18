@@ -5,7 +5,7 @@ services:
     container_name: serving_patterns_web_single
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api
+      dockerfile: dockerfiles/Dockerfile_api_iris
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=iris_svc_sklearn.yaml
@@ -24,7 +24,7 @@ services:
     container_name: serving_patterns_synchronous
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api
+      dockerfile: dockerfiles/Dockerfile_api_iris
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
@@ -43,7 +43,7 @@ services:
     container_name: serving_patterns_asynchronous
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api
+      dockerfile: dockerfiles/Dockerfile_api_iris
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
@@ -63,7 +63,7 @@ services:
     container_name: serving_patterns_backend
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_backend
+      dockerfile: dockerfiles/Dockerfile_backend_iris
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
@@ -76,7 +76,7 @@ services:
     container_name: serving_patterns_web_single_image
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api
+      dockerfile: dockerfiles/Dockerfile_api_imagenet_resnet50
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=imagenet_resnet50.yaml

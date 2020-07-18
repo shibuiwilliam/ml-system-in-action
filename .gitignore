@@ -132,7 +132,5 @@ dmypy.json
 cython_debug/
 
 .python-version
-*.h5
-*.hdf5
-*.onnx
-serving_patterns/app/ml/models/*.json
+
+serving_patterns/app/ml/models/*
