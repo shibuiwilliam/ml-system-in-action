@@ -26,7 +26,7 @@ RUN apt-get -y update && \
     pip install -r requirements_api.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
-COPY --from=builder ${PROJECT_DIR}app/ml/models/* ./app/ml/models/
+COPY --from=builder ${PROJECT_DIR}models/* ./models/
 
 ENV RUN_FILE run_api.sh
 COPY ./scripts/${RUN_FILE} ${PROJECT_DIR}${RUN_FILE}
