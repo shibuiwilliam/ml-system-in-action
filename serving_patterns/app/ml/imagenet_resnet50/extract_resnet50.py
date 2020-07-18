@@ -6,7 +6,7 @@ import numpy as np
 
 from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 from app.ml.save_helper import save_interface, load_labels
-from app.ml.transformers import ImagePreprocessTransformer, SoftmaxTransformer
+from app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransformer
 
 
 MODEL_DIR = './app/ml/models/'
@@ -26,7 +26,7 @@ def main():
 
     labels = load_labels(LABEL_FILE)
 
-    preprocess = ImagePreprocessTransformer()
+    preprocess = ONNXImagePreprocessTransformer()
 
     image = Image.open(SAMPLE_IMAGE)
     np_image = preprocess.transform(image)

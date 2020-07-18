@@ -9,7 +9,7 @@ import os
 from app.configurations import _ModelConfigurations
 from app.constants import MODEL_RUNTIME
 from app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
-from app.ml.transformers import ImagePreprocessTransformer, SoftmaxTransformer
+from app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransformer
 from app.ml.save_helper import load_labels
 
 import logging
