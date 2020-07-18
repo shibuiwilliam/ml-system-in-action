@@ -135,4 +135,4 @@ cython_debug/
 *.h5
 *.hdf5
 *.onnx
-
+serving_patterns/app/ml/models/*.json

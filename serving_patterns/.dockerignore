@@ -1,0 +1,13 @@
+dockerfile
+.dockerignore
+log
+tmp
+*.sqlite3
+*.sqlite3-journal
+__pycache__
+.pytest_cache
+
+app/ml/models/iris*.json
+app/ml/models/iris*.yaml
+app/ml/models/iris*.pkl
+app/ml/models/iris*.onnx
