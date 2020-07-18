@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api-imagenet-resnet50-web-single
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_imagenet_resnet50:83e49fb
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_imagenet_resnet50:latest
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM
