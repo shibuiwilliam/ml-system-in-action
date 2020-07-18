@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-iris-web-single
+  name: api-imagenet-resnet50-web-single
   labels:
-    app: api-iris-web-single
+    app: api-imagenet-resnet50-web-single
   namespace: serving-pattern
 spec:
   selector:
     matchLabels:
-      app: api-iris-web-single
+      app: api-imagenet-resnet50-web-single
   replicas: 1
   template:
     metadata:
       labels:
-        app: api-iris-web-single
-      name: api-iris-web-single
+        app: api-imagenet-resnet50-web-single
+      name: api-imagenet-resnet50-web-single
     spec:
       containers:
-      - name: api-iris-web-single
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_iris:83e49fb
+      - name: api-imagenet-resnet50-web-single
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_imagenet_resnet50:83e49fb
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM
@@ -26,32 +26,32 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: iris_svc_sklearn.yaml
+          value: imagenet_resnet50.yaml
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
           value: "4"
         - name: APP_NAME
-          value: "app.apps.app_web_single"
+          value: "app.apps.app_web_single_image"
         - name: PORT
-          value: "8888"
+          value: "8891"
         - name: PROFILE
           value: "0"
         ports:
-        - containerPort: 8888
+        - containerPort: 8891
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-iris-web-single
+  name: api-imagenet-resnet50-web-single
   labels:
-    app: api-iris-web-single
+    app: api-imagenet-resnet50-web-single
   namespace: serving-pattern
 spec:
   ports:
-  - port: 8888
+  - port: 8891
     protocol: TCP
   selector:
-    app: api-iris-web-single
+    app: api-imagenet-resnet50-web-single

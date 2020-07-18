@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-iris
+  labels:
+    app: backend-iris
+  namespace: serving-pattern
+spec:
+  selector:
+    matchLabels:
+      app: backend-iris
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backend-iris
+      name: backend-iris
+    spec:
+      containers:
+      - name: backend-iris
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_backend_iris:83e49fb
+        command: ["./run_backend.sh"]
+        env:
+        - name: PLATFORM
+          value: kubernetes
+        - name: CACHE_HOST
+          value: redis.serving-pattern.svc.cluster.local
+        - name: MODEL_INTERFACE
+          value: iris_svc_onnx_runtime.yaml
+        - name: NUM_PROCS
+          value: "4"
+        - name: APP_NAME
+          value: "app.backend.prediction_batch"
+        - name: PROFILE
+          value: "0"
