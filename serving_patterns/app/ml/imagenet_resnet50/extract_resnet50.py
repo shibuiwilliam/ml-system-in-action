@@ -9,7 +9,7 @@ from app.ml.save_helper import save_interface, load_labels
 from app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransformer
 
 
-MODEL_DIR = './app/ml/models/'
+MODEL_DIR = './models/'
 MODEL_FILENAME = 'imagenet_resnet50v2.onnx'
 RESNET50_MODEL = os.path.join(MODEL_DIR, MODEL_FILENAME)
 SAMPLE_IMAGE = os.path.join('./app/ml/imagenet_resnet50', 'good_cat.jpg')

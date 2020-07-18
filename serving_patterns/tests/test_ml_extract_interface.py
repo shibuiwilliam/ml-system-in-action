@@ -3,7 +3,7 @@ from app.ml import extract_interface
 from typing import Tuple, List
 
 
-filepath = 'app/ml/models/iris_svc_sklearn.yaml'
+filepath = './models/iris_svc_sklearn.yaml'
 
 
 @pytest.mark.parametrize(

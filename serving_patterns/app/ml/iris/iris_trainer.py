@@ -15,7 +15,7 @@ from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 from app.ml.save_helper import save_interface
 
 
-MODEL_DIR = './app/ml/models/'
+MODEL_DIR = './models/'
 
 
 def get_data() -> Dict[str, np.ndarray]:

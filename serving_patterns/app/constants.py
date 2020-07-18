@@ -39,7 +39,7 @@ def constant(f):
 class _Constants(object):
     @constant
     def MODEL_DIRECTORY():
-        return '/serving_patterns/app/ml/models/'
+        return '/serving_patterns/models/'
 
     @constant
     def DATA_DIRECTORY():

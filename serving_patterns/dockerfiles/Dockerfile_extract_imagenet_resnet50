@@ -4,11 +4,13 @@ ENV PROJECT_DIR /serving_patterns/
 WORKDIR ${PROJECT_DIR}
 ADD requirements/requirements_api.txt ${PROJECT_DIR}
 RUN apt-get -y update && \
-    apt-get -y install gcc && \
+    apt-get -y install gcc curl && \
     pip install -r requirements_api.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
-ENV RUN_FILE run_extract_imagenet_resnet50.sh
-COPY ./scripts/${RUN_FILE} ${PROJECT_DIR}${RUN_FILE}
-RUN chmod +x ${RUN_FILE}
+COPY ./scripts/get_imagenet_resnet50v2_onnx.sh ${PROJECT_DIR}get_imagenet_resnet50v2_onnx.sh
+COPY ./scripts/run_extract_imagenet_resnet50.sh ${PROJECT_DIR}run_extract_imagenet_resnet50.sh
+RUN chmod +x get_imagenet_resnet50v2_onnx.sh && \
+    ./get_imagenet_resnet50v2_onnx.sh && \
+    chmod +x run_extract_imagenet_resnet50.sh && \
 CMD ./run_extract_imagenet_resnet50.sh

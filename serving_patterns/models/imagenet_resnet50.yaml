@@ -1,0 +1,22 @@
+imagenet_resnet50:
+  data_interface:
+    data_type: image
+    input_shape:
+    - 1
+    - 3
+    - 224
+    - 224
+    input_type: float32
+    output_shape:
+    - 1
+    - 1000
+    output_type: float32
+  meta:
+    models:
+    - imagenet_resnet50_preprocess_transformer.pkl: sklearn
+    - imagenet_resnet50v2.onnx: onnx_runtime
+    - imagenet_resnet50_softmax_transformer.pkl: sklearn
+    prediction_type: classification
+    runner: app.ml.imagenet_resnet50.imagenet_resnet50_predictor
+  options:
+    label_filepath: ./models/imagenet_labels.json

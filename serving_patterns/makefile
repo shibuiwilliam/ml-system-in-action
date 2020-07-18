@@ -5,7 +5,7 @@ imageName := serving_patterns_api
 imageVersion := latest
 containerName := serving_patterns_api
 
-testContainerFile := TestDockerfile
+testContainerFile := Dockerfile_test
 testImageVersion := test
 testContainerName := test
 
@@ -23,9 +23,9 @@ composeBuild := docker-compose build
 composeUp := docker-compose up -d
 composeDown := docker-compose down
 
-requirements_api := requirements_api.txt
-pipFreeze := pip freeze > requirements/$(requirements_api)
-pipInstall := pip install -r requirements/$(requirements_api)
+requirements_api_test := requirements_api_test.txt
+pipFreezeTest := pip freeze > requirements/$(requirements_api_test)
+pipInstallTest := pip install -r requirements/$(requirements_api_test)
 
 pytest := pytest -v -s ./tests/
 pytestD := docker build \
@@ -33,6 +33,7 @@ pytestD := docker build \
 				-f $(dockerfileDir)/$(testContainerFile) . && \
  		   docker run --rm \
 				--name $(testContainerName) \
+				-v $(absolutePath)/models/:/serving_patterns/models/ \
 				$(imageName):$(testImageVersion) $(pytest)
 
 testRequest := ./scripts/test_request.sh
@@ -42,7 +43,7 @@ trainIris := docker build \
 				-f $(dockerfileDir)/$(trainIrisContainerFile) . && \
  			 docker run --rm \
 				--name $(trainIrisContainerName) \
-				-v $(absolutePath)/app/ml/models/:/serving_patterns/app/ml/models/ \
+				-v $(absolutePath)/models/:/serving_patterns/models/ \
 				$(trainIrisImageName):$(trainIrisImageVersion)
 
 extractImagenetResnet50 := docker build \
@@ -50,12 +51,12 @@ extractImagenetResnet50 := docker build \
 				-f $(dockerfileDir)/$(extractImagenetResnet50ContainerFile) . && \
  			 docker run --rm \
 				--name $(extractImagenetResnet50ContainerName) \
-				-v $(absolutePath)/app/ml/models/:/serving_patterns/app/ml/models/ \
+				-v $(absolutePath)/models/:/serving_patterns/models/ \
 				$(extractImagenetResnet50ImageName):$(extractImagenetResnet50ImageVersion)
 
 .PHONY: clean pip_freeze compose_build compose_up compose_down test test_d train_iris test_request extract_imagenet_resnet50
 pip_freeze:
-	$(pipFreeze)
+	$(pipFreezeTest)
 
 clean:
 	$(composeDown)

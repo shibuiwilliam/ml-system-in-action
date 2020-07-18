@@ -1,0 +1,12 @@
+FROM python:3.7-slim
+
+ENV PROJECT_DIR /serving_patterns/
+WORKDIR ${PROJECT_DIR}
+ADD requirements/requirements_api_test.txt ${PROJECT_DIR}
+RUN apt-get -y update && \
+    apt-get -y install gcc && \
+    pip install -r requirements_api_test.txt
+
+COPY ./app/ ${PROJECT_DIR}app/
+COPY ./tests/ ${PROJECT_DIR}tests/
+CMD ['pytest', '-v', '-s', './tests/']
