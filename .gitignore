@@ -137,3 +137,4 @@ serving_patterns/models/*.json
 serving_patterns/models/*.yaml
 serving_patterns/models/*.pkl
 serving_patterns/models/*.onnx
+serving_patterns/models/*.txt

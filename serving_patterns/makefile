@@ -1,86 +1,86 @@
-absolutePath := $(shell pwd)
-dockerfileDir := dockerfiles
+_absolute_path := $(shell pwd)
+_dockerfile_dir := dockerfiles
 
-imageName := serving_patterns_api
-imageVersion := latest
-containerName := serving_patterns_api
+_image_name := serving_patterns_api
+_image_version := latest
+_container_name := serving_patterns_api
 
-testContainerFile := Dockerfile_test
-testImageVersion := test
-testContainerName := test
+_test_container_file := Dockerfile_test
+_test_image_version := test
+_test_container_name := test
 
-trainIrisContainerFile := Dockerfile_train_iris
-trainIrisImageName := serving_patterns_train_iris
-trainIrisImageVersion := latest
-trainIrisContainerName := serving_patterns_train_iris
+_train_iris_container_file := Dockerfile_train_iris
+_train_iris_image_name := serving_patterns_train_iris
+_train_iris_image_version := latest
+_train_iris_container_name := serving_patterns_train_iris
 
-extractImagenetResnet50ContainerFile := Dockerfile_extract_imagenet_resnet50
-extractImagenetResnet50ImageName := serving_patterns_extract_imagenet_resnet50
-extractImagenetResnet50ImageVersion := latest
-extractImagenetResnet50ContainerName := serving_patterns_extract_imagenet_resnet50
+_extract_imagenet_resnet50_container_file := Dockerfile_extract_imagenet_resnet50
+_extract_imagenet_resnet50_image_name := serving_patterns_extract_imagenet_resnet50
+_extract_imagenet_resnet50_image_version := latest
+_extract_imagenet_resnet50_container_name := serving_patterns_extract_imagenet_resnet50
 
-composeBuild := docker-compose build
-composeUp := docker-compose up -d
-composeDown := docker-compose down
+_compose_build := docker-compose build
+_compose_up := docker-compose up -d
+_compose_down := docker-compose down
 
-requirements_api_test := requirements_api_test.txt
-pipFreezeTest := pip freeze > requirements/$(requirements_api_test)
-pipInstallTest := pip install -r requirements/$(requirements_api_test)
+_requirements_api_test := requirements_api_test.txt
+_pip_freeze_test := pip freeze > requirements/$(_requirements_api_test)
+_pip_install_test := pip install -r requirements/$(_requirements_api_test)
 
-pytest := pytest -v -s ./tests/
-pytestD := docker build \
-				-t $(imageName):$(testImageVersion) \
-				-f $(dockerfileDir)/$(testContainerFile) . && \
- 		   docker run --rm \
-				--name $(testContainerName) \
-				-v $(absolutePath)/models/:/serving_patterns/models/ \
-				$(imageName):$(testImageVersion) $(pytest)
+_pytest := pytest -v -s ./tests/
+_pytest_d := docker build \
+				-t $(_image_name):$(_test_image_version) \
+				-f $(_dockerfile_dir)/$(_test_container_file) . && \
+			docker run --rm \
+				--name $(_test_container_name) \
+				-v $(_absolute_path)/models/:/serving_patterns/models/ \
+				$(_image_name):$(_test_image_version) $(_pytest)
 
-testRequest := ./scripts/test_request.sh
+_test_request := ./scripts/test_request.sh
 
-trainIris := docker build \
-				-t $(trainIrisImageName):$(trainIrisImageVersion) \
-				-f $(dockerfileDir)/$(trainIrisContainerFile) . && \
- 			 docker run --rm \
-				--name $(trainIrisContainerName) \
-				-v $(absolutePath)/models/:/serving_patterns/models/ \
-				$(trainIrisImageName):$(trainIrisImageVersion)
+_train_iris := docker build \
+				-t $(_train_iris_image_name):$(_train_iris_image_version) \
+				-f $(_dockerfile_dir)/$(_train_iris_container_file) . && \
+ 			docker run --rm \
+				--name $(_train_iris_container_name) \
+				-v $(_absolute_path)/models/:/serving_patterns/models/ \
+				$(_train_iris_image_name):$(_train_iris_image_version)
 
-extractImagenetResnet50 := docker build \
-				-t $(extractImagenetResnet50ImageName):$(extractImagenetResnet50ImageVersion) \
-				-f $(dockerfileDir)/$(extractImagenetResnet50ContainerFile) . && \
- 			 docker run --rm \
-				--name $(extractImagenetResnet50ContainerName) \
-				-v $(absolutePath)/models/:/serving_patterns/models/ \
-				$(extractImagenetResnet50ImageName):$(extractImagenetResnet50ImageVersion)
+_extract_imagenet_resnet50 := docker build \
+				-t $(_extract_imagenet_resnet50_image_name):$(_extract_imagenet_resnet50_image_version) \
+				-f $(_dockerfile_dir)/$(_extract_imagenet_resnet50_container_file) . && \
+ 			docker run --rm \
+				--name $(_extract_imagenet_resnet50_container_name) \
+				-v $(_absolute_path)/models/:/serving_patterns/models/ \
+				$(_extract_imagenet_resnet50_image_name):$(_extract_imagenet_resnet50_image_version)
 
 .PHONY: clean pip_freeze compose_build compose_up compose_down test test_d train_iris test_request extract_imagenet_resnet50
 pip_freeze:
-	$(pipFreezeTest)
+	$(_pip_freeze_test)
 
 clean:
-	$(composeDown)
+	$(_compose_down)
 
 compose_build:
-	$(composeBuild)
+	$(_compose_build)
 
 compose_up:
-	$(composeUp)
+	$(_compose_up)
 
 compose_down:
-	$(composeDown)
+	$(_compose_down)
 
 test:
-	$(pytest)
+	$(_pytest)
 
 test_d: pip_freeze
-	$(pytestD)
+	$(_pytest_d)
 
 test_request:
-	$(testRequest)
+	$(_test_request)
 
 train_iris:
-	$(trainIris)
+	$(_train_iris)
 
 extract_imagenet_resnet50:
-	$(extractImagenetResnet50)
+	$(_extract_imagenet_resnet50)

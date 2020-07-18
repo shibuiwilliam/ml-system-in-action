@@ -93,7 +93,8 @@ def _test_label() -> Dict[str, int]:
 
 
 def _predict(file: UploadFile = File(...),
-             background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, int]:
+             background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str,
+                                                                            int]:
     data = Data()
     data.image_data = io.BytesIO(file.file.read())
     __predict(data)
@@ -102,7 +103,8 @@ def _predict(file: UploadFile = File(...),
 
 
 def _predict_label(file: UploadFile = File(...),
-             background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, int]:
+                   background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str,
+                                                                                  int]:
     data = Data()
     data.image_data = io.BytesIO(file.file.read())
     label_proba = __predict_label(data)
