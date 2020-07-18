@@ -8,6 +8,7 @@ model_filename=${target_dir}/imagenet_resnet50v2.onnx
 label_file=${target_dir}/imagenet_labels.json
 
 if [ ! -f "${model_filename}" ]; then
+    mkdir -p ${target_dir}
     [ ! -f "${target_tar}" ] && curl --output ${target_dir}/resnet50v2.tar.gz https://s3.amazonaws.com/onnx-model-zoo/resnet/resnet50v2/resnet50v2.tar.gz
 
     [ ! -d "${target_extracted}" ] && tar zxvf ${target_tar} -C ${target_dir}
