@@ -28,7 +28,13 @@ def _save_data_job(data: Data,
             enqueue=enqueue)
 
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
-        pass
+        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
+        num_files = 0 if incr is None else incr
+        job_id = f'{str(uuid.uuid4())}_{num_files}'
+        task = store_data_job.SaveDataRedisJob(
+            job_id=job_id,
+            data=data,
+            enqueue=enqueue)
     else:
         pass
     background_tasks.add_task(task)
@@ -82,7 +88,9 @@ def _predict_async_get(job_id: str) -> Dict[str, int]:
         return result
 
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
-        pass
+        data_dict = store_data_job.load_data_redis(job_id)
+        result[job_id]['prediction'] = data_dict['prediction']
+        return result
 
     else:
-        pass
+        return result
