@@ -23,9 +23,9 @@ composeBuild := docker-compose build
 composeUp := docker-compose up -d
 composeDown := docker-compose down
 
-requirements := requirements.txt
-pipFreeze := pip freeze > $(requirements)
-pipInstall := pip install -r $(requirements)
+requirements_api := requirements_api.txt
+pipFreeze := pip freeze > $(dockerfileDir)/$(requirements_api)
+pipInstall := pip install -r $(dockerfileDir)/$(requirements_api)
 
 pytest := pytest -v -s ./tests/
 pytestD := docker build \
@@ -60,7 +60,7 @@ pip_freeze:
 clean:
 	$(composeDown)
 
-compose_build: pip_freeze
+compose_build:
 	$(composeBuild)
 
 compose_up:
