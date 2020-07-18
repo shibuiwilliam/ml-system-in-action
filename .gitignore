@@ -133,4 +133,7 @@ cython_debug/
 
 .python-version
 
-serving_patterns/app/ml/models/*
+serving_patterns/models/*.json
+serving_patterns/models/*.yaml
+serving_patterns/models/*.pkl
+serving_patterns/models/*.onnx
