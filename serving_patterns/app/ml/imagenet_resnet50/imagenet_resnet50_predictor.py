@@ -23,7 +23,7 @@ LABELS = load_labels(_ModelConfigurations().options['label_filepath'])
 
 class _Data(BaseData):
     image_data: Any = None
-    test_data: str = os.path.join('./app/ml/imagenet_resnet50', 'good_cat.jpg')
+    test_data: str = os.path.join('./app/ml/data', 'good_cat.jpg')
     labels: List[str] = LABELS
 
 

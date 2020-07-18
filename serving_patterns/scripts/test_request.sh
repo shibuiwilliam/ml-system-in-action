@@ -40,7 +40,7 @@ function predict_image() {
     curl -X POST \
         -H "accept: application/json" \
         -H "Content-Type: multipart/form-data" \
-        -F "file=@./app/ml/imagenet_resnet50/good_cat.jpg;type=image/jpeg" \
+        -F "file=@./app/ml/data/good_cat.jpg;type=image/jpeg" \
         ${TARGET_HOST}:$1/${PREDICT}/label
     echo ""
 }

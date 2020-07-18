@@ -12,7 +12,7 @@ from app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransform
 MODEL_DIR = './models/'
 MODEL_FILENAME = 'imagenet_resnet50v2.onnx'
 RESNET50_MODEL = os.path.join(MODEL_DIR, MODEL_FILENAME)
-SAMPLE_IMAGE = os.path.join('./app/ml/imagenet_resnet50', 'good_cat.jpg')
+SAMPLE_IMAGE = os.path.join('./app/ml/data', 'good_cat.jpg')
 LABEL_FILE = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
 
 

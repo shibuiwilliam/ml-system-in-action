@@ -31,6 +31,22 @@ class ONNXImagePreprocessTransformer(BaseEstimator, TransformerMixin):
         norm_image_data = norm_image_data.reshape(self.prediction_shape).astype('float32')
         return norm_image_data
 
+class TFImagePreprocessTransformer(BaseEstimator, TransformerMixin):
+    def __init__(
+            self,
+            image_size: Tuple[int] = (299, 299),
+            prediction_shape: Tuple[int] = (1, 299, 299, 3)):
+        self.image_size = image_size
+        self.prediction_shape = prediction_shape
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X: Image) -> np.ndarray:
+        image_data = np.array(X.resize(self.image_size)).astype('float32')
+        norm_image_data = image_data.reshape(self.prediction_shape) / 255.0
+        return norm_image_data
+
 
 class SoftmaxTransformer(BaseEstimator, TransformerMixin):
     def __init__(self):
