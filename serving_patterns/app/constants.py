@@ -19,6 +19,7 @@ class PREDICTION_TYPE(enum.Enum):
 class MODEL_RUNTIME(enum.Enum):
     SKLEARN = 'sklearn'
     ONNX_RUNTIME = 'onnx_runtime'
+    TF_SERVING = 'tf_serving'
 
 
 class DATA_TYPE(enum.Enum):
