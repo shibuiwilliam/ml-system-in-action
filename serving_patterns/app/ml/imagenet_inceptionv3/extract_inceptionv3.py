@@ -10,8 +10,9 @@ from app.ml.transformers import TFImagePreprocessTransformer, SoftmaxTransformer
 from app.ml.extract_from_tfhub import get_model
 
 MODEL_DIR = './models/'
-MODEL_FILE_DIR = 'savedmodel/inceptionv3'
+MODEL_FILE_DIR = 'savedmodel/inceptionv3/4'
 SAVEDMODEL_DIR = os.path.join(MODEL_DIR, MODEL_FILE_DIR)
+HUB_URL = 'https://tfhub.dev/google/imagenet/inception_v3/classification/4'
 SAMPLE_IMAGE = os.path.join('./app/ml/data', 'good_cat.jpg')
 LABEL_FILE = os.path.join(MODEL_DIR, 'imagenet_labels_1001.json')
 LABELS = load_labels(LABEL_FILE)
@@ -30,8 +31,13 @@ def validate(image, preprocess, predictor, postprocess):
 def main():
     os.makedirs(SAVEDMODEL_DIR, exist_ok=True)
 
-    hub_url = 'https://tfhub.dev/google/imagenet/inception_v3/classification/4'
-    model = get_model(hub_url, (299, 299, 3))
+    if os.path.exists(SAVEDMODEL_DIR):
+        print(f'saved model {SAVEDMODEL_DIR} found')
+        model = tf.keras.models.load_model(SAVEDMODEL_DIR)
+    else:
+        print(f'saved model {SAVEDMODEL_DIR} not found')
+        model = get_model(HUB_URL, (299, 299, 3))
+
     preprocess = TFImagePreprocessTransformer()
     postprocess = SoftmaxTransformer()
 
