@@ -15,5 +15,17 @@ RUN ./run_extract_imagenet_inceptionv3.sh
 
 FROM tensorflow/serving:latest
 
-COPY --from=builder /serving_patterns/models/savedmodel/inceptionv3 /models/inceptionv3
-ENV MODEL_NAME inceptionv3
+ENV MODEL_BASE_PATH=/models/inceptionv3
+ENV MODEL_NAME=inceptionv3
+
+COPY --from=builder /serving_patterns/models/savedmodel/inceptionv3 ${MODEL_BASE_PATH}
+EXPOSE 8500
+EXPOSE 8501
+
+RUN echo '#!/bin/bash \n\n\
+tensorflow_model_server --port=8500 --rest_api_port=8501 \
+--model_name=${MODEL_NAME} --model_base_path=${MODEL_BASE_PATH} \
+"$@"' > /usr/bin/tf_serving_entrypoint.sh \
+&& chmod +x /usr/bin/tf_serving_entrypoint.sh
+
+ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]

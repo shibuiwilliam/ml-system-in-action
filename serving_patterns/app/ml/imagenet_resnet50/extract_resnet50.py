@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 
 from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
-from app.ml.save_helper import save_interface, load_labels
+from app.ml.save_helper import save_interface, load_labels, dump_model
 from app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransformer
 
 
@@ -14,10 +14,6 @@ MODEL_FILENAME = 'imagenet_resnet50v2.onnx'
 RESNET50_MODEL = os.path.join(MODEL_DIR, MODEL_FILENAME)
 SAMPLE_IMAGE = os.path.join('./app/ml/data', 'good_cat.jpg')
 LABEL_FILE = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
-
-
-def dump_model(model, name: str):
-    joblib.dump(model, name)
 
 
 def main():

@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 import yaml
 import json
+import joblib
 
 from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 
@@ -9,6 +10,10 @@ from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 def load_labels(label_filepath: str):
     with open(label_filepath, 'r') as f:
         return json.load(f)
+
+
+def dump_model(model, name: str):
+    joblib.dump(model, name)
 
 
 def save_interface(model_dir: str,
