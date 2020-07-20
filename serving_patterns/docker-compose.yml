@@ -115,9 +115,10 @@ services:
     container_name: serving_patterns_imagenet_inceptionv3_tfs
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_front_inceptionv3
+      dockerfile: dockerfiles/Dockerfile_tfserving_inceptionv3
     environment:
       - MODEL_NAME=inceptionv3
+      - MODEL_BASE_PATH=/models/inceptionv3
     ports:
       - "8500:8500"
       - "8501:8501"

@@ -82,6 +82,7 @@ _run_inceptionv3_tfserving := docker build \
 				-f $(_dockerfile_dir)/$(_imagenet_inceptionv3_tfs_container_file) . && \
 			docker run --rm \
 				--name $(_imagenet_inceptionv3_tfs_container_name) \
+				-p 8500:8500 \
 				-p 8501:8501 \
 				$(_imagenet_inceptionv3_tfs_image_name):$(_imagenet_inceptionv3_tfs_image_version)
 

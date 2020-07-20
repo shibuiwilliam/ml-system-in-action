@@ -58,7 +58,7 @@ class _Classifier(BasePredictor):
                         'predictor': joblib.load(k)
                     }
                 else:
-                    pass
+                    self.classifiers[k] = {'runner': v, 'predictor': None}
         logger.info(f'initialized {self.__class__.__name__}')
 
     def predict(self, input_data: Image) -> np.ndarray:
@@ -68,12 +68,12 @@ class _Classifier(BasePredictor):
             if v['runner'] == MODEL_RUNTIME.SKLEARN.value:
                 _prediction = np.array(v['predictor'].transform(_prediction))
             else:
-                channel = grpc.insecure_channel('prep_pred_tfs:8501')
+                channel = grpc.insecure_channel('prep_pred_tfs:8500')
                 stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
                 request = predict_pb2.PredictRequest()
                 request.model_spec.name = 'inceptionv3'
                 request.model_spec.signature_name = 'serving_default'
-                request.inputs['input_1'].CopyFrom(
+                request.inputs['keras_layer_input'].CopyFrom(
                     tf.make_tensor_proto(_prediction, shape=[1, 299, 299, 3]))
                 result = stub.Predict(request, 10.0)
                 logging.info(f'result: {result}')
