@@ -93,7 +93,7 @@ compose_down:
 test:
 	$(_pytest)
 
-test_d: pip_freeze
+test_d:
 	$(_pytest_d)
 
 test_request:

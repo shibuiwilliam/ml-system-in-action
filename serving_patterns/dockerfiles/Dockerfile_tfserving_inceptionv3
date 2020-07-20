@@ -1,0 +1,4 @@
+FROM tensorflow/serving:latest
+
+COPY ./models/savedmodel/inceptionv3 /models/inceptionv3
+ENV MODEL_NAME inceptionv3
