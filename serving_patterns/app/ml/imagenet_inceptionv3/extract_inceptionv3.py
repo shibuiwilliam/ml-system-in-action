@@ -12,6 +12,7 @@ from app.ml.extract_from_tfhub import get_model
 MODEL_DIR = './models/'
 MODEL_FILE_DIR = 'savedmodel/inceptionv3/4'
 SAVEDMODEL_DIR = os.path.join(MODEL_DIR, MODEL_FILE_DIR)
+PB_FILE = os.path.join(SAVEDMODEL_DIR, 'saved_model.pb')
 HUB_URL = 'https://tfhub.dev/google/imagenet/inception_v3/classification/4'
 SAMPLE_IMAGE = os.path.join('./app/ml/data', 'good_cat.jpg')
 LABEL_FILE = os.path.join(MODEL_DIR, 'imagenet_labels_1001.json')
@@ -31,7 +32,7 @@ def validate(image, preprocess, predictor, postprocess):
 def main():
     os.makedirs(SAVEDMODEL_DIR, exist_ok=True)
 
-    if os.path.exists(SAVEDMODEL_DIR):
+    if os.path.exists(PB_FILE):
         print(f'saved model {SAVEDMODEL_DIR} found')
         model = tf.keras.models.load_model(SAVEDMODEL_DIR)
     else:

@@ -24,6 +24,16 @@ _extract_imagenet_inceptionv3_image_name := serving_patterns_extract_imagenet_in
 _extract_imagenet_inceptionv3_image_version := latest
 _extract_imagenet_inceptionv3_container_name := serving_patterns_extract_imagenet_inceptionv3
 
+_imagenet_inceptionv3_tfs_container_file := Dockerfile_tfserving_inceptionv3
+_imagenet_inceptionv3_tfs_image_name := serving_patterns_imagenet_inceptionv3_tfs
+_imagenet_inceptionv3_tfs_image_version := latest
+_imagenet_inceptionv3_tfs_container_name := serving_patterns_imagenet_inceptionv3_tfs
+
+_imagenet_inceptionv3_front_container_file := Dockerfile_front_inceptionv3
+_imagenet_inceptionv3_front_image_name := serving_patterns_imagenet_inceptionv3_front
+_imagenet_inceptionv3_front_image_version := latest
+_imagenet_inceptionv3_front_container_name := serving_patterns_imagenet_inceptionv3_front
+
 _compose_build := docker-compose build
 _compose_up := docker-compose up -d
 _compose_down := docker-compose down
@@ -67,12 +77,13 @@ _extract_imagenet_inceptionv3 := docker build \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				$(_extract_imagenet_inceptionv3_image_name):$(_extract_imagenet_inceptionv3_image_version)
 
-_run_inceptionv3_tfserving := docker run --rm \
-			--name $(_extract_imagenet_inceptionv3_container_name) \
-			-p 8501:8501 \
-			-v "$(_absolute_path)/models/savedmodel/inceptionv3":"/models/inceptionv3" \
-			-e MODEL_NAME=inceptionv3 \
-			tensorflow/serving:latest
+_run_inceptionv3_tfserving := docker build \
+				-t $(_imagenet_inceptionv3_tfs_image_name):$(_imagenet_inceptionv3_tfs_image_version) \
+				-f $(_dockerfile_dir)/$(_imagenet_inceptionv3_tfs_container_file) . && \
+			docker run --rm \
+				--name $(_imagenet_inceptionv3_tfs_container_name) \
+				-p 8501:8501 \
+				$(_imagenet_inceptionv3_tfs_image_name):$(_imagenet_inceptionv3_tfs_image_version)
 
 .PHONY: clean pip_freeze compose_build compose_up compose_down test test_d train_iris test_request extract_imagenet_resnet50 extract_imagenet_inceptionv3 run_inceptionv3_tfserving
 pip_freeze:
