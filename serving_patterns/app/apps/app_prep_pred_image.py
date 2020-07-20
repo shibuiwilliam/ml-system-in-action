@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 import logging
 
-from app.api import health, predict_web_single_image
+from app.api import health, predict_prep_pred_image
 from app.constants import CONSTANTS
 from app.configurations import _PlatformConfigurations, _FastAPIConfigurations
 
@@ -25,7 +25,7 @@ app.include_router(
 )
 
 app.include_router(
-    predict_web_single_image.router,
+    predict_prep_pred_image.router,
     prefix='/predict',
     tags=['predict']
 )

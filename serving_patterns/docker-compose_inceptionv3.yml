@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  prep_pred_front:
+    container_name: serving_patterns_imagenet_inceptionv3_front
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_front_inceptionv3
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=imagenet_inceptionv3.yaml
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_prep_pred_image
+      - PORT=8892
+      - PROFILE=0
+    ports:
+      - "8892:8892"
+    command: ./run_api.sh
+    depends_on:
+      - redis
+      - prep_pred_tfs
+
+  prep_pred_tfs:
+    container_name: serving_patterns_imagenet_inceptionv3_tfs
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_tfserving_inceptionv3
+    environment:
+      - MODEL_NAME=inceptionv3
+      - MODEL_BASE_PATH=/models/inceptionv3
+    ports:
+      - "8500:8500"
+      - "8501:8501"
+    entrypoint: ["/usr/bin/tf_serving_entrypoint.sh"]
+
+  redis:
+    container_name: serving_patterns_redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"

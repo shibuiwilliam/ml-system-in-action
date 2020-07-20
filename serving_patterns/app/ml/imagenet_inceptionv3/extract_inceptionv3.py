@@ -68,7 +68,11 @@ def main():
                     {postprocess_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
                    'app.ml.imagenet_inceptionv3.imagenet_inceptionv3_predictor',
-                   label_filepath=LABEL_FILE)
+                   label_filepath=LABEL_FILE,
+                   model_spec_name='inceptionv3',
+                   model_spec_signature_name='serving_default',
+                   input_name='keras_layer_input',
+                   output_name='keras_layer')
 
 if __name__ == '__main__':
     main()
