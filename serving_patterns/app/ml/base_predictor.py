@@ -3,8 +3,6 @@ from pydantic import BaseModel, Extra
 from typing import List, Any, Sequence, Union
 import numpy as np
 
-from app.ml.extract_np_type import type_name_to_np_type
-
 
 class BaseData(BaseModel):
     input_data: Union[List[float], List[List[float]]] = None

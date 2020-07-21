@@ -10,7 +10,7 @@ from app.middleware.profiler import do_cprofile
 from app.jobs import store_data_job
 from app.ml.active_predictor import Data, DataInterface, DataConverter, active_predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
-from app.configurations import _PlatformConfigurations
+from app.configurations import _PlatformConfigurations, _CacheConfigurations
 from app.middleware.redis_client import redis_client
 
 
@@ -28,6 +28,7 @@ def _save_data_job(data: Data,
         task = store_data_job.SaveDataRedisJob(
             job_id=job_id,
             data=data,
+            queue_name=_CacheConfigurations().queue_name,
             enqueue=enqueue)
 
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
@@ -37,17 +38,18 @@ def _save_data_job(data: Data,
         task = store_data_job.SaveDataRedisJob(
             job_id=job_id,
             data=data,
+            queue_name=_CacheConfigurations().queue_name,
             enqueue=enqueue)
 
     else:
-        pass
+        raise ValueError(f'platform must be chosen from constants.PLATFORM_ENUM')
     background_tasks.add_task(task)
     return job_id
 
 
 @do_cprofile
 def __predict(data: Data):
-    image_data = Image.open(data.image_data)
+    image_data = data.image_data if isinstance(data.image_data, Image.Image) else Image.open(data.image_data)
     output_np = active_predictor.predict(image_data)
     reshaped_output_nps = DataConverter.reshape_output(output_np)
     data.prediction = reshaped_output_nps.tolist()
@@ -56,12 +58,8 @@ def __predict(data: Data):
 
 @do_cprofile
 def __predict_label(data: Data) -> Dict[str, float]:
-    image_data = Image.open(data.image_data)
-    output_np = active_predictor.predict(image_data)
-    reshaped_output_nps = DataConverter.reshape_output(output_np)
-    argmax = int(np.argmax(reshaped_output_nps[0]))
-    data.prediction = reshaped_output_nps.tolist()
-    logger.info(f'prediction: {data.__dict__}')
+    __predict(data)
+    argmax = int(np.argmax(np.array(data.prediction)[0]))
     return {data.labels[argmax]: data.prediction[0][argmax]}
 
 
@@ -74,19 +72,17 @@ def __predict_label(data: Data) -> Dict[str, float]:
 #     return data
 
 
-def _labels() -> Dict[str, List[str]]:
-    return {'labels': Data().labels}
+def _labels(data: Data = Data()) -> Dict[str, List[str]]:
+    return {'labels': data.labels}
 
 
-def _test() -> Dict[str, int]:
-    data = Data()
+def _test(data: Data = Data()) -> Dict[str, int]:
     data.image_data = data.test_data
     __predict(data)
     return {'prediction': data.prediction}
 
 
-def _test_label() -> Dict[str, int]:
-    data = Data()
+def _test_label(data: Data = Data()) -> Dict[str, int]:
     data.image_data = data.test_data
     label_proba = __predict_label(data)
     return {'prediction': label_proba}

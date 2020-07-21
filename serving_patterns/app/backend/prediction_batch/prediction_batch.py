@@ -4,6 +4,7 @@ import asyncio
 from concurrent.futures import ProcessPoolExecutor
 
 from app.constants import CONSTANTS
+from app.configurations import _CacheConfigurations
 from app.api._predict import _predict_from_redis_cache
 from app.jobs import store_data_job
 from app.middleware.profiler import do_cprofile
@@ -18,11 +19,11 @@ def _run_prediction(job_id: str):
     if data is not None:
         store_data_job.save_data_redis_job(job_id, data)
     else:
-        store_data_job.left_push_queue(CONSTANTS.REDIS_QUEUE, job_id)
+        store_data_job.left_push_queue(_CacheConfigurations().queue_name, job_id)
 
 
 def _trigger_prediction_if_queue():
-    job_id = store_data_job.right_pop_queue(CONSTANTS.REDIS_QUEUE)
+    job_id = store_data_job.right_pop_queue(_CacheConfigurations().queue_name)
     logger.info(f'predict job_id: {job_id}')
     if job_id is not None:
         _run_prediction(job_id)

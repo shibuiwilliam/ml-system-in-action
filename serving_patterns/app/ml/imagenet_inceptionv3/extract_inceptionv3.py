@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 
 from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
-from app.ml.save_helper import save_interface, load_labels, dump_model
+from app.ml.save_helper import save_interface, load_labels, dump_sklearn
 from app.ml.transformers import TFImagePreprocessTransformer, SoftmaxTransformer
 from app.ml.extract_from_tfhub import get_model
 
@@ -52,11 +52,11 @@ def main():
     interface_filename = f'{modelname}.yaml'
     preprocess_filename = f'{modelname}_preprocess_transformer.pkl'
     postprocess_filename = f'{modelname}_softmax_transformer.pkl'
-    dump_model(preprocess, os.path.join(MODEL_DIR, preprocess_filename))
-    dump_model(postprocess, os.path.join(MODEL_DIR, postprocess_filename))
+    dump_sklearn(preprocess, os.path.join(MODEL_DIR, preprocess_filename))
+    dump_sklearn(postprocess, os.path.join(MODEL_DIR, postprocess_filename))
 
-    save_interface(MODEL_DIR,
-                   modelname,
+    save_interface(modelname,
+                   MODEL_DIR,
                    interface_filename,
                    [1, 299, 299, 3],
                    'float32',

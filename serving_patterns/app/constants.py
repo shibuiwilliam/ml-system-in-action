@@ -60,7 +60,7 @@ class _Constants(object):
 
     @constant
     def REDIS_QUEUE():
-        return 'queue'
+        return 'redis_queue'
 
     @constant
     def PREDICTION_DEFAULT():

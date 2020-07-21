@@ -17,6 +17,7 @@ class _PlatformConfigurations():
 class _CacheConfigurations():
     cache_host = os.getenv('CACHE_HOST', 'redis')
     cache_port = int(os.getenv('CACHE_PORT', 6379))
+    queue_name = os.getenv('QUEUE_NAME', 'queue')
 
 
 class _RedisCacheConfigurations(_CacheConfigurations):

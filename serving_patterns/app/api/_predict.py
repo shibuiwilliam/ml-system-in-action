@@ -7,7 +7,7 @@ from app.middleware.profiler import do_cprofile
 from app.jobs import store_data_job
 from app.ml.active_predictor import Data, DataInterface, DataConverter, active_predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
-from app.configurations import _PlatformConfigurations
+from app.configurations import _PlatformConfigurations, _CacheConfigurations
 from app.middleware.redis_client import redis_client
 
 
@@ -25,6 +25,7 @@ def _save_data_job(data: Data,
         task = store_data_job.SaveDataRedisJob(
             job_id=job_id,
             data=data,
+            queue_name=_CacheConfigurations().queue_name,
             enqueue=enqueue)
 
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
@@ -34,9 +35,10 @@ def _save_data_job(data: Data,
         task = store_data_job.SaveDataRedisJob(
             job_id=job_id,
             data=data,
+            queue_name=_CacheConfigurations().queue_name,
             enqueue=enqueue)
     else:
-        pass
+        raise ValueError(f'platform must be chosen from constants.PLATFORM_ENUM')
     background_tasks.add_task(task)
     return job_id
 

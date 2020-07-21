@@ -62,6 +62,7 @@ def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
 class SaveDataJob(BaseModel):
     job_id: str
     data: BaseData
+    queue_name: str = CONSTANTS.REDIS_QUEUE
     is_completed: bool = False
 
     def __call__(self):
@@ -89,7 +90,7 @@ class SaveDataRedisJob(SaveDataJob):
             f'registered job: {self.job_id} in {self.__class__.__name__}')
         self.is_completed = save_data_redis_job(self.job_id, self.data)
         if self.enqueue:
-            self.is_completed = left_push_queue(CONSTANTS.REDIS_QUEUE, self.job_id)
+            self.is_completed = left_push_queue(self.queue_name, self.job_id)
         logger.info(f'completed save data: {self.job_id}')
 
 

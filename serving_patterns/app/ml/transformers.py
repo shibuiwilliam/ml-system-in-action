@@ -20,9 +20,16 @@ class ONNXImagePreprocessTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
-    def transform(self, X: Image) -> np.ndarray:
-        image_data = np.array(X.resize(self.image_size)).transpose(2, 0, 1).astype('float32')
+    def transform(self, X: Union[Image.Image, np.ndarray]) -> np.ndarray:
+        if isinstance(X, np.ndarray):
+            dim_0 = (3,) + self.image_size
+            dim_1 = self.image_size + (3,)
+            if X.shape != dim_0 and X.shape != dim_1:
+                raise ValueError(f'resize to image_size {self.image_size} beforehand for numpy array')
+        else:
+            X = np.array(X.resize(self.image_size))
 
+        image_data = X.transpose(2, 0, 1).astype('float32')
         mean_vec = np.array(self.mean_vec)
         stddev_vec = np.array(self.stddev_vec)
         norm_image_data = np.zeros(image_data.shape).astype('float32')
@@ -42,8 +49,16 @@ class TFImagePreprocessTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
-    def transform(self, X: Image) -> np.ndarray:
-        image_data = np.array(X.resize(self.image_size)).astype('float32')
+    def transform(self, X: Union[Image.Image, np.ndarray]) -> np.ndarray:
+        if isinstance(X, np.ndarray):
+            dim_0 = (3,) + self.image_size
+            dim_1 = self.image_size + (3,)
+            if X.shape != dim_0 and X.shape != dim_1:
+                raise ValueError(f'resize to image_size {self.image_size} beforehand for numpy array')
+        else:
+            X = np.array(X.resize(self.image_size))
+
+        image_data = X.astype('float32')
         norm_image_data = image_data.reshape(self.prediction_shape) / 255.0
         return norm_image_data
 
@@ -55,7 +70,9 @@ class SoftmaxTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
-    def transform(self, X: np.ndarray) -> np.ndarray:
+    def transform(self, X: Union[np.ndarray, List[float], List[List[float]]]) -> np.ndarray:
+        if isinstance(X, List):
+            X = np.array(X)
         x = X.reshape(-1)
         e_x = np.exp(x - np.max(x))
         result = np.array([e_x / e_x.sum(axis=0)])

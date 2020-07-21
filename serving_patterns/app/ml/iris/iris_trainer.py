@@ -12,7 +12,7 @@ from typing import Dict, List, Union
 import yaml
 
 from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
-from app.ml.save_helper import save_interface
+from app.ml.save_helper import save_interface, dump_sklearn
 
 
 MODEL_DIR = './models/'
@@ -64,10 +64,6 @@ def evaluate_model(model, x: np.ndarray, y: np.ndarray):
     print(score)
 
 
-def dump_model(model, name: str):
-    joblib.dump(model, name)
-
-
 def train_and_save(model,
                    modelname: str,
                    filename: str,
@@ -78,7 +74,7 @@ def train_and_save(model,
     train_model(model, x_train, y_train)
     evaluate_model(model, x_test, y_test)
     os.makedirs(MODEL_DIR, exist_ok=True)
-    dump_model(model, os.path.join(MODEL_DIR, filename))
+    dump_sklearn(model, os.path.join(MODEL_DIR, filename))
 
 
 def save_onnx(model,
@@ -122,8 +118,8 @@ def main():
                    data['y_train'],
                    data['x_test'],
                    data['y_test'])
-    save_interface(MODEL_DIR, 
-                   modelname,
+    save_interface(modelname,
+                   MODEL_DIR,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
@@ -141,8 +137,8 @@ def main():
               onnx_filename,
               data['x_test'],
               data['y_test'])
-    save_interface(MODEL_DIR, 
-                   modelname,
+    save_interface(modelname,
+                   MODEL_DIR,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
@@ -164,8 +160,8 @@ def main():
                    data['y_train'],
                    data['x_test'],
                    data['y_test'])
-    save_interface(MODEL_DIR, 
-                   modelname,
+    save_interface(modelname,
+                   MODEL_DIR,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
@@ -183,8 +179,8 @@ def main():
               onnx_filename,
               data['x_test'],
               data['y_test'])
-    save_interface(MODEL_DIR, 
-                   modelname,
+    save_interface(modelname,
+                   MODEL_DIR,
                    interface_filename,
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],

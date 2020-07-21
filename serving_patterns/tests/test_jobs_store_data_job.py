@@ -141,14 +141,15 @@ def test_SaveDataFileJob(mocker, job_id, directory, data):
 
 
 @pytest.mark.parametrize(
-    ('job_id', 'data', 'enqueue'),
-    [(test_job_id, MockData(), True),
-     (test_job_id, MockData(), False)]
+    ('job_id', 'data', 'queue_name', 'enqueue'),
+    [(test_job_id, MockData(), CONSTANTS.REDIS_QUEUE, True),
+     (test_job_id, MockData(), 'aaaaaaaa', False)]
 )
-def test_SaveDataRedisJob(mocker, job_id, data, enqueue):
+def test_SaveDataRedisJob(mocker, job_id, data, queue_name, enqueue):
     save_data_redis_job = store_data_job.SaveDataRedisJob(
         job_id=job_id,
         data=data,
+        queue_name=queue_name,
         enqueue=enqueue
     )
     mocker.patch(
