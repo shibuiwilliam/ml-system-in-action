@@ -7,7 +7,8 @@ RUN apt-get -y update && \
     apt-get -y install gcc && \
     pip install -r requirements_api.txt
 
-COPY ./app/ ${PROJECT_DIR}app/
+COPY ./app/ml/ ${PROJECT_DIR}app/ml/
+COPY ./app/constants.py ${PROJECT_DIR}app/constants.py
 ENV RUN_FILE run_train_iris.sh
 COPY ./scripts/${RUN_FILE} ${PROJECT_DIR}${RUN_FILE}
 RUN chmod +x ${RUN_FILE} && \

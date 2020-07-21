@@ -29,10 +29,10 @@ _imagenet_inceptionv3_tfs_image_name := serving_patterns_imagenet_inceptionv3_tf
 _imagenet_inceptionv3_tfs_image_version := latest
 _imagenet_inceptionv3_tfs_container_name := serving_patterns_imagenet_inceptionv3_tfs
 
-_imagenet_inceptionv3_front_container_file := Dockerfile_front_inceptionv3
-_imagenet_inceptionv3_front_image_name := serving_patterns_imagenet_inceptionv3_front
-_imagenet_inceptionv3_front_image_version := latest
-_imagenet_inceptionv3_front_container_name := serving_patterns_imagenet_inceptionv3_front
+_imagenet_inceptionv3_api_container_file := Dockerfile_api_inceptionv3
+_imagenet_inceptionv3_api_image_name := serving_patterns_imagenet_inceptionv3_api
+_imagenet_inceptionv3_api_image_version := latest
+_imagenet_inceptionv3_api_container_name := serving_patterns_imagenet_inceptionv3_api
 
 _compose_api := docker-compose_api.yml
 _compose_build_api := docker-compose -f $(_compose_api) build

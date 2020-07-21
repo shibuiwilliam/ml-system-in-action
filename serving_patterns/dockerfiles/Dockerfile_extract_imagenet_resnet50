@@ -7,7 +7,8 @@ RUN apt-get -y update && \
     apt-get -y install gcc curl && \
     pip install -r requirements_api.txt
 
-COPY ./app/ ${PROJECT_DIR}app/
+COPY ./app/ml/ ${PROJECT_DIR}app/ml/
+COPY ./app/constants.py ${PROJECT_DIR}app/constants.py
 COPY ./scripts/run_extract_imagenet_resnet50.sh ${PROJECT_DIR}run_extract_imagenet_resnet50.sh
 
 RUN chmod +x run_extract_imagenet_resnet50.sh

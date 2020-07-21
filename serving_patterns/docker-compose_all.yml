@@ -91,11 +91,11 @@ services:
     depends_on:
       - redis
 
-  prep_pred_front:
-    container_name: serving_patterns_imagenet_inceptionv3_front
+  prep_pred_api:
+    container_name: serving_patterns_imagenet_inceptionv3_api
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_front_inceptionv3
+      dockerfile: dockerfiles/Dockerfile_api_inceptionv3
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=imagenet_inceptionv3.yaml
