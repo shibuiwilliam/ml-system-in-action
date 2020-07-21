@@ -32,6 +32,7 @@ scipy==1.4.1
 six==1.15.0
 skl2onnx==1.7.0
 starlette==0.13.4
+tensorflow-serving-api==2.2.0
 threadpoolctl==2.1.0
 toml==0.10.1
 typing==3.7.4.1
