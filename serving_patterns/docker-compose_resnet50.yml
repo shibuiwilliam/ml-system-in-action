@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  web_single_image:
+  image_api:
     container_name: serving_patterns_image
     build:
       context: .

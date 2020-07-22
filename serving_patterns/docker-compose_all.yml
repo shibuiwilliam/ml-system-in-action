@@ -72,7 +72,7 @@ services:
       - PROFILE=0
     command: ./run_backend.sh
 
-  web_single_image:
+  image_api:
     container_name: serving_patterns_image
     build:
       context: .
