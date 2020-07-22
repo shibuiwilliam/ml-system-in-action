@@ -17,3 +17,19 @@ def test():
 def predict(data: Data,
             background_tasks: BackgroundTasks):
     return _predict._predict(data, background_tasks)
+
+
+@router.get('/labels')
+def labels():
+    return _predict._labels()
+
+
+@router.get('/label')
+def test_label():
+    return _predict._test_label()
+
+
+@router.post('/label')
+def predict_label(data: Data,
+                  background_tasks: BackgroundTasks = BackgroundTasks()):
+    return _predict._predict_label(data, background_tasks)

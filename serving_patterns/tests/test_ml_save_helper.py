@@ -21,7 +21,7 @@ def test_dump_sklearn(mocker):
 
 
 @pytest.mark.parametrize(('model_name',
-                          'interface_filename',
+                          'interface_filepath',
                           'input_shape',
                           'input_type',
                           'output_shape',
@@ -45,7 +45,7 @@ def test_dump_sklearn(mocker):
 def test_save_interface(
         mocker,
         model_name,
-        interface_filename,
+        interface_filepath,
         input_shape,
         input_type,
         output_shape,
@@ -56,10 +56,9 @@ def test_save_interface(
         runner,
         option):
     with tempfile.TemporaryDirectory() as model_dir:
-        mocker.patch('os.makedirs', return_value=None)
+        interface_filepath = os.path.join(model_dir, interface_filepath)
         save_helper.save_interface(model_name,
-                                   model_dir,
-                                   interface_filename,
+                                   interface_filepath,
                                    input_shape,
                                    input_type,
                                    output_shape,

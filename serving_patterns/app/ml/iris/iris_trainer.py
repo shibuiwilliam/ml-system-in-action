@@ -6,16 +6,24 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 import onnxruntime as rt
 import os
+import yaml
+import json
 import joblib
 import numpy as np
 from typing import Dict, List, Union
-import yaml
 
 from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 from app.ml.save_helper import save_interface, dump_sklearn
 
 
 MODEL_DIR = './models/'
+LABEL_FILEPATH = os.path.join(MODEL_DIR, 'iris_labels.json')
+
+
+def make_label_file(label_filepath: str):
+    labels = ['setosa', 'versicolor', 'virginica']
+    with open(label_filepath, 'w') as f:
+        json.dump(labels, f)
 
 
 def get_data() -> Dict[str, np.ndarray]:
@@ -73,18 +81,14 @@ def train_and_save(model,
                    y_test: np.ndarray):
     train_model(model, x_train, y_train)
     evaluate_model(model, x_test, y_test)
-    os.makedirs(MODEL_DIR, exist_ok=True)
     dump_sklearn(model, os.path.join(MODEL_DIR, filename))
 
 
 def save_onnx(model,
               modelname: str,
-              filename: str,
+              filepath: str,
               x_test: np.ndarray,
               y_test: np.ndarray):
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    filepath = os.path.join(MODEL_DIR, filename)
-
     initial_type = [('float_input', FloatTensorType([None, 4]))]
     onx = convert_sklearn(model, initial_types=initial_type)
     with open(filepath, 'wb') as f:
@@ -105,91 +109,85 @@ def save_onnx(model,
 
 
 def main():
+    os.makedirs(MODEL_DIR, exist_ok=True)
     data = get_data()
+    make_label_file(LABEL_FILEPATH)
 
     svc_pipeline = define_svc_pipeline()
-    modelname = 'iris_svc'
-    model_filename = f'{modelname}.pkl'
-    interface_filename = f'{modelname}_sklearn.yaml'
-    train_and_save(svc_pipeline,
-                   modelname,
-                   model_filename,
-                   data['x_train'],
-                   data['y_train'],
-                   data['x_test'],
-                   data['y_test'])
-    save_interface(modelname,
-                   MODEL_DIR,
-                   interface_filename,
+    svc_modelname = 'iris_svc'
+    svc_model_filename = f'{svc_modelname}.pkl'
+    svc_sklearn_interface_filename = f'{svc_modelname}_sklearn.yaml'
+    train_model(svc_pipeline, data['x_train'], data['y_train'])
+    evaluate_model(svc_pipeline, data['x_test'], data['y_test'])
+    dump_sklearn(svc_pipeline, os.path.join(MODEL_DIR, svc_model_filename))
+    save_interface(svc_modelname,
+                   os.path.join(MODEL_DIR, svc_sklearn_interface_filename),
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   [{model_filename: MODEL_RUNTIME.SKLEARN}],
+                   [{svc_model_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'app.ml.iris.iris_predictor_sklearn')
+                   'app.ml.iris.iris_predictor_sklearn',
+                   label_filepath=LABEL_FILEPATH)
 
-    onnx_filename = f'{modelname}.onnx'
-    interface_filename = f'{modelname}_onnx_runtime.yaml'
+    svc_onnx_filename = f'{svc_modelname}.onnx'
+    svc_onnx_interface_filename = f'{svc_modelname}_onnx_runtime.yaml'
     save_onnx(svc_pipeline,
-              modelname,
-              onnx_filename,
+              svc_modelname,
+              os.path.join(MODEL_DIR, svc_onnx_filename),
               data['x_test'],
               data['y_test'])
-    save_interface(modelname,
-                   MODEL_DIR,
-                   interface_filename,
+    save_interface(svc_modelname,
+                   os.path.join(MODEL_DIR, svc_onnx_interface_filename),
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   [{onnx_filename: MODEL_RUNTIME.ONNX_RUNTIME}],
+                   [{svc_onnx_filename: MODEL_RUNTIME.ONNX_RUNTIME}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'app.ml.iris.iris_predictor_onnx')
+                   'app.ml.iris.iris_predictor_onnx',
+                   label_filepath=LABEL_FILEPATH)
 
     tree_pipeline = define_tree_pipeline()
-    modelname = 'iris_tree'
-    model_filename = f'{modelname}.pkl'
-    interface_filename = f'{modelname}_sklearn.yaml'
-    train_and_save(tree_pipeline,
-                   modelname,
-                   model_filename,
-                   data['x_train'],
-                   data['y_train'],
-                   data['x_test'],
-                   data['y_test'])
-    save_interface(modelname,
-                   MODEL_DIR,
-                   interface_filename,
+    tree_modelname = 'iris_tree'
+    tree_model_filename = f'{tree_modelname}.pkl'
+    tree_sklearn_interface_filename = f'{tree_modelname}_sklearn.yaml'
+    train_model(tree_pipeline, data['x_train'], data['y_train'])
+    evaluate_model(tree_pipeline, data['x_test'], data['y_test'])
+    dump_sklearn(tree_pipeline, os.path.join(MODEL_DIR, tree_model_filename))
+    save_interface(tree_modelname,
+                   os.path.join(MODEL_DIR, tree_sklearn_interface_filename),
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   [{model_filename: MODEL_RUNTIME.SKLEARN}],
+                   [{tree_model_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'app.ml.iris.iris_predictor_sklearn')
+                   'app.ml.iris.iris_predictor_sklearn',
+                   label_filepath=LABEL_FILEPATH)
 
-    onnx_filename = f'{modelname}.onnx'
-    interface_filename = f'{modelname}_onnx_runtime.yaml'
+    tree_onnx_filename = f'{tree_modelname}.onnx'
+    tree_onnx_interface_filename = f'{tree_modelname}_sklearn.yaml'
     save_onnx(tree_pipeline,
-              modelname,
-              onnx_filename,
+              tree_modelname,
+              tree_onnx_filename,
               data['x_test'],
               data['y_test'])
-    save_interface(modelname,
-                   MODEL_DIR,
-                   interface_filename,
+    save_interface(tree_modelname,
+                   os.path.join(MODEL_DIR, tree_onnx_interface_filename),
                    [1, 4],
                    str(data['x_train'].dtype).split('.')[-1],
                    [1, 3],
                    'float32',
                    DATA_TYPE.ARRAY,
-                   [{onnx_filename: MODEL_RUNTIME.ONNX_RUNTIME}],
+                   [{tree_onnx_filename: MODEL_RUNTIME.ONNX_RUNTIME}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'app.ml.iris.iris_predictor_onnx')
+                   'app.ml.iris.iris_predictor_onnx',
+                   label_filepath=LABEL_FILEPATH)
 
 
 if __name__ == '__main__':

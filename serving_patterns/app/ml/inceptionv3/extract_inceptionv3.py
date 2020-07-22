@@ -15,8 +15,8 @@ SAVEDMODEL_DIR = os.path.join(MODEL_DIR, MODEL_FILE_DIR)
 PB_FILE = os.path.join(SAVEDMODEL_DIR, 'saved_model.pb')
 HUB_URL = 'https://tfhub.dev/google/imagenet/inception_v3/classification/4'
 SAMPLE_IMAGE = os.path.join('./app/ml/data', 'good_cat.jpg')
-LABEL_FILE = os.path.join(MODEL_DIR, 'imagenet_labels_1001.json')
-LABELS = load_labels(LABEL_FILE)
+LABEL_FILEPATH = os.path.join(MODEL_DIR, 'imagenet_labels_1001.json')
+LABELS = load_labels(LABEL_FILEPATH)
 
 
 def validate(image, preprocess, predictor, postprocess):
@@ -48,7 +48,7 @@ def main():
 
     tf.saved_model.save(model, SAVEDMODEL_DIR)
 
-    modelname = 'imagenet_inceptionv3'
+    modelname = 'inceptionv3'
     interface_filename = f'{modelname}.yaml'
     preprocess_filename = f'{modelname}_preprocess_transformer.pkl'
     postprocess_filename = f'{modelname}_softmax_transformer.pkl'
@@ -56,8 +56,7 @@ def main():
     dump_sklearn(postprocess, os.path.join(MODEL_DIR, postprocess_filename))
 
     save_interface(modelname,
-                   MODEL_DIR,
-                   interface_filename,
+                   os.path.join(MODEL_DIR, interface_filename),
                    [1, 299, 299, 3],
                    'float32',
                    [1, 1001],
@@ -67,8 +66,8 @@ def main():
                     {MODEL_FILE_DIR: MODEL_RUNTIME.TF_SERVING},
                     {postprocess_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'app.ml.imagenet_inceptionv3.imagenet_inceptionv3_predictor',
-                   label_filepath=LABEL_FILE,
+                   'app.ml.inceptionv3.inceptionv3_predictor',
+                   label_filepath=LABEL_FILEPATH,
                    model_spec_name='inceptionv3',
                    model_spec_signature_name='serving_default',
                    input_name='keras_layer_input',

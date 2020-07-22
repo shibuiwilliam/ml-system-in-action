@@ -2,16 +2,19 @@ from typing import List, Sequence
 import joblib
 import numpy as np
 
+from app.configurations import _ModelConfigurations
 from app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
+from app.ml.save_helper import load_labels
 import logging
 
 
 logger = logging.getLogger(__name__)
 
+LABELS = load_labels(_ModelConfigurations().options['label_filepath'])
 
 class _Data(BaseData):
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
-
+    labels: List[str] = LABELS
 
 class _DataInterface(BaseDataInterface):
     pass

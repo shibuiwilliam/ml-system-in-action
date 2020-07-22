@@ -17,8 +17,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 LABELS = load_labels(_ModelConfigurations().options['label_filepath'])
+
 
 
 class _Data(BaseData):

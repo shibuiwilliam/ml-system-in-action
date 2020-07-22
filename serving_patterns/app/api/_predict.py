@@ -1,6 +1,7 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 from fastapi import BackgroundTasks
 import uuid
+import numpy as np
 import logging
 
 from app.middleware.profiler import do_cprofile
@@ -52,13 +53,24 @@ def __predict(data: Data):
     logger.info(f'prediction: {data.__dict__}')
 
 
-def _predict_from_redis_cache(job_id: str) -> Data:
+@do_cprofile
+def __predict_label(data: Data) -> Dict[str, float]:
+    __predict(data)
+    argmax = int(np.argmax(np.array(data.prediction)[0]))
+    return {data.labels[argmax]: data.prediction[0][argmax]}
+
+
+def _predict_from_redis_cache(job_id: str, data_class: callable = Data) -> Data:
     data_dict = store_data_job.load_data_redis(job_id)
     if data_dict is None:
         return None
-    data = Data(**data_dict)
+    data = data_class(**data_dict)
     __predict(data)
     return data
+
+
+def _labels(data_class: callable = Data) -> Dict[str, List[str]]:
+    return {'labels': data_class().labels}
 
 
 def _test(data: Data = Data()) -> Dict[str, int]:
@@ -67,11 +79,24 @@ def _test(data: Data = Data()) -> Dict[str, int]:
     return {'prediction': data.prediction}
 
 
+def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
+    data.input_data = data.test_data
+    label_proba = __predict_label(data)
+    return {'prediction': label_proba}
+
+
 def _predict(data: Data,
-             background_tasks: BackgroundTasks) -> Dict[str, int]:
+             background_tasks: BackgroundTasks) -> Dict[str, List[float]]:
     __predict(data)
     _save_data_job(data, background_tasks, False)
     return {'prediction': data.prediction}
+
+
+def _predict_label(data: Data,
+                   background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, Dict[str, float]]:
+    label_proba = __predict_label(data)
+    _save_data_job(data, background_tasks, False)
+    return {'prediction': label_proba}
 
 
 async def _predict_async_post(
@@ -82,7 +107,7 @@ async def _predict_async_post(
 
 
 @do_cprofile
-def _predict_async_get(job_id: str) -> Dict[str, int]:
+def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
     result = {job_id: {'prediction': []}}
     if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = store_data_job.load_data_redis(job_id)
@@ -92,6 +117,31 @@ def _predict_async_get(job_id: str) -> Dict[str, int]:
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
         data_dict = store_data_job.load_data_redis(job_id)
         result[job_id]['prediction'] = data_dict['prediction']
+        return result
+
+    else:
+        return result
+
+
+@do_cprofile
+def _predict_async_get_label(job_id: str) -> Dict[str, Dict[str, Dict[str, float]]]:
+    result = {job_id: {'prediction': []}}
+    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        if result[job_id]['prediction'] is None:
+            result[job_id]['prediction'] = data_dict['prediction']
+            return result
+        argmax = int(np.argmax(np.array(data_dict['prediction'])[0]))
+        result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
+        return result
+
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        if result[job_id]['prediction'] is None:
+            result[job_id]['prediction'] = data_dict['prediction']
+            return result
+        argmax = int(np.argmax(np.array(data_dict['prediction'])[0]))
+        result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
         return result
 
     else:

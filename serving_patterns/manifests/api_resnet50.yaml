@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-imagenet-resnet50-web-single
+  name: api-resnet50
   labels:
-    app: api-imagenet-resnet50-web-single
+    app: api-resnet50
   namespace: serving-pattern
 spec:
   selector:
     matchLabels:
-      app: api-imagenet-resnet50-web-single
+      app: api-resnet50
   replicas: 1
   template:
     metadata:
       labels:
-        app: api-imagenet-resnet50-web-single
-      name: api-imagenet-resnet50-web-single
+        app: api-resnet50
+      name: api-resnet50
     spec:
       containers:
-      - name: api-imagenet-resnet50-web-single
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_imagenet_resnet50:latest
+      - name: api-resnet50
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_resnet50:latest
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM
@@ -26,7 +26,7 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: imagenet_resnet50.yaml
+          value: resnet50.yaml
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
@@ -45,13 +45,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-imagenet-resnet50-web-single
+  name: api-resnet50
   labels:
-    app: api-imagenet-resnet50-web-single
+    app: api-resnet50
   namespace: serving-pattern
 spec:
   ports:
   - port: 8891
     protocol: TCP
   selector:
-    app: api-imagenet-resnet50-web-single
+    app: api-resnet50

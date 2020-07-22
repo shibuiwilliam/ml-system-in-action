@@ -2,16 +2,16 @@ version: '3'
 
 services:
   web_single_image:
-    container_name: serving_patterns_web_single_image
+    container_name: serving_patterns_image
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api_imagenet_resnet50
+      dockerfile: dockerfiles/Dockerfile_api_resnet50
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=imagenet_resnet50.yaml
+      - MODEL_INTERFACE=resnet50.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
-      - APP_NAME=app.apps.app_web_single_image
+      - APP_NAME=app.apps.app_image
       - PORT=8891
       - PROFILE=0
     ports:

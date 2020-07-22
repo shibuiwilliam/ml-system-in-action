@@ -63,17 +63,17 @@ def __predict_label(data: Data) -> Dict[str, float]:
     return {data.labels[argmax]: data.prediction[0][argmax]}
 
 
-# def _predict_from_redis_cache(job_id: str) -> Data:
-#     data_dict = store_data_job.load_data_redis(job_id)
-#     if data_dict is None:
-#         return None
-#     data = Data(**data_dict)
-#     __predict(data)
-#     return data
+def _predict_from_redis_cache(job_id: str, data_class: callable = Data) -> Data:
+    data_dict = store_data_job.load_data_redis(job_id)
+    if data_dict is None:
+        return None
+    data = data_class(**data_dict)
+    __predict(data)
+    return data
 
 
-def _labels(data: Data = Data()) -> Dict[str, List[str]]:
-    return {'labels': data.labels}
+def _labels(data_class: callable = Data) -> Dict[str, List[str]]:
+    return {'labels': data_class().labels}
 
 
 def _test(data: Data = Data()) -> Dict[str, int]:
@@ -82,16 +82,15 @@ def _test(data: Data = Data()) -> Dict[str, int]:
     return {'prediction': data.prediction}
 
 
-def _test_label(data: Data = Data()) -> Dict[str, int]:
+def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
     data.image_data = data.test_data
     label_proba = __predict_label(data)
     return {'prediction': label_proba}
 
 
 def _predict(file: UploadFile = File(...),
-             background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str,
-                                                                            int]:
-    data = Data()
+             background_tasks: BackgroundTasks = BackgroundTasks(),
+             data: Data = Data()) -> Dict[str, int]:
     data.image_data = io.BytesIO(file.file.read())
     __predict(data)
     _save_data_job(data, background_tasks, False)
@@ -99,34 +98,33 @@ def _predict(file: UploadFile = File(...),
 
 
 def _predict_label(file: UploadFile = File(...),
-                   background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str,
-                                                                                  int]:
-    data = Data()
+                   background_tasks: BackgroundTasks = BackgroundTasks(),
+                   data: Data = Data()) -> Dict[str, Dict[str, float]]:
     data.image_data = io.BytesIO(file.file.read())
     label_proba = __predict_label(data)
     _save_data_job(data, background_tasks, False)
     return {'prediction': label_proba}
 
 
-# async def _predict_async_post(
-#         data: Data,
-#         background_tasks: BackgroundTasks) -> Dict[str, str]:
-#     job_id = _save_data_job(data, background_tasks, True)
-#     return {'job_id': job_id}
+async def _predict_async_post(
+        data: Data,
+        background_tasks: BackgroundTasks) -> Dict[str, str]:
+    job_id = _save_data_job(data, background_tasks, True)
+    return {'job_id': job_id}
 
 
-# @do_cprofile
-# def _predict_async_get(job_id: str) -> Dict[str, int]:
-#     result = {job_id: {'prediction': []}}
-#     if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
-#         data_dict = store_data_job.load_data_redis(job_id)
-#         result[job_id]['prediction'] = data_dict['prediction']
-#         return result
+@do_cprofile
+def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
+    result = {job_id: {'prediction': []}}
+    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        result[job_id]['prediction'] = data_dict['prediction']
+        return result
 
-#     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
-#         data_dict = store_data_job.load_data_redis(job_id)
-#         result[job_id]['prediction'] = data_dict['prediction']
-#         return result
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        result[job_id]['prediction'] = data_dict['prediction']
+        return result
 
-#     else:
-#         return result
+    else:
+        return result

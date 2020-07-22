@@ -9,9 +9,9 @@ RUN apt-get -y update && \
 
 COPY ./app/ml/ ${PROJECT_DIR}app/ml/
 COPY ./app/constants.py ${PROJECT_DIR}app/constants.py
-COPY ./scripts/run_extract_imagenet_resnet50.sh ${PROJECT_DIR}run_extract_imagenet_resnet50.sh
-RUN chmod +x run_extract_imagenet_resnet50.sh && \
-    ./run_extract_imagenet_resnet50.sh
+COPY ./scripts/run_extract_resnet50.sh ${PROJECT_DIR}run_extract_resnet50.sh
+RUN chmod +x run_extract_resnet50.sh && \
+    ./run_extract_resnet50.sh
 
 
 FROM python:3.7-slim

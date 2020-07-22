@@ -10,17 +10,17 @@ from app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransform
 
 
 MODEL_DIR = './models/'
-MODEL_FILENAME = 'imagenet_resnet50v2.onnx'
+MODEL_FILENAME = 'resnet50v2.onnx'
 RESNET50_MODEL = os.path.join(MODEL_DIR, MODEL_FILENAME)
 SAMPLE_IMAGE = os.path.join('./app/ml/data', 'good_cat.jpg')
-LABEL_FILE = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
+LABEL_FILEPATH = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
 
 
 def main():
-    modelname = 'imagenet_resnet50'
+    modelname = 'resnet50'
     interface_filename = f'{modelname}.yaml'
 
-    labels = load_labels(LABEL_FILE)
+    labels = load_labels(LABEL_FILEPATH)
 
     preprocess = ONNXImagePreprocessTransformer()
 
@@ -49,8 +49,7 @@ def main():
     print(labels[np.argmax(prediction[0])])
 
     save_interface(modelname,
-                   MODEL_DIR,
-                   interface_filename,
+                   os.path.join(MODEL_DIR, interface_filename),
                    [1, 3, 224, 224],
                    'float32',
                    [1, 1000],
@@ -60,8 +59,8 @@ def main():
                     {MODEL_FILENAME: MODEL_RUNTIME.ONNX_RUNTIME},
                     {postprocess_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'app.ml.imagenet_resnet50.imagenet_resnet50_predictor',
-                   label_filepath=LABEL_FILE)
+                   'app.ml.resnet50.resnet50_predictor',
+                   label_filepath=LABEL_FILEPATH)
 
 
 if __name__ == '__main__':

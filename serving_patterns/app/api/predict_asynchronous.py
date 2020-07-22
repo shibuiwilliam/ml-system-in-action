@@ -23,3 +23,13 @@ async def predict_async(data: Data,
 @router.get('/{job_id}')
 def predict_async(job_id: str):
     return _predict._predict_async_get(job_id)
+
+
+@router.get('/labels')
+def labels():
+    return _predict._labels()
+
+
+@router.get('/label/{job_id}')
+def predict_async(job_id: str):
+    return _predict._predict_async_get_label(job_id)

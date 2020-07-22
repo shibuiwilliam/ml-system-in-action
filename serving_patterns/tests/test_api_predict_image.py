@@ -1,10 +1,11 @@
 import pytest
-from fastapi import BackgroundTasks
+from fastapi import BackgroundTasks, UploadFile
 from typing import List, Tuple, Any
 from PIL import Image
 import numpy as np
 import os
 
+from tests.utils import floats_almost_equal, nested_floats_almost_equal
 from app.constants import PLATFORM_ENUM
 from app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
 from app.ml.active_predictor import DataConverter
@@ -13,6 +14,7 @@ from app.api._predict_image import (
     _save_data_job,
     __predict,
     __predict_label,
+    _predict_from_redis_cache,
     _labels,
     _test,
     _test_label,
@@ -61,14 +63,6 @@ MockDataConverter.meta_data = MockDataInterface
 class MockJob():
     def __call__(self):
         return True
-
-
-def floats_almost_equal(X, Y):
-    return all(round(x-y, 5) == 0 for x,y in zip(X, Y))
-
-
-def nested_floats_almost_equal(X, Y):
-    return all((round(_x-_y, 5) == 0 for _x,_y in zip(x,y)) for x,y in zip(X, Y))
 
 
 @pytest.mark.parametrize(
@@ -126,28 +120,26 @@ def test__predict_label(mocker, prediction, expected):
     assert result == expected
 
 
-# @pytest.mark.parametrize(
-#     ('job_id', 'data', 'expected'),
-#     [(job_id, {'input_data': f_data}, {'input_data': f_data, 'prediction': [f_proba]})]
-# )
-# def test_predict_from_redis_cache(mocker, job_id, data, expected):
-#     mock_data = MockData(
-#         input_data=data['input_data'],
-#         prediction=expected['prediction']
-#     )
-
-#     mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data)
-
-#     mocker.patch(
-#         'app.ml.active_predictor.active_predictor.predict',
-#         return_value=np.array(expected['prediction']))
-#     result = _predict_from_redis_cache(job_id)
-#     assert expected['input_data'] == result.input_data
-#     assert nested_floats_almost_equal(mock_data.prediction, expected['prediction'])
+@pytest.mark.parametrize(
+    ('job_id', 'data', 'expected'),
+    [(job_id, {'image_data': mock_image}, {'image_data': mock_image, 'prediction': [f_proba]})]
+)
+def test_predict_from_redis_cache(mocker, job_id, data, expected):
+    mock_data = MockData(
+        image_data=data['image_data'],
+        prediction=expected['prediction']
+    )
+    mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data)
+    mocker.patch(
+        'app.ml.active_predictor.active_predictor.predict',
+        return_value=np.array(expected['prediction']))
+    result = _predict_from_redis_cache(job_id, MockData)
+    assert expected['image_data'] == result.image_data
+    assert nested_floats_almost_equal(mock_data.prediction, expected['prediction'])
 
 
 def test_labels(mocker):
-    result = _labels(MockData())
+    result = _labels(MockData)
     assert 'labels' in result
 
 
@@ -163,7 +155,7 @@ def test_test(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
-    result = _test(data=MockData())
+    result = _test(MockData())
     assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
 
 
@@ -179,22 +171,40 @@ def test_test_label(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
-    result = _test_label(data=MockData())
+    result = _test_label(MockData())
     assert result == expected
 
 
-# @pytest.mark.parametrize(
-#     ('output', 'expected'),
-#     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
-#      (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
-# )
-# def test_predict(mocker, output, expected):
-#     mocker.patch(
-#         'app.ml.active_predictor.active_predictor.predict',
-#         return_value=output)
-#     mocker.patch('app.api._predict._save_data_job', return_value=job_id)
-#     result = _predict(MockData(), mock_BackgroundTasks)
-#     assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
+@pytest.mark.parametrize(
+    ('output', 'expected'),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
+     (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
+)
+def test_predict(mocker, output, expected):
+    mock_upload_file = UploadFile(os.path.join('./app/ml/data', 'good_cat.jpg'))
+    mocker.patch('io.BytesIO', return_value=mock_image)
+    mocker.patch(
+        'app.ml.active_predictor.active_predictor.predict',
+        return_value=output)
+    mocker.patch('app.api._predict_image._save_data_job', return_value=job_id)
+    result = _predict(mock_upload_file, mock_BackgroundTasks, MockData())
+    assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
+
+
+@pytest.mark.parametrize(
+    ('output', 'expected'),
+    [(np.array([[0.8, 0.1, 0.1]]), {'prediction': {'a': 0.8}}),
+     (np.array([[0.7, 0.1, 0.2]]), {'prediction': {'a': 0.7}})]
+)
+def test_predict_label(mocker, output, expected):
+    mock_upload_file = UploadFile(os.path.join('./app/ml/data', 'good_cat.jpg'))
+    mocker.patch('io.BytesIO', return_value=mock_image)
+    mocker.patch(
+        'app.ml.active_predictor.active_predictor.predict',
+        return_value=output)
+    mocker.patch('app.api._predict_image._save_data_job', return_value=job_id)
+    result = _predict_label(mock_upload_file, mock_BackgroundTasks, MockData())
+    assert result['prediction']['a'] == pytest.approx(expected['prediction']['a'])
 
 
 # @pytest.mark.asyncio

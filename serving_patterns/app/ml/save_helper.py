@@ -17,8 +17,7 @@ def dump_sklearn(model, name: str):
 
 
 def save_interface(model_name: str,
-                   model_dir: str,
-                   interface_filename: str,
+                   interface_filepath: str,
                    input_shape: List[int],
                    input_type: str,
                    output_shape: List[int],
@@ -28,12 +27,10 @@ def save_interface(model_name: str,
                    prediction_type: PREDICTION_TYPE,
                    runner: str,
                    **kwargs: Dict) -> None:
-    os.makedirs(model_dir, exist_ok=True)
-    if not (interface_filename.endswith('yaml') or interface_filename.endswith('yml')):
-        interface_filename = f'{interface_filename}.yaml'
-    filepath = os.path.join(model_dir, interface_filename)
+    if not (interface_filepath.endswith('yaml') or interface_filepath.endswith('yml')):
+        interface_filepath = f'{interface_filepath}.yaml'
     _models = [{k:v.value for k,v in m.items()} for m in models]
-    with open(filepath, 'w') as f:
+    with open(interface_filepath, 'w') as f:
         f.write(yaml.dump({
             model_name: {
                 'data_interface': {

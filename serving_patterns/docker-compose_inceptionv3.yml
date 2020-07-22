@@ -2,13 +2,13 @@ version: '3'
 
 services:
   prep_pred_api:
-    container_name: serving_patterns_imagenet_inceptionv3_api
+    container_name: serving_patterns_inceptionv3_api
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile_api_inceptionv3
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=imagenet_inceptionv3.yaml
+      - MODEL_INTERFACE=inceptionv3.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - APP_NAME=app.apps.app_prep_pred_image
@@ -22,7 +22,7 @@ services:
       - prep_pred_tfs
 
   prep_pred_tfs:
-    container_name: serving_patterns_imagenet_inceptionv3_tfs
+    container_name: serving_patterns_inceptionv3_tfs
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile_tfserving_inceptionv3
