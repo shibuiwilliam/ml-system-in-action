@@ -19,7 +19,10 @@ from app.api._predict_image import (
     _test,
     _test_label,
     _predict,
-    _predict_label)
+    _predict_label,
+    _predict_async_post,
+    _predict_async_get,
+    _predict_async_get_label)
 
 
 mock_image = Image.new('RGB', size=(300, 300), color=(10, 10, 10))
@@ -135,7 +138,7 @@ def test_predict_from_redis_cache(mocker, job_id, data, expected):
         return_value=np.array(expected['prediction']))
     result = _predict_from_redis_cache(job_id, MockData)
     assert expected['image_data'] == result.image_data
-    assert nested_floats_almost_equal(mock_data.prediction, expected['prediction'])
+    assert nested_floats_almost_equal(result.prediction, expected['prediction'])
 
 
 def test_labels(mocker):
@@ -207,27 +210,43 @@ def test_predict_label(mocker, output, expected):
     assert result['prediction']['a'] == pytest.approx(expected['prediction']['a'])
 
 
-# @pytest.mark.asyncio
-# @pytest.mark.parametrize(
-#     ('job_id'),
-#     [(job_id)]
-# )
-# async def test_predict_async_post(mocker, job_id):
-#     mocker.patch('app.api._predict._save_data_job', return_value=job_id)
-#     result = await _predict_async_post(MockData(), mock_BackgroundTasks)
-#     assert result['job_id'] == job_id
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ('job_id'),
+    [(job_id)]
+)
+async def test_predict_async_post(mocker, job_id):
+    mock_upload_file = UploadFile(os.path.join('./app/ml/data', 'good_cat.jpg'))
+    mocker.patch('app.api._predict_image._save_data_job', return_value=job_id)
+    result = await _predict_async_post(mock_upload_file, mock_BackgroundTasks, MockData())
+    assert result['job_id'] == job_id
 
 
-# @pytest.mark.parametrize(
-#     ('job_id', 'data_dict', 'expected'),
-#     [(job_id,
-#       {'input_data': [[5.1, 3.5, 1.4, 0.2]], 'prediction': [[0.8, 0.1, 0.1]]},
-#       {job_id: {'prediction': [[0.8, 0.1, 0.1]]}})]
-# )
-# def test_predict_async_get(mocker, job_id, data_dict, expected):
-#     app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
-#     mocker.patch(
-#         'app.jobs.store_data_job.load_data_redis',
-#         return_value=data_dict)
-#     result = _predict_async_get(job_id)
-#     assert result == expected
+@pytest.mark.parametrize(
+    ('job_id', 'data_dict', 'expected'),
+    [(job_id,
+      {'image_data': mock_image, 'prediction': [[0.8, 0.1, 0.1]]},
+      {job_id: {'prediction': [[0.8, 0.1, 0.1]]}})]
+)
+def test_predict_async_get(mocker, job_id, data_dict, expected):
+    app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
+    mocker.patch(
+        'app.jobs.store_data_job.load_data_redis',
+        return_value=data_dict)
+    result = _predict_async_get(job_id)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    ('job_id', 'data_dict', 'expected'),
+    [(job_id,
+      {'image_data': mock_image, 'prediction': [[0.8, 0.1, 0.1]], 'labels': labels},
+      {job_id: {'prediction': {'a': 0.8}}})]
+)
+def test_predict_async_get_label(mocker, job_id, data_dict, expected):
+    app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
+    mocker.patch(
+        'app.jobs.store_data_job.load_data_redis',
+        return_value=data_dict)
+    result = _predict_async_get_label(job_id)
+    assert result == expected

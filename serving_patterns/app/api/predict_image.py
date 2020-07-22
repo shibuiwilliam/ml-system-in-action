@@ -32,3 +32,20 @@ def test_label():
 def predict_label(file: UploadFile = File(...),
                   background_tasks: BackgroundTasks = BackgroundTasks()):
     return _predict_image._predict_label(file, background_tasks)
+
+
+@router.post('/async')
+async def predict_async(file: UploadFile = File(...),
+                        background_tasks: BackgroundTasks = BackgroundTasks()):
+    return await _predict_image._predict_async_post(file, background_tasks)
+
+
+@router.get('/async/{job_id}')
+def predict_async(job_id: str):
+    return _predict_image._predict_async_get(job_id)
+
+
+@router.get('/async/label/{job_id}')
+def predict_async(job_id: str):
+    return _predict_image._predict_async_get_label(job_id)
+

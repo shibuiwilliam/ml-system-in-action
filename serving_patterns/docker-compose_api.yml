@@ -14,6 +14,7 @@ services:
       - APP_NAME=app.apps.app_web_single
       - PORT=8888
       - PROFILE=0
+      - QUEUE_NAME=api_queue
     ports:
       - "8888:8888"
     command: ./run_api.sh
@@ -33,6 +34,7 @@ services:
       - APP_NAME=app.apps.app_synchronous
       - PORT=8889
       - PROFILE=0
+      - QUEUE_NAME=api_queue
     ports:
       - "8889:8889"
     command: ./run_api.sh
@@ -52,14 +54,15 @@ services:
       - APP_NAME=app.apps.app_asynchronous
       - PORT=8890
       - PROFILE=0
+      - QUEUE_NAME=api_queue
     ports:
       - "8890:8890"
     command: ./run_api.sh
     depends_on:
-      - backend
+      - api_backend
       - redis
 
-  backend:
+  api_backend:
     container_name: serving_patterns_backend
     build:
       context: .
@@ -70,7 +73,10 @@ services:
       - NUM_PROCS=4
       - BATCH_CODE=app.backend.prediction_batch
       - PROFILE=0
+      - QUEUE_NAME=api_queue
     command: ./run_backend.sh
+    depends_on:
+      - redis
 
   redis:
     container_name: serving_patterns_redis

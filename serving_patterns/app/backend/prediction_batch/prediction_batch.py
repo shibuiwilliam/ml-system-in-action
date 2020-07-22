@@ -1,21 +1,23 @@
 import logging
 from time import sleep
 import asyncio
+import importlib
+import os
 from concurrent.futures import ProcessPoolExecutor
 
 from app.constants import CONSTANTS
 from app.configurations import _CacheConfigurations
-from app.api._predict import _predict_from_redis_cache
 from app.jobs import store_data_job
 from app.middleware.profiler import do_cprofile
 
+_predictor = importlib.import_module(os.getenv('PREDICTOR', 'app.api._predict'))
 
 logger = logging.getLogger('prediction_batch')
 
 
 @do_cprofile
 def _run_prediction(job_id: str):
-    data = _predict_from_redis_cache(job_id)
+    data = _predictor._predict_from_redis_cache(job_id)
     if data is not None:
         store_data_job.save_data_redis_job(job_id, data)
     else:

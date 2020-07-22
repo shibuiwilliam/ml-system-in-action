@@ -54,13 +54,15 @@ def __predict(data: Data):
 
 
 @do_cprofile
-def __predict_label(data: Data) -> Dict[str, float]:
-    __predict(data)
+def __predict_label(data: Data,
+                    __predict_callable: callable = __predict) -> Dict[str, float]:
+    __predict_callable(data)
     argmax = int(np.argmax(np.array(data.prediction)[0]))
     return {data.labels[argmax]: data.prediction[0][argmax]}
 
 
-def _predict_from_redis_cache(job_id: str, data_class: callable = Data) -> Data:
+def _predict_from_redis_cache(job_id: str,
+                              data_class: callable = Data) -> Data:
     data_dict = store_data_job.load_data_redis(job_id)
     if data_dict is None:
         return None
@@ -73,15 +75,18 @@ def _labels(data_class: callable = Data) -> Dict[str, List[str]]:
     return {'labels': data_class().labels}
 
 
-def _test(data: Data = Data()) -> Dict[str, int]:
+def _test(data: Data = Data(),
+          __predict_callable: callable = __predict) -> Dict[str, int]:
     data.input_data = data.test_data
-    __predict(data)
+    __predict_callable(data)
     return {'prediction': data.prediction}
 
 
-def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
+def _test_label(
+        data: Data = Data(),
+        __predict_callable: callable = __predict_label) -> Dict[str, Dict[str, float]]:
     data.input_data = data.test_data
-    label_proba = __predict_label(data)
+    label_proba = __predict_callable(data)
     return {'prediction': label_proba}
 
 
@@ -92,8 +97,9 @@ def _predict(data: Data,
     return {'prediction': data.prediction}
 
 
-def _predict_label(data: Data,
-                   background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, Dict[str, float]]:
+def _predict_label(
+        data: Data,
+        background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, Dict[str, float]]:
     label_proba = __predict_label(data)
     _save_data_job(data, background_tasks, False)
     return {'prediction': label_proba}

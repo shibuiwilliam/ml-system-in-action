@@ -25,6 +25,16 @@ class _RedisCacheConfigurations(_CacheConfigurations):
     redis_decode_responses = bool(os.getenv('REDIS_DECODE_RESPONSES', True))
 
 
+class _FileConfigurations():
+    shared_volume = ''
+    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+        shared_volume = '/shared_volume'
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+        shared_volume = ''
+    else:
+        pass
+
+
 class _FastAPIConfigurations():
     title = os.getenv('FASTAPI_TITLE', 'ML Rest')
     description = os.getenv('FASTAPI_DESCRIPTION', 'ML rest description')

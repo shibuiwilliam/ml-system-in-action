@@ -60,6 +60,7 @@ _pytest_d := docker build \
 			docker run --rm \
 				--name $(_test_container_name) \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
+				-e PROFILE=0 \
 				$(_image_name):$(_test_image_version) $(_pytest)
 
 _test_request := ./scripts/test_request.sh
