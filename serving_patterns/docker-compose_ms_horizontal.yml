@@ -53,7 +53,7 @@ services:
       - BATCH_CODE=app.backend.prediction_batch
       - TFS_GRPC=ms_horizontal_inceptionv3_tfs:8500
       - PROFILE=0
-      - PREDICTOR=app.api._predict_image
+      - PREDICTOR=app.api._predict_image_tfs
       - QUEUE_NAME=inceptionv2_queue
     command: ./run_backend.sh
     volumes:
@@ -113,7 +113,7 @@ services:
       - BATCH_CODE=app.backend.prediction_batch
       - TFS_GRPC=ms_horizontal_mobilenetv2_tfs:8510
       - PROFILE=0
-      - PREDICTOR=app.api._predict_image
+      - PREDICTOR=app.api._predict_image_tfs
       - QUEUE_NAME=mobilenetv2_queue
     command: ./run_backend.sh
     volumes:

@@ -8,14 +8,16 @@ router = APIRouter()
 
 
 @router.get('')
-def test():
-    return _predict_image._test()
+async def test():
+    result = await _predict_image._test()
+    return result
 
 
 @router.post('')
-def predict(file: UploadFile = File(...),
-            background_tasks: BackgroundTasks = BackgroundTasks()):
-    return _predict_image._predict(file, background_tasks)
+async def predict(file: UploadFile = File(...),
+                  background_tasks: BackgroundTasks = BackgroundTasks()):
+    result = await _predict_image._predict(file, background_tasks)
+    return result
 
 
 @router.get('/labels')
@@ -24,14 +26,16 @@ def labels():
 
 
 @router.get('/label')
-def test_label():
-    return _predict_image._test_label()
+async def test_label():
+    result = await _predict_image._test_label()
+    return result
 
 
 @router.post('/label')
-def predict_label(file: UploadFile = File(...),
-                  background_tasks: BackgroundTasks = BackgroundTasks()):
-    return _predict_image._predict_label(file, background_tasks)
+async def predict_label(file: UploadFile = File(...),
+                        background_tasks: BackgroundTasks = BackgroundTasks()):
+    result = await _predict_image._predict_label(file, background_tasks)
+    return result
 
 
 @router.post('/async')
@@ -48,4 +52,3 @@ def predict_async(job_id: str):
 @router.get('/async/label/{job_id}')
 def predict_async(job_id: str):
     return _predict_image._predict_async_get_label(job_id)
-

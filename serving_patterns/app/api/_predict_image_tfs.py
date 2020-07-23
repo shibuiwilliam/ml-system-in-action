@@ -75,8 +75,8 @@ async def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
 
 
 async def _predict(file: UploadFile = File(...),
-                   background_tasks: BackgroundTasks = BackgroundTasks(),
-                   data: Data = Data()) -> Dict[str, List[float]]:
+             background_tasks: BackgroundTasks = BackgroundTasks(),
+             data: Data = Data()) -> Dict[str, List[float]]:
     file_read = file.file.read()
     io_bytes = io.BytesIO(file_read)
     data.image_data = Image.open(io_bytes)
@@ -86,8 +86,8 @@ async def _predict(file: UploadFile = File(...),
 
 
 async def _predict_label(file: UploadFile = File(...),
-                         background_tasks: BackgroundTasks = BackgroundTasks(),
-                         data: Data = Data()) -> Dict[str, Dict[str, float]]:
+                   background_tasks: BackgroundTasks = BackgroundTasks(),
+                   data: Data = Data()) -> Dict[str, Dict[str, float]]:
     file_read = file.file.read()
     io_bytes = io.BytesIO(file_read)
     data.image_data = Image.open(io_bytes)
