@@ -47,7 +47,7 @@ def __predict_label(data: Data) -> Dict[str, float]:
 
 
 def _predict_from_redis_cache(job_id: str,
-                              data_class: callable = Data) -> Data:
+                                    data_class: callable = Data) -> Data:
     data_dict = store_data_job.load_data_redis(job_id)
     if data_dict is None:
         return None

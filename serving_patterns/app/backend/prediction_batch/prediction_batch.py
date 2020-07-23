@@ -16,12 +16,12 @@ logger = logging.getLogger('prediction_batch')
 
 
 @do_cprofile
-def _run_prediction(job_id: str):
+def _run_prediction(job_id: str) -> bool:
     data = _predictor._predict_from_redis_cache(job_id)
     if data is not None:
-        store_data_job.save_data_redis_job(job_id, data)
+        return store_data_job.save_data_redis_job(job_id, data)
     else:
-        store_data_job.left_push_queue(_CacheConfigurations().queue_name, job_id)
+        return store_data_job.left_push_queue(_CacheConfigurations().queue_name, job_id)
 
 
 def _trigger_prediction_if_queue():

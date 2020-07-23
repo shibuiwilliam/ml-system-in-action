@@ -11,7 +11,7 @@ services:
       - MODEL_INTERFACE=inceptionv3.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
-      - APP_NAME=app.apps.app_prep_pred_image
+      - APP_NAME=app.apps.app_image
       - PORT=8892
       - TFS_GRPC=ms_horizontal_inceptionv3_tfs:8500
       - PROFILE=0
@@ -53,7 +53,7 @@ services:
       - BATCH_CODE=app.backend.prediction_batch
       - TFS_GRPC=ms_horizontal_inceptionv3_tfs:8500
       - PROFILE=0
-      - PREDICTOR=app.api._predict_image_tfs
+      - PREDICTOR=app.api._predict_image
       - QUEUE_NAME=inceptionv2_queue
     command: ./run_backend.sh
     volumes:
@@ -71,7 +71,7 @@ services:
       - MODEL_INTERFACE=mobilenetv2.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
-      - APP_NAME=app.apps.app_prep_pred_image
+      - APP_NAME=app.apps.app_image
       - PORT=8893
       - TFS_GRPC=ms_horizontal_mobilenetv2_tfs:8510
       - PROFILE=0
@@ -113,7 +113,7 @@ services:
       - BATCH_CODE=app.backend.prediction_batch
       - TFS_GRPC=ms_horizontal_mobilenetv2_tfs:8510
       - PROFILE=0
-      - PREDICTOR=app.api._predict_image_tfs
+      - PREDICTOR=app.api._predict_image
       - QUEUE_NAME=mobilenetv2_queue
     command: ./run_backend.sh
     volumes:
