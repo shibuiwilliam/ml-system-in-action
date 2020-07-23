@@ -25,6 +25,7 @@ RUN apt-get -y update && \
     pip install -r requirements_api.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
+COPY ./configurations/ ${PROJECT_DIR}configurations/
 COPY --from=builder ${PROJECT_DIR}models/* ./models/
 
 ENV RUN_FILE run_backend.sh

@@ -24,6 +24,11 @@ _extract_inceptionv3_image_name := serving_patterns_extract_inceptionv3
 _extract_inceptionv3_image_version := latest
 _extract_inceptionv3_container_name := serving_patterns_extract_inceptionv3
 
+_extract_mobilenetv2_container_file := Dockerfile_extract_mobilenetv2
+_extract_mobilenetv2_image_name := serving_patterns_extract_mobilenetv2
+_extract_mobilenetv2_image_version := latest
+_extract_mobilenetv2_container_name := serving_patterns_extract_mobilenetv2
+
 _inceptionv3_tfs_container_file := Dockerfile_tfserving_inceptionv3
 _inceptionv3_tfs_image_name := serving_patterns_inceptionv3_tfs
 _inceptionv3_tfs_image_version := latest
@@ -33,6 +38,16 @@ _inceptionv3_api_container_file := Dockerfile_api_inceptionv3
 _inceptionv3_api_image_name := serving_patterns_inceptionv3_api
 _inceptionv3_api_image_version := latest
 _inceptionv3_api_container_name := serving_patterns_inceptionv3_api
+
+_mobilenetv2_tfs_container_file := Dockerfile_tfserving_mobilenetv2
+_mobilenetv2_tfs_image_name := serving_patterns_mobilenetv2_tfs
+_mobilenetv2_tfs_image_version := latest
+_mobilenetv2_tfs_container_name := serving_patterns_mobilenetv2_tfs
+
+_mobilenetv2_api_container_file := Dockerfile_api_mobilenetv2
+_mobilenetv2_api_image_name := serving_patterns_mobilenetv2_api
+_mobilenetv2_api_image_version := latest
+_mobilenetv2_api_container_name := serving_patterns_mobilenetv2_api
 
 _compose_api := docker-compose_api.yml
 _compose_build_api := docker-compose -f $(_compose_api) build
@@ -48,6 +63,16 @@ _compose_inceptionv3 := docker-compose_inceptionv3.yml
 _compose_build_inceptionv3 := docker-compose -f $(_compose_inceptionv3) build
 _compose_up_inceptionv3 := docker-compose -f $(_compose_inceptionv3) up -d
 _compose_down_inceptionv3 := docker-compose -f $(_compose_inceptionv3) down
+
+_compose_mobilenetv2 := docker-compose_mobilenetv2.yml
+_compose_build_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) build
+_compose_up_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) up -d
+_compose_down_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) down
+
+_compose_ms_horizontal := docker-compose_ms_horizontal.yml
+_compose_build_ms_horizontal := docker-compose -f $(_compose_ms_horizontal) build
+_compose_up_ms_horizontal := docker-compose -f $(_compose_ms_horizontal) up -d
+_compose_down_ms_horizontal := docker-compose -f $(_compose_ms_horizontal) down
 
 _requirements_api_test := requirements_api_test.txt
 _pip_freeze_test := pip freeze > requirements/$(_requirements_api_test)
@@ -66,6 +91,8 @@ _pytest_d := docker build \
 
 _test_request_api := ./scripts/test_request_api.sh
 _test_request_resnet50 := ./scripts/test_request_resnet50.sh
+_test_request_inceptionv3 := ./scripts/test_request_inceptionv3.sh
+_test_request_mobilenetv2 := ./scripts/test_request_mobilenetv2.sh
 
 _train_iris := docker build \
 				-t $(_train_iris_image_name):$(_train_iris_image_version) \
@@ -90,6 +117,14 @@ _extract_inceptionv3 := docker build \
 				--name $(_extract_inceptionv3_container_name) \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				$(_extract_inceptionv3_image_name):$(_extract_inceptionv3_image_version)
+
+_extract_mobilenetv2 := docker build \
+				-t $(_extract_mobilenetv2_image_name):$(_extract_mobilenetv2_image_version) \
+				-f $(_dockerfile_dir)/$(_extract_mobilenetv2_container_file) . && \
+ 			docker run --rm \
+				--name $(_extract_mobilenetv2_container_name) \
+				-v $(_absolute_path)/models/:/serving_patterns/models/ \
+				$(_extract_mobilenetv2_image_name):$(_extract_mobilenetv2_image_version)
 
 .PHONY: pip_freeze
 pip_freeze:
@@ -135,6 +170,30 @@ c_up_inceptionv3:
 c_down_inceptionv3:
 	$(_compose_down_inceptionv3)
 
+.PHONY: c_build_mobilenetv2
+c_build_mobilenetv2:
+	$(_compose_build_mobilenetv2)
+
+.PHONY: c_up_mobilenetv2
+c_up_mobilenetv2:
+	$(_compose_up_mobilenetv2)
+
+.PHONY: c_down_mobilenetv2
+c_down_mobilenetv2:
+	$(_compose_down_mobilenetv2)
+
+.PHONY: c_build_ms_horizontal
+c_build_ms_horizontal:
+	$(_compose_build_ms_horizontal)
+
+.PHONY: c_up_ms_horizontal
+c_up_ms_horizontal:
+	$(_compose_up_ms_horizontal)
+
+.PHONY: c_down_ms_horizontal
+c_down_ms_horizontal:
+	$(_compose_down_ms_horizontal)
+
 .PHONY: test_d
 test_d:
 	$(_pytest_d)
@@ -147,6 +206,14 @@ test_request_api:
 test_request_resnet50:
 	$(_test_request_resnet50)
 
+.PHONY: test_request_inceptionv3
+test_request_inceptionv3:
+	$(_test_request_inceptionv3)
+
+.PHONY: test_request_mobilenetv2
+test_request_mobilenetv2:
+	$(_test_request_mobilenetv2)
+
 .PHONY: train_iris
 train_iris:
 	$(_train_iris)
@@ -158,3 +225,10 @@ extract_resnet50:
 .PHONY: extract_inceptionv3
 extract_inceptionv3:
 	$(_extract_inceptionv3)
+
+.PHONY: extract_mobilenetv2
+extract_mobilenetv2:
+	$(_extract_mobilenetv2)
+
+.PHONY: build_all
+build_all: train_iris extract_resnet50 extract_inceptionv3 c_build_api c_build_resnet50 c_build_inceptionv3 c_build_mobilenetv2

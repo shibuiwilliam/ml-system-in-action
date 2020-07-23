@@ -9,9 +9,9 @@ RUN apt-get -y update && \
 
 COPY ./app/ml/ ${PROJECT_DIR}app/ml/
 COPY ./app/constants.py ${PROJECT_DIR}app/constants.py
-COPY ./scripts/run_extract_inceptionv3.sh ${PROJECT_DIR}run_extract_inceptionv3.sh
-RUN chmod +x run_extract_inceptionv3.sh && \
-    ./run_extract_inceptionv3.sh
+COPY ./scripts/run_extract_mobilenetv2.sh ${PROJECT_DIR}run_extract_mobilenetv2.sh
+RUN chmod +x run_extract_mobilenetv2.sh && \
+    ./run_extract_mobilenetv2.sh
 
 
 FROM tensorflow/tensorflow:latest
@@ -27,7 +27,7 @@ COPY ./app/ ${PROJECT_DIR}app/
 COPY ./configurations/ ${PROJECT_DIR}configurations/
 COPY --from=builder ${PROJECT_DIR}models/* ./models/
 
-ENV RUN_FILE run_backend.sh
+ENV RUN_FILE run_api.sh
 COPY ./scripts/${RUN_FILE} ${PROJECT_DIR}${RUN_FILE}
 RUN chmod +x ${RUN_FILE}
-CMD ./run_backend.sh
+CMD ./run_api.sh

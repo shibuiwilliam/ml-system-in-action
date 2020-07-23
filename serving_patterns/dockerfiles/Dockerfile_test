@@ -8,5 +8,6 @@ RUN apt-get -y update && \
     pip install -r requirements_api_test.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
+COPY ./configurations/ ${PROJECT_DIR}configurations/
 COPY ./tests/ ${PROJECT_DIR}tests/
 CMD ['pytest', '-v', '-s', './tests/']

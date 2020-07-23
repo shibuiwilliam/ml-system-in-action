@@ -24,6 +24,7 @@ RUN apt-get -y update && \
     pip install -r requirements_api_tf2_serving.txt
 
 COPY ./app/ ${PROJECT_DIR}app/
+COPY ./configurations/ ${PROJECT_DIR}configurations/
 COPY --from=builder ${PROJECT_DIR}models/* ./models/
 
 ENV RUN_FILE run_api.sh
