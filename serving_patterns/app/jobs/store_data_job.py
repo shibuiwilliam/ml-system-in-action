@@ -46,8 +46,12 @@ def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
 
 
 def save_data_redis_job(job_id: str, data: BaseData) -> bool:
+    return save_data_dict_redis_job(job_id, data.__dict__)
+
+
+def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
     data_dict = {}
-    for k, v in data.__dict__.items():
+    for k, v in data.items():
         if isinstance(v, np.ndarray):
             data_dict[k] = v.tolist()
         elif isinstance(v, Image.Image):
@@ -56,13 +60,9 @@ def save_data_redis_job(job_id: str, data: BaseData) -> bool:
             data_dict[k] = filepath
         else:
             data_dict[k] = v
-    return save_data_dict_redis_job(job_id, data_dict)
-
-
-def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
     redis_client.incr(CONSTANTS.REDIS_INCREMENTS)
-    logger.info({job_id: data})
-    redis_client.set(job_id, json.dumps(data))
+    logger.info({job_id: data_dict})
+    redis_client.set(job_id, json.dumps(data_dict))
     return True
 
 

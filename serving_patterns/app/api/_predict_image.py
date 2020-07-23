@@ -50,7 +50,10 @@ def _predict_from_redis_cache(job_id: str, data_class: callable = Data) -> Data:
     data_dict = store_data_job.load_data_redis(job_id)
     if data_dict is None:
         return None
-    data_dict['image_data'] = Image.open(data_dict['image_data'])
+    if isinstance(data_dict['image_data'], Image.Image):
+        pass
+    else:
+        data_dict['image_data'] = Image.open(data_dict['image_data'])
     data = data_class(**data_dict)
     __predict(data)
     return data
@@ -71,8 +74,9 @@ def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
 def _predict(file: UploadFile = File(...),
              background_tasks: BackgroundTasks = BackgroundTasks(),
              data: Data = Data()) -> Dict[str, List[float]]:
-    data.image_data = Image.open(io.BytesIO(file.file.read()))
-    logger.info(type(data.image_data))
+    file_read = file.file.read()
+    io_bytes = io.BytesIO(file_read)
+    data.image_data = Image.open(io_bytes)
     __predict(data)
     _save_data_job(data, background_tasks, False)
     return {'prediction': data.prediction}
@@ -81,7 +85,9 @@ def _predict(file: UploadFile = File(...),
 def _predict_label(file: UploadFile = File(...),
                    background_tasks: BackgroundTasks = BackgroundTasks(),
                    data: Data = Data()) -> Dict[str, Dict[str, float]]:
-    data.image_data = Image.open(io.BytesIO(file.file.read()))
+    file_read = file.file.read()
+    io_bytes = io.BytesIO(file_read)
+    data.image_data = Image.open(io_bytes)
     label_proba = __predict_label(data)
     _save_data_job(data, background_tasks, False)
     return {'prediction': label_proba}
@@ -91,7 +97,9 @@ async def _predict_async_post(
         file: UploadFile = File(...),
         background_tasks: BackgroundTasks = BackgroundTasks(),
         data: Data = Data()) -> Dict[str, str]:
-    data.image_data = Image.open(io.BytesIO(file.file.read()))
+    file_read = file.file.read()
+    io_bytes = io.BytesIO(file_read)
+    data.image_data = Image.open(io_bytes)
     job_id = _save_data_job(data, background_tasks, True)
     return {'job_id': job_id}
 

@@ -38,6 +38,16 @@ def _save_data_job(data: Data,
             data=data,
             queue_name=_CacheConfigurations().queue_name,
             enqueue=enqueue)
+
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
+        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
+        num_files = 0 if incr is None else incr
+        job_id = f'{str(uuid.uuid4())}_{num_files}'
+        task = store_data_job.SaveDataRedisJob(
+            job_id=job_id,
+            data=data,
+            queue_name=_CacheConfigurations().queue_name,
+            enqueue=enqueue)
     else:
         raise ValueError(f'platform must be chosen from constants.PLATFORM_ENUM')
     background_tasks.add_task(task)
@@ -125,6 +135,11 @@ def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
         result[job_id]['prediction'] = data_dict['prediction']
         return result
 
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        result[job_id]['prediction'] = data_dict['prediction']
+        return result
+
     else:
         return result
 
@@ -142,6 +157,15 @@ def _predict_async_get_label(job_id: str) -> Dict[str, Dict[str, Dict[str, float
         return result
 
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        if result[job_id]['prediction'] is None:
+            result[job_id]['prediction'] = data_dict['prediction']
+            return result
+        argmax = int(np.argmax(np.array(data_dict['prediction'])[0]))
+        result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
+        return result
+
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
         data_dict = store_data_job.load_data_redis(job_id)
         if result[job_id]['prediction'] is None:
             result[job_id]['prediction'] = data_dict['prediction']

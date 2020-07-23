@@ -26,6 +26,7 @@ from app.api._predict_image import (
 
 
 mock_image = Image.new('RGB', size=(300, 300), color=(10, 10, 10))
+mock_image_path = os.path.join('./app/ml/data', 'good_cat.jpg')
 labels = ['a', 'b', 'c']
 test_uuid = '550e8400-e29b-41d4-a716-446655440000'
 job_id = f'{test_uuid}_0'
@@ -43,7 +44,7 @@ class MockPredictor(BasePredictor):
 
 class MockData(BaseData):
     image_data: Any = mock_image
-    test_data: str = os.path.join('./app/ml/data', 'good_cat.jpg')
+    test_data: str = mock_image_path
     labels: List[str] = labels
 
 
@@ -184,7 +185,8 @@ def test_test_label(mocker, output, expected):
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
 def test_predict(mocker, output, expected):
-    mock_upload_file = UploadFile(os.path.join('./app/ml/data', 'good_cat.jpg'))
+    mock_upload_file = UploadFile(mock_image_path)
+    mocker.patch('PIL.Image.open', return_value=mock_image)
     mocker.patch('io.BytesIO', return_value=mock_image)
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
@@ -200,7 +202,8 @@ def test_predict(mocker, output, expected):
      (np.array([[0.7, 0.1, 0.2]]), {'prediction': {'a': 0.7}})]
 )
 def test_predict_label(mocker, output, expected):
-    mock_upload_file = UploadFile(os.path.join('./app/ml/data', 'good_cat.jpg'))
+    mock_upload_file = UploadFile(mock_image_path)
+    mocker.patch('PIL.Image.open', return_value=mock_image)
     mocker.patch('io.BytesIO', return_value=mock_image)
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
@@ -216,8 +219,10 @@ def test_predict_label(mocker, output, expected):
     [(job_id)]
 )
 async def test_predict_async_post(mocker, job_id):
-    mock_upload_file = UploadFile(os.path.join('./app/ml/data', 'good_cat.jpg'))
+    mock_upload_file = UploadFile(mock_image_path)
     mocker.patch('app.api._predict_image._save_data_job', return_value=job_id)
+    mocker.patch('PIL.Image.open', return_value=mock_image)
+    mocker.patch('io.BytesIO', return_value=mock_image)
     result = await _predict_async_post(mock_upload_file, mock_BackgroundTasks, MockData())
     assert result['job_id'] == job_id
 

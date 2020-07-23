@@ -1,6 +1,7 @@
 import pytest
 import json
-from typing import List, Tuple
+from PIL import Image
+from typing import List, Tuple, Any
 
 from app.constants import CONSTANTS
 from app.jobs import store_data_job
@@ -8,11 +9,21 @@ from app.ml.base_predictor import BaseData, BaseDataInterface
 
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
+mock_image = Image.new('RGB', size=(300, 300), color=(10, 10, 10))
+labels = ['a', 'b', 'c']
 
 
 class MockData(BaseData):
     data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+    labels: List[str] = labels
+
+
+class MockDataImage(BaseData):
+    image_data: Any = mock_image
+    data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+    test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
+    labels: List[str] = labels
 
 
 class MockDataInterface(BaseDataInterface):
@@ -84,7 +95,8 @@ class Test:
 
     @pytest.mark.parametrize(
         ('job_id', 'data'),
-        [(test_job_id, MockData())]
+        [(test_job_id, MockData()),
+         (test_job_id, MockDataImage())]
     )
     def test_save_data_redis_job(self, mocker, job_id, data) -> None:
         def set(key, value):
@@ -104,7 +116,8 @@ class Test:
 
     @pytest.mark.parametrize(
         ('job_id', 'data'),
-        [(test_job_id, {'data': [1.0, -1.0], 'prediction': None})]
+        [(test_job_id, {'data': [1.0, -1.0], 'prediction': None}),
+         (test_job_id, MockDataImage().__dict__)]
     )
     def test_save_data_dict_redis_job(self, mocker, job_id, data) -> None:
         def set(key, value):

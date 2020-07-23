@@ -61,6 +61,7 @@ _pytest_d := docker build \
 				--name $(_test_container_name) \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				-e PROFILE=0 \
+				-e PLATFORM=test \
 				$(_image_name):$(_test_image_version) $(_pytest)
 
 _test_request := ./scripts/test_request.sh
@@ -89,54 +90,66 @@ _extract_inceptionv3 := docker build \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				$(_extract_inceptionv3_image_name):$(_extract_inceptionv3_image_version)
 
-.PHONY: clean pip_freeze c_build_api c_up_api c_down_api c_build_resnet50 c_up_resnet50 c_down_resnet50 c_build_inceptionv3 c_up_inceptionv3 c_down_inceptionv3 test test_d train_iris test_request extract_resnet50 extract_inceptionv3 run_inceptionv3_tfserving
+.PHONY: pip_freeze
 pip_freeze:
 	$(_pip_freeze_test)
 
+.PHONY: clean
 clean:
 	$(_compose_down)
 
+.PHONY: c_build_api
 c_build_api:
 	$(_compose_build_api)
 
+.PHONY: c_up_api
 c_up_api:
 	$(_compose_up_api)
 
+.PHONY: c_down_api
 c_down_api:
 	$(_compose_down_api)
 
+.PHONY: c_build_resnet50
 c_build_resnet50:
 	$(_compose_build_resnet50)
 
+.PHONY: c_up_resnet50
 c_up_resnet50:
 	$(_compose_up_resnet50)
 
+.PHONY: c_down_resnet50
 c_down_resnet50:
 	$(_compose_down_resnet50)
 
+.PHONY: c_build_inceptionv3
 c_build_inceptionv3:
 	$(_compose_build_inceptionv3)
 
+.PHONY: c_up_inceptionv3
 c_up_inceptionv3:
 	$(_compose_up_inceptionv3)
 
+.PHONY: c_down_inceptionv3
 c_down_inceptionv3:
 	$(_compose_down_inceptionv3)
 
-test:
-	$(_pytest)
-
+.PHONY: test_d
 test_d:
 	$(_pytest_d)
 
+.PHONY: test_request
 test_request:
 	$(_test_request)
 
+.PHONY: train_iris
 train_iris:
 	$(_train_iris)
 
+.PHONY: extract_resnet50
 extract_resnet50:
 	$(_extract_resnet50)
 
+.PHONY: extract_inceptionv3
 extract_inceptionv3:
 	$(_extract_inceptionv3)

@@ -11,7 +11,7 @@ class _PlatformConfigurations():
     platform = os.getenv('PLATFORM', PLATFORM_ENUM.DOCKER_COMPOSE.value)
     platform = platform if platform in (
         PLATFORM_ENUM.DOCKER_COMPOSE.value,
-        PLATFORM_ENUM.KUBERNETES.value) else PLATFORM_ENUM.DOCKER_COMPOSE.value
+        PLATFORM_ENUM.KUBERNETES.value) else PLATFORM_ENUM.TEST.value
 
 
 class _CacheConfigurations():
@@ -32,7 +32,7 @@ class _FileConfigurations():
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
         shared_volume = ''
     else:
-        pass
+        shared_volume = '/tmp'
 
 
 class _FastAPIConfigurations():
