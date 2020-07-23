@@ -10,8 +10,7 @@ router = APIRouter()
 
 @router.get('')
 def test():
-    prediction = _predict._test()
-    return prediction
+    return _predict._test()
 
 
 @router.post('')
@@ -20,7 +19,7 @@ async def predict_async(data: Data,
     return await _predict._predict_async_post(data, background_tasks)
 
 
-@router.get('/{job_id}')
+@router.get('/job/{job_id}')
 def predict_async(job_id: str):
     return _predict._predict_async_get(job_id)
 
@@ -30,6 +29,11 @@ def labels():
     return _predict._labels()
 
 
+@router.get('/label')
+def test_label():
+    return _predict._test_label()
+
+
 @router.get('/label/{job_id}')
-def predict_async(job_id: str):
+def predict_async_label(job_id: str):
     return _predict._predict_async_get_label(job_id)

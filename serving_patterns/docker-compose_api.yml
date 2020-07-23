@@ -48,7 +48,7 @@ services:
       dockerfile: dockerfiles/Dockerfile_api_iris
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
+      - MODEL_INTERFACE=iris_tree_onnx_runtime.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - APP_NAME=app.apps.app_asynchronous
@@ -69,7 +69,7 @@ services:
       dockerfile: dockerfiles/Dockerfile_backend_iris
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
+      - MODEL_INTERFACE=iris_tree_onnx_runtime.yaml
       - NUM_PROCS=4
       - BATCH_CODE=app.backend.prediction_batch
       - PROFILE=0

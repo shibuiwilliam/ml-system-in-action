@@ -171,10 +171,10 @@ def main():
                    label_filepath=LABEL_FILEPATH)
 
     tree_onnx_filename = f'{tree_modelname}.onnx'
-    tree_onnx_interface_filename = f'{tree_modelname}_sklearn.yaml'
+    tree_onnx_interface_filename = f'{tree_modelname}_onnx_runtime.yaml'
     save_onnx(tree_pipeline,
               tree_modelname,
-              tree_onnx_filename,
+              os.path.join(MODEL_DIR, tree_onnx_filename),
               data['x_test'],
               data['y_test'])
     save_interface(tree_modelname,

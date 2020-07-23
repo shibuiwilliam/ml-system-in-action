@@ -64,7 +64,8 @@ _pytest_d := docker build \
 				-e PLATFORM=test \
 				$(_image_name):$(_test_image_version) $(_pytest)
 
-_test_request := ./scripts/test_request.sh
+_test_request_api := ./scripts/test_request_api.sh
+_test_request_resnet50 := ./scripts/test_request_resnet50.sh
 
 _train_iris := docker build \
 				-t $(_train_iris_image_name):$(_train_iris_image_version) \
@@ -138,9 +139,13 @@ c_down_inceptionv3:
 test_d:
 	$(_pytest_d)
 
-.PHONY: test_request
-test_request:
-	$(_test_request)
+.PHONY: test_request_api
+test_request_api:
+	$(_test_request_api)
+
+.PHONY: test_request_resnet50
+test_request_resnet50:
+	$(_test_request_resnet50)
 
 .PHONY: train_iris
 train_iris:

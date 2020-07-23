@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 import logging
 
-from app.api import health, predict_asynchronous
+from app.routers import health, predict_asynchronous
 from app.constants import CONSTANTS
 from app.configurations import _PlatformConfigurations, _FastAPIConfigurations
 
