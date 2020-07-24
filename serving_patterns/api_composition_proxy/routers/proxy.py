@@ -1,5 +1,4 @@
-from urllib.parse import urlparse, urlunparse
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, UploadFile, File
 import os
 import logging
 import aiohttp
@@ -21,7 +20,7 @@ def health():
     return {'health': 'ok'}
 
 
-async def _redirect_get(session, url: str) -> Dict[str, Any]:
+async def _get_redirect(session, url: str) -> Dict[str, Any]:
     async with session.get(url) as response:
         response_json = await response.json()
         resp = {
@@ -35,13 +34,13 @@ async def _redirect_get(session, url: str) -> Dict[str, Any]:
 
 
 @router.get('/redirect/{redirect_path:path}')
-async def redirect_get(redirect_path: str) -> Dict[str, Any]:
-    logger.info(f'GET redirect to: {redirect_path}')
+async def get_redirect(redirect_path: str) -> Dict[str, Any]:
+    logger.info(f'GET redirect to: /{redirect_path}')
     responses = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
             asyncio.ensure_future(
-                _redirect_get(
+                _get_redirect(
                     session,
                     helpers.url_builder(v, redirect_path))) for v in Services().services.values()]
         _responses = await asyncio.gather(*tasks)
@@ -56,7 +55,7 @@ class Data(BaseModel):
     data: Any = None
 
 
-async def _redirect_post_json(session, url: str, data: Dict[Any, Any]) -> Dict[str, Any]:
+async def _post_redirect_json(session, url: str, data: Dict[Any, Any]) -> Dict[str, Any]:
     async with session.post(url, json=data) as response:
         response_json = await response.json()
         resp = {
@@ -69,18 +68,53 @@ async def _redirect_post_json(session, url: str, data: Dict[Any, Any]) -> Dict[s
         return resp
 
 
-@router.post('/redirect/{redirect_path:path}')
-async def redirect_post_json(redirect_path: str, data: Data = Body(...)) -> Dict[str, Any]:
-    logger.info(f'POST redirect to: {redirect_path}')
+@router.post('/redirect_json/{redirect_path:path}')
+async def redirect_json(redirect_path: str, data: Data = Body(...)) -> Dict[str, Any]:
+    logger.info(f'POST redirect to: /{redirect_path}')
     logger.info(f'POST body: {data}')
     responses = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
             asyncio.ensure_future(
-                _redirect_post_json(
+                _post_redirect_json(
                     session,
                     helpers.url_builder(v, redirect_path),
                     data.data)) for v in Services().services.values()]
+        _responses = await asyncio.gather(*tasks)
+        for r in _responses:
+            for k, v in r.items():
+                responses[k] = v
+        logger.info(f'responses: {responses}')
+        return responses
+
+
+async def _post_redirect_file(session, url: str, data: Any) -> Dict[str, Any]:
+    async with session.post(url, data=data) as response:
+        response_json = await response.json()
+        resp = {
+            url: {
+                'response': response_json,
+                'status_code': response.status
+                }
+            }
+        logger.info(f'response: {resp}')
+        return resp
+
+
+@router.post('/redirect_file/{redirect_path:path}')
+async def post_redirect_file(redirect_path: str, file: UploadFile = File(...)) -> Dict[str, Any]:
+    logger.info(f'POST redirect to: /{redirect_path}')
+    logger.info(f'POST body: {file}')
+    data = aiohttp.FormData()
+    data.add_field('file', file.file.read(), filename='image.jpeg', content_type='multipart/form-data')
+    responses = {}
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
+        tasks = [
+            asyncio.ensure_future(
+                _post_redirect_file(
+                    session,
+                    helpers.url_builder(v, redirect_path),
+                    data)) for v in Services().services.values()]
         _responses = await asyncio.gather(*tasks)
         for r in _responses:
             for k, v in r.items():

@@ -12,50 +12,51 @@ services:
       - APP_NAME=api_composition_proxy.apps.proxy:app
       - PORT=8000
       - PROFILE=0
-      - SERVICE_WEB_SINGLE=web_single:8888
-      - SERVICE_SYNCHRONOUS=synchronous:8889
+      - SERVICE_WEB_SINGLE=image_api:8891
       - QUEUE_NAME=api_queue
     ports:
       - "8000:8000"
     command: ./run_proxy.sh
 
-  web_single:
-    container_name: serving_patterns_web_single
+  image_api:
+    container_name: serving_patterns_image_api
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api_iris
+      dockerfile: dockerfiles/Dockerfile_api_resnet50
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_svc_sklearn.yaml
+      - MODEL_INTERFACE=resnet50.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
-      - APP_NAME=app.apps.app_web_single:app
-      - PORT=8888
+      - APP_NAME=app.apps.app_image:app
+      - PORT=8891
       - PROFILE=0
-      - QUEUE_NAME=api_queue
+      - QUEUE_NAME=image_queue
     ports:
-      - "8888:8888"
+      - "8891:8891"
     command: ./run_api.sh
+    volumes:
+      - shared_volume:/shared_volume
     depends_on:
+      - image_backend
       - redis
 
-  synchronous:
-    container_name: serving_patterns_synchronous
+  image_backend:
+    container_name: serving_patterns_image_backend
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api_iris
+      dockerfile: dockerfiles/Dockerfile_backend_resnet50
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
-      - GUNICORN_UVICORN=GUNICORN
-      - WORKERS=4
-      - APP_NAME=app.apps.app_synchronous:app
-      - PORT=8889
+      - MODEL_INTERFACE=resnet50.yaml
+      - NUM_PROCS=4
+      - BATCH_CODE=app.backend.prediction_batch
       - PROFILE=0
-      - QUEUE_NAME=api_queue
-    ports:
-      - "8889:8889"
-    command: ./run_api.sh
+      - PREDICTOR=app.api._predict_image
+      - QUEUE_NAME=image_queue
+    command: ./run_backend.sh
+    volumes:
+      - shared_volume:/shared_volume
     depends_on:
       - redis
 
@@ -64,3 +65,10 @@ services:
     image: "redis:latest"
     ports:
       - "6379:6379"
+
+volumes:
+  shared_volume:
+    driver_opts:
+      type: none
+      device: /tmp
+      o: bind
