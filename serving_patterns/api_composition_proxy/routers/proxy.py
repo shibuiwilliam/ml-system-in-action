@@ -1,8 +1,8 @@
 from urllib.parse import urlparse, urlunparse
 from fastapi import APIRouter
-import requests
 import os
 import logging
+import aiohttp
 
 from api_composition_proxy.configurations import Services
 
@@ -21,8 +21,8 @@ async def redirect():
     logger.info('redirect!')
     responses = {}
     for k,v in Services().services.items():
-        response = requests.request('GET', v, allow_redirects=True)
-        logger.info(f'target: {v}')
-        logger.info(f'status_code: {response.status_code}')
-        responses[v] = response.status_code
+        async with aiohttp.request('GET', v) as response:
+            logger.info(f'target: {v}')
+            logger.info(f'status_code: {response.status}')
+            responses[v] = response.status
     return responses
