@@ -3,9 +3,11 @@ import os
 import logging
 import aiohttp
 import asyncio
+from PIL import Image
+import io
 from typing import Dict, Any
 from pydantic import BaseModel
-
+import uuid
 
 from api_composition_proxy.configurations import Services
 from api_composition_proxy import helpers
@@ -89,7 +91,10 @@ async def redirect_json(redirect_path: str, data: Data = Body(...)) -> Dict[str,
 
 
 async def _post_redirect_file(session, url: str, data: Any) -> Dict[str, Any]:
-    async with session.post(url, data=data) as response:
+    data.file.seek(0)
+    _data = aiohttp.FormData()
+    _data.add_field('file', data.file.read(), filename='image.jpeg', content_type='multipart/form-data')
+    async with session.post(url, data=_data) as response:
         response_json = await response.json()
         resp = {
             url: {
@@ -105,8 +110,6 @@ async def _post_redirect_file(session, url: str, data: Any) -> Dict[str, Any]:
 async def post_redirect_file(redirect_path: str, file: UploadFile = File(...)) -> Dict[str, Any]:
     logger.info(f'POST redirect to: /{redirect_path}')
     logger.info(f'POST body: {file}')
-    data = aiohttp.FormData()
-    data.add_field('file', file.file.read(), filename='image.jpeg', content_type='multipart/form-data')
     responses = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
@@ -114,7 +117,7 @@ async def post_redirect_file(redirect_path: str, file: UploadFile = File(...)) -
                 _post_redirect_file(
                     session,
                     helpers.url_builder(v, redirect_path),
-                    data)) for v in Services().services.values()]
+                    file)) for v in Services().services.values()]
         _responses = await asyncio.gather(*tasks)
         for r in _responses:
             for k, v in r.items():
