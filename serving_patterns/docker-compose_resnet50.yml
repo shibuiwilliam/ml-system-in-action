@@ -11,7 +11,7 @@ services:
       - MODEL_INTERFACE=resnet50.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
-      - APP_NAME=app.apps.app_image
+      - APP_NAME=app.apps.app_image:app
       - PORT=8891
       - PROFILE=0
       - QUEUE_NAME=image_queue
