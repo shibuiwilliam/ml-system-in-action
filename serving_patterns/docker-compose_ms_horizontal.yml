@@ -1,6 +1,24 @@
 version: '3'
 
 services:
+  proxy:
+    container_name: serving_patterns_proxy
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_proxy
+    environment:
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=2
+      - APP_NAME=api_composition_proxy.apps.proxy:app
+      - PORT=8000
+      - PROFILE=0
+      - SERVICE_INCEPTIONV3=ms_horizontal_inceptionv3_api:8892
+      - SERVICE_MOBILENETV2=ms_horizontal_mobilenetv2_api:8893
+      - QUEUE_NAME=api_queue
+    ports:
+      - "8000:8000"
+    command: ./run_proxy.sh
+
   ms_horizontal_inceptionv3_api:
     container_name: serving_patterns_ms_horizontal_ineptionv3_api
     build:
