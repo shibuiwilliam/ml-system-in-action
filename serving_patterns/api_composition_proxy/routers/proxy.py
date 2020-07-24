@@ -29,8 +29,8 @@ async def _get_redirect(session, url: str) -> Dict[str, Any]:
             url: {
                 'response': response_json,
                 'status_code': response.status
-                }
             }
+        }
         logger.info(f'response: {resp}')
         return resp
 
@@ -44,7 +44,9 @@ async def get_redirect(redirect_path: str) -> Dict[str, Any]:
             asyncio.ensure_future(
                 _get_redirect(
                     session,
-                    helpers.url_builder(v, redirect_path))) for v in Services().services.values()]
+                    helpers.url_builder(
+                        v,
+                        redirect_path))) for v in Services().services.values()]
         _responses = await asyncio.gather(*tasks)
         for r in _responses:
             for k, v in r.items():
@@ -64,8 +66,8 @@ async def _post_redirect_json(session, url: str, data: Dict[Any, Any]) -> Dict[s
             url: {
                 'response': response_json,
                 'status_code': response.status
-                }
             }
+        }
         logger.info(f'response: {resp}')
         return resp
 
@@ -73,7 +75,6 @@ async def _post_redirect_json(session, url: str, data: Dict[Any, Any]) -> Dict[s
 @router.post('/redirect_json/{redirect_path:path}')
 async def redirect_json(redirect_path: str, data: Data = Body(...)) -> Dict[str, Any]:
     logger.info(f'POST redirect to: /{redirect_path}')
-    logger.info(f'POST body: {data}')
     responses = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
@@ -93,15 +94,19 @@ async def redirect_json(redirect_path: str, data: Data = Body(...)) -> Dict[str,
 async def _post_redirect_file(session, url: str, data: Any) -> Dict[str, Any]:
     data.file.seek(0)
     _data = aiohttp.FormData()
-    _data.add_field('file', data.file.read(), filename='image.jpeg', content_type='multipart/form-data')
+    _data.add_field(
+        'file',
+        data.file.read(),
+        filename='image.jpeg',
+        content_type='multipart/form-data')
     async with session.post(url, data=_data) as response:
         response_json = await response.json()
         resp = {
             url: {
                 'response': response_json,
                 'status_code': response.status
-                }
             }
+        }
         logger.info(f'response: {resp}')
         return resp
 
@@ -109,7 +114,6 @@ async def _post_redirect_file(session, url: str, data: Any) -> Dict[str, Any]:
 @router.post('/redirect_file/{redirect_path:path}')
 async def post_redirect_file(redirect_path: str, file: UploadFile = File(...)) -> Dict[str, Any]:
     logger.info(f'POST redirect to: /{redirect_path}')
-    logger.info(f'POST body: {file}')
     responses = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
