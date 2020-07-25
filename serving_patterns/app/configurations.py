@@ -36,10 +36,10 @@ class _FileConfigurations():
 
 
 class _FastAPIConfigurations():
-    title = os.getenv('FASTAPI_TITLE', 'ML Rest')
-    description = os.getenv('FASTAPI_DESCRIPTION', 'ML rest description')
+    title = os.getenv('FASTAPI_TITLE', 'ServingPattern')
+    description = os.getenv('FASTAPI_DESCRIPTION', 'machine learning system serving patterns')
     version = os.getenv('FASTAPI_VERSION', '0.1')
-    app_name = os.getenv('APP_NAME', 'app.apps.app_web_single')
+    app_name = os.getenv('APP_NAME', 'app.apps.app_web_single:app')
 
 
 class _ModelConfigurations():
@@ -69,3 +69,5 @@ class _ModelConfigurations():
 logger.info(f'model configurations: {_ModelConfigurations.__dict__}')
 logger.info(f'fastapi configurations: {_FastAPIConfigurations.__dict__}')
 logger.info(f'platform configurations: {_PlatformConfigurations.__dict__}')
+logger.info(f'redis cache configurations: {_RedisCacheConfigurations.__dict__}')
+logger.info(f'file configurations: {_FileConfigurations.__dict__}')

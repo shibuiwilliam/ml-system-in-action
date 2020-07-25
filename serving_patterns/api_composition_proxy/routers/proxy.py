@@ -9,7 +9,7 @@ from typing import Dict, Any
 from pydantic import BaseModel
 import uuid
 
-from api_composition_proxy.configurations import Services
+from api_composition_proxy.configurations import _Services
 from api_composition_proxy import helpers
 
 logger = logging.getLogger(__name__)
@@ -35,6 +35,25 @@ async def _get_redirect(session, url: str) -> Dict[str, Any]:
         return resp
 
 
+@router.get('/health_check')
+async def health_check() -> Dict[str, Any]:
+    logger.info(f'Health check target urls')
+    responses = {}
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
+        tasks = [
+            asyncio.ensure_future(
+                _get_redirect(
+                    session,
+                    helpers.path_builder(v, '/health'))
+                ) for v in _Services().urls.values()]
+        _responses = await asyncio.gather(*tasks)
+        for r in _responses:
+            for k, v in r.items():
+                responses[k] = v
+        logger.info(f'responses: {responses}')
+        return responses
+
+
 @router.get('/redirect/{redirect_path:path}')
 async def get_redirect(redirect_path: str) -> Dict[str, Any]:
     logger.info(f'GET redirect to: /{redirect_path}')
@@ -44,9 +63,8 @@ async def get_redirect(redirect_path: str) -> Dict[str, Any]:
             asyncio.ensure_future(
                 _get_redirect(
                     session,
-                    helpers.url_builder(
-                        v,
-                        redirect_path))) for v in Services().services.values()]
+                    helpers.path_builder(v, redirect_path))
+                ) for v in _Services().urls.values()]
         _responses = await asyncio.gather(*tasks)
         for r in _responses:
             for k, v in r.items():
@@ -81,8 +99,9 @@ async def redirect_json(redirect_path: str, data: Data = Body(...)) -> Dict[str,
             asyncio.ensure_future(
                 _post_redirect_json(
                     session,
-                    helpers.url_builder(v, redirect_path),
-                    data.data)) for v in Services().services.values()]
+                    helpers.path_builder(v, redirect_path),
+                    data.data)
+                ) for v in _Services().services.values()]
         _responses = await asyncio.gather(*tasks)
         for r in _responses:
             for k, v in r.items():
@@ -120,8 +139,9 @@ async def post_redirect_file(redirect_path: str, file: UploadFile = File(...)) -
             asyncio.ensure_future(
                 _post_redirect_file(
                     session,
-                    helpers.url_builder(v, redirect_path),
-                    file)) for v in Services().services.values()]
+                    helpers.path_builder(v, redirect_path),
+                    file)
+                ) for v in _Services().urls.values()]
         _responses = await asyncio.gather(*tasks)
         for r in _responses:
             for k, v in r.items():

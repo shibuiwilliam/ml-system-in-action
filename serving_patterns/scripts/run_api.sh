@@ -21,7 +21,7 @@ if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
         --log-config ${LOGCONFIG}
 
 else
-    uvicorn ${APP_NAME}:app \
+    uvicorn ${APP_NAME} \
         --host ${HOST} \
         --port ${PORT} \
         --workers ${WORKERS} \
