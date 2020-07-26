@@ -3,6 +3,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 def path_builder(url: str, path: str) -> str:
+    if path == '' or path is None:
+        return url
     if path.startswith('/'):
         path = path[1:]
     if url.endswith('/'):
@@ -18,7 +20,7 @@ def url_builder(hostname: str, https: bool = False) -> str:
     return hostname
 
 
-def url_path_builder(hostname: str, path: str) -> str:
-    hostname = url_builder(hostname, path)
+def url_path_builder(hostname: str, path: str, https: bool = False) -> str:
+    hostname = url_builder(hostname, https)
     url = path_builder(hostname, path)
     return url

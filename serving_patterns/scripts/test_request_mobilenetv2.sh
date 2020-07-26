@@ -9,8 +9,6 @@ LABELS=labels
 PREDICT=predict
 LABEL=label
 ASYNC=async
-JSON=json
-IMAGE_PATH=./app/ml/data/good_cat.jpg
 JSON_PATH=./app/ml/data/good_cat_base64.json
 
 function which_is_it() {
@@ -57,8 +55,8 @@ function predict() {
     endpoint=${TARGET_HOST}:$1/${PREDICT}
     which_is_it "${endpoint}"
     curl -X POST \
-        -H "Content-Type: multipart/form-data" \
-        -F "file=@${IMAGE_PATH};type=image/jpeg" \
+        -H "Content-Type: application/json" \
+        -d @${JSON_PATH} \
         ${endpoint}
     finish
 }
@@ -67,44 +65,14 @@ function predict_label() {
     endpoint=${TARGET_HOST}:$1/${PREDICT}/${LABEL}
     which_is_it "${endpoint}"
     curl -X POST \
-        -H "Content-Type: multipart/form-data" \
-        -F "file=@${IMAGE_PATH};type=image/jpeg" \
+        -H "Content-Type: application/json" \
+        -d @${JSON_PATH} \
         ${endpoint}
     finish
 }
 
 function predict_async() {
     endpoint=${TARGET_HOST}:$1/${PREDICT}/${ASYNC}
-    which_is_it "${endpoint}"
-    curl -X POST \
-        -H "Content-Type: multipart/form-data" \
-        -F "file=@${IMAGE_PATH};type=image/jpeg" \
-        ${endpoint}
-    finish
-}
-
-function predict_json() {
-    endpoint=${TARGET_HOST}:$1/${PREDICT}/${JSON}
-    which_is_it "${endpoint}"
-    curl -X POST \
-        -H "Content-Type: application/json" \
-        -d @${JSON_PATH} \
-        ${endpoint}
-    finish
-}
-
-function predict_label_json() {
-    endpoint=${TARGET_HOST}:$1/${PREDICT}/${LABEL}/${JSON}
-    which_is_it "${endpoint}"
-    curl -X POST \
-        -H "Content-Type: application/json" \
-        -d @${JSON_PATH} \
-        ${endpoint}
-    finish
-}
-
-function predict_async_json() {
-    endpoint=${TARGET_HOST}:$1/${PREDICT}/${ASYNC}/${JSON}
     which_is_it "${endpoint}"
     curl -X POST \
         -H "Content-Type: application/json" \
@@ -121,9 +89,6 @@ function all() {
     predict $1
     predict_label $1
     predict_async $1
-    predict_json $1
-    predict_label_json $1
-    predict_async_json $1
 }
 
 all ${PORT}

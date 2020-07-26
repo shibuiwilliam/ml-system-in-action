@@ -1,11 +1,11 @@
 import pytest
-from fastapi import BackgroundTasks, UploadFile
+from fastapi import BackgroundTasks
 from typing import List, Tuple, Any
 from PIL import Image
 import numpy as np
 import os
 
-from tests.utils import floats_almost_equal, nested_floats_almost_equal
+from tests.utils import floats_almost_equal, nested_floats_almost_equal, get_image_data
 from app.constants import PLATFORM_ENUM
 from app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
 from app.ml.active_predictor import DataConverter
@@ -147,69 +147,79 @@ def test_labels(mocker):
     assert 'labels' in result
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('output', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
-def test_test(mocker, output, expected):
+async def test_test(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.DataConverter.reshape_output',
         return_value=output)
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
-    result = _test(MockData())
+    result = await _test(MockData())
     assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('output', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': {'a': 0.8}}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': {'c': 0.7}})]
 )
-def test_test_label(mocker, output, expected):
+async def test_test_label(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.DataConverter.reshape_output',
         return_value=output)
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
-    result = _test_label(MockData())
+    result = await _test_label(MockData())
     assert result == expected
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('output', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
-def test_predict(mocker, output, expected):
-    mock_upload_file = UploadFile(mock_image_path)
+async def test_predict(mocker, output, expected):
+    mock_image_base64 = get_image_data()['image_data']
+    mock_data = MockData(
+        image_data=mock_image_base64
+    )
     mocker.patch('PIL.Image.open', return_value=mock_image)
     mocker.patch('io.BytesIO', return_value=mock_image)
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     mocker.patch('app.api._predict_image._save_data_job', return_value=job_id)
-    result = _predict(mock_upload_file, mock_BackgroundTasks, MockData())
+    result = await _predict(mock_data, mock_BackgroundTasks)
     assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('output', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': {'a': 0.8}}),
      (np.array([[0.7, 0.1, 0.2]]), {'prediction': {'a': 0.7}})]
 )
-def test_predict_label(mocker, output, expected):
-    mock_upload_file = UploadFile(mock_image_path)
+async def test_predict_label(mocker, output, expected):
+    mock_image_base64 = get_image_data()['image_data']
+    mock_data = MockData(
+        image_data=mock_image_base64
+    )
     mocker.patch('PIL.Image.open', return_value=mock_image)
     mocker.patch('io.BytesIO', return_value=mock_image)
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     mocker.patch('app.api._predict_image._save_data_job', return_value=job_id)
-    result = _predict_label(mock_upload_file, mock_BackgroundTasks, MockData())
+    result = await _predict_label(mock_data, mock_BackgroundTasks)
     assert result['prediction']['a'] == pytest.approx(expected['prediction']['a'])
 
 
@@ -219,11 +229,14 @@ def test_predict_label(mocker, output, expected):
     [(job_id)]
 )
 async def test_predict_async_post(mocker, job_id):
-    mock_upload_file = UploadFile(mock_image_path)
+    mock_image_base64 = get_image_data()['image_data']
+    mock_data = MockData(
+        image_data=mock_image_base64
+    )
     mocker.patch('app.api._predict_image._save_data_job', return_value=job_id)
     mocker.patch('PIL.Image.open', return_value=mock_image)
     mocker.patch('io.BytesIO', return_value=mock_image)
-    result = await _predict_async_post(mock_upload_file, mock_BackgroundTasks, MockData())
+    result = await _predict_async_post(mock_data, mock_BackgroundTasks)
     assert result['job_id'] == job_id
 
 

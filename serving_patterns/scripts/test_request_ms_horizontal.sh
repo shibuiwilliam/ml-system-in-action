@@ -5,15 +5,12 @@ set -eu
 TARGET_HOST=localhost
 PORT=8000
 HEALTH=health
-HEALTH_ALL=health_all
-REDIRECT=redirect
-REDIRECT_JSON=redirect_json
+GET_REDIRECT=get_redirect
+POST_REDIRECT=post_redirect
 LABELS=labels
 PREDICT=predict
 LABEL=label
 ASYNC=async
-JSON=json
-IMAGE_PATH=./app/ml/data/good_cat.jpg
 JSON_PATH=./app/ml/data/good_cat_base64_data.json
 
 function which_is_it() {
@@ -33,7 +30,7 @@ function health() {
 }
 
 function health_all() {
-    endpoint=${TARGET_HOST}:$1/${HEALTH_ALL}
+    endpoint=${TARGET_HOST}:$1/${GET_REDIRECT}/${HEALTH}
     which_is_it "${endpoint}"
     curl -X GET \
         ${endpoint}
@@ -41,7 +38,7 @@ function health_all() {
 }
 
 function labels(){
-    endpoint=${TARGET_HOST}:$1/${REDIRECT}/${PREDICT}/${LABELS}
+    endpoint=${TARGET_HOST}:$1/${GET_REDIRECT}/${PREDICT}/${LABELS}
     which_is_it "${endpoint}"
     curl -X GET \
         ${endpoint}
@@ -49,7 +46,7 @@ function labels(){
 }
 
 function test_predict() {
-    endpoint=${TARGET_HOST}:$1/${REDIRECT}/${PREDICT}
+    endpoint=${TARGET_HOST}:$1/${GET_REDIRECT}/${PREDICT}
     which_is_it "${endpoint}"
     curl -X GET \
         ${endpoint}
@@ -57,15 +54,15 @@ function test_predict() {
 }
 
 function test_predict_label() {
-    endpoint=${TARGET_HOST}:$1/${REDIRECT}/${PREDICT}/${LABEL}
+    endpoint=${TARGET_HOST}:$1/${GET_REDIRECT}/${PREDICT}/${LABEL}
     which_is_it "${endpoint}"
     curl -X GET \
         ${endpoint}
     finish
 }
 
-function predict_json() {
-    endpoint=${TARGET_HOST}:$1/${REDIRECT_JSON}/${PREDICT}/${JSON}
+function predict() {
+    endpoint=${TARGET_HOST}:$1/${POST_REDIRECT}/${PREDICT}
     which_is_it "${endpoint}"
     curl -X POST \
         -H "Content-Type: application/json" \
@@ -74,8 +71,8 @@ function predict_json() {
     finish
 }
 
-function predict_label_json() {
-    endpoint=${TARGET_HOST}:$1/${REDIRECT_JSON}/${PREDICT}/${LABEL}/${JSON}
+function predict_label() {
+    endpoint=${TARGET_HOST}:$1/${POST_REDIRECT}/${PREDICT}/${LABEL}
     which_is_it "${endpoint}"
     curl -X POST \
         -H "Content-Type: application/json" \
@@ -84,8 +81,8 @@ function predict_label_json() {
     finish
 }
 
-function predict_async_json() {
-    endpoint=${TARGET_HOST}:$1/${REDIRECT_JSON}/${PREDICT}/${ASYNC}/${JSON}
+function predict_async() {
+    endpoint=${TARGET_HOST}:$1/${POST_REDIRECT}/${PREDICT}/${ASYNC}
     which_is_it "${endpoint}"
     curl -X POST \
         -H "Content-Type: application/json" \
@@ -100,9 +97,9 @@ function all() {
     labels $1
     test_predict $1
     test_predict_label $1
-    predict_json $1
-    predict_label_json $1
-    predict_async_json $1
+    predict $1
+    predict_label $1
+    predict_async $1
 }
 
 all ${PORT}
