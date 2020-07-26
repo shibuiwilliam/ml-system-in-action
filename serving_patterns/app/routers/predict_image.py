@@ -41,7 +41,7 @@ async def predict_label(data: Data,
 
 @router.post('/async')
 async def predict_async(data: Data,
-                             background_tasks: BackgroundTasks = BackgroundTasks()):
+                        background_tasks: BackgroundTasks = BackgroundTasks()):
     return await _predict_image._predict_async_post(data, background_tasks)
 
 

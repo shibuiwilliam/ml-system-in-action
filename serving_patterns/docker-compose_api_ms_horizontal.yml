@@ -1,0 +1,103 @@
+version: '3'
+
+services:
+  proxy:
+    container_name: serving_patterns_proxy
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_proxy
+    environment:
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=8
+      - APP_NAME=api_composition_proxy.apps.proxy:app
+      - PORT=8000
+      - PROFILE=0
+      - SERVICE_WEB_SINGLE=web_single:8888
+      - SERVICE_SYNCHRONOUS=synchronous:8889
+      - QUEUE_NAME=api_queue
+    ports:
+      - "8000:8000"
+    command: ./run_proxy.sh
+
+  web_single:
+    container_name: serving_patterns_web_single
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_api_iris
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_svc_sklearn.yaml
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_web_single:app
+      - PORT=8888
+      - PROFILE=0
+      - QUEUE_NAME=api_queue
+    ports:
+      - "8888:8888"
+    command: ./run_api.sh
+    depends_on:
+      - redis
+
+  synchronous:
+    container_name: serving_patterns_synchronous
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_api_iris
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_synchronous:app
+      - PORT=8889
+      - PROFILE=0
+      - QUEUE_NAME=api_queue
+    ports:
+      - "8889:8889"
+    command: ./run_api.sh
+    depends_on:
+      - redis
+
+  asynchronous:
+    container_name: serving_patterns_asynchronous
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_api_iris
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_tree_onnx_runtime.yaml
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=app.apps.app_asynchronous:app
+      - PORT=8890
+      - PROFILE=0
+      - QUEUE_NAME=api_queue
+    ports:
+      - "8890:8890"
+    command: ./run_api.sh
+    depends_on:
+      - api_backend
+      - redis
+
+  api_backend:
+    container_name: serving_patterns_backend
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_backend_iris
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=iris_tree_onnx_runtime.yaml
+      - NUM_PROCS=4
+      - BATCH_CODE=app.backend.prediction_batch
+      - PROFILE=0
+      - QUEUE_NAME=api_queue
+    command: ./run_backend.sh
+    depends_on:
+      - redis
+
+  redis:
+    container_name: serving_patterns_redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"

@@ -69,10 +69,10 @@ _compose_build_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) build
 _compose_up_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) up -d
 _compose_down_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) down
 
-_compose_ms_horizontal := docker-compose_ms_horizontal.yml
-_compose_build_ms_horizontal := docker-compose -f $(_compose_ms_horizontal) build
-_compose_up_ms_horizontal := docker-compose -f $(_compose_ms_horizontal) up -d
-_compose_down_ms_horizontal := docker-compose -f $(_compose_ms_horizontal) down
+_compose_image_ms_horizontal := docker-compose_image_ms_horizontal.yml
+_compose_build_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) build
+_compose_up_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) up -d
+_compose_down_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) down
 
 _requirements_api_test := requirements_api_test.txt
 _pip_freeze_test := pip freeze > requirements/$(_requirements_api_test)
@@ -93,7 +93,7 @@ _test_request_api := ./scripts/test_request_api.sh
 _test_request_resnet50 := ./scripts/test_request_resnet50.sh
 _test_request_inceptionv3 := ./scripts/test_request_inceptionv3.sh
 _test_request_mobilenetv2 := ./scripts/test_request_mobilenetv2.sh
-_test_request_ms_horizontal := ./scripts/test_request_ms_horizontal.sh
+_test_request_image_ms_horizontal := ./scripts/test_request_image_ms_horizontal.sh
 
 _train_iris := docker build \
 				-t $(_train_iris_image_name):$(_train_iris_image_version) \
@@ -185,17 +185,17 @@ c_up_mobilenetv2:
 c_down_mobilenetv2:
 	$(_compose_down_mobilenetv2)
 
-.PHONY: c_build_ms_horizontal
-c_build_ms_horizontal:
-	$(_compose_build_ms_horizontal)
+.PHONY: c_build_image_ms_h
+c_build_image_ms_h:
+	$(_compose_build_image_ms_horizontal)
 
-.PHONY: c_up_ms_horizontal
-c_up_ms_horizontal:
-	$(_compose_up_ms_horizontal)
+.PHONY: c_up_image_ms_h
+c_up_image_ms_h:
+	$(_compose_up_image_ms_horizontal)
 
-.PHONY: c_down_ms_horizontal
-c_down_ms_horizontal:
-	$(_compose_down_ms_horizontal)
+.PHONY: c_down_image_ms_h
+c_down_image_ms_h:
+	$(_compose_down_image_ms_horizontal)
 
 .PHONY: test_d
 test_d:
@@ -217,9 +217,9 @@ test_request_inceptionv3:
 test_request_mobilenetv2:
 	$(_test_request_mobilenetv2)
 
-.PHONY: test_request_ms_horizontal
-test_request_ms_horizontal:
-	$(_test_request_ms_horizontal)
+.PHONY: test_request_image_ms_horizontal
+test_request_image_ms_horizontal:
+	$(_test_request_image_ms_horizontal)
 
 .PHONY: build_locust
 build_locust:
