@@ -9,6 +9,7 @@ RUN apt-get -y update && \
 
 COPY ./app/ml/ /${PROJECT_DIR}/app/ml/
 COPY ./app/constants.py /${PROJECT_DIR}/app/constants.py
+COPY ./configurations/ /${PROJECT_DIR}/configurations/
 COPY ./scripts/run_extract_inceptionv3.sh /${PROJECT_DIR}/run_extract_inceptionv3.sh
 RUN chmod +x run_extract_inceptionv3.sh && \
     ./run_extract_inceptionv3.sh
@@ -24,7 +25,10 @@ RUN apt-get -y update && \
     pip install -r requirements_api_tf2_serving.txt
 
 COPY ./app/ /${PROJECT_DIR}/app/
+COPY ./jobs/ /${PROJECT_DIR}/jobs/
+COPY ./middleware/ /${PROJECT_DIR}/middleware/
 COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./logging/ /${PROJECT_DIR}/logging/
 COPY --from=builder /${PROJECT_DIR}/models/* ./models/
 
 ENV RUN_FILE run_api.sh

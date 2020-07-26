@@ -1,18 +1,18 @@
 import os
 from typing import Dict, Any
+from fastapi import BackgroundTasks
 import logging
 from pydantic import BaseModel
 import json
 import numpy as np
-import io
-import base64
+import uuid
 from PIL import Image
 
-
-from app.constants import CONSTANTS
+from configurations.constants import PLATFORM_ENUM, CONSTANTS
+from configurations.configurations import _PlatformConfigurations
 from middleware.redis_client import redis_client
-from app.ml.base_predictor import BaseData
-from app.configurations import _FileConfigurations
+from configurations.configurations import _FileConfigurations
+from configurations.configurations import _CacheConfigurations
 
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
     return True
 
 
-def save_data_redis_job(job_id: str, data: BaseData) -> bool:
+def save_data_redis_job(job_id: str, data: Any) -> bool:
     return save_data_dict_redis_job(job_id, data.__dict__)
 
 
@@ -68,7 +68,7 @@ def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
 
 class SaveDataJob(BaseModel):
     job_id: str
-    data: BaseData
+    data: Any
     queue_name: str = CONSTANTS.REDIS_QUEUE
     is_completed: bool = False
 
@@ -99,6 +99,44 @@ class SaveDataRedisJob(SaveDataJob):
         if self.enqueue:
             self.is_completed = left_push_queue(self.queue_name, self.job_id)
         logger.info(f'completed save data: {self.job_id}')
+
+
+def _save_data_job(data: Any,
+                   background_tasks: BackgroundTasks,
+                   enqueue: bool = False) -> str:
+    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
+        num_files = 0 if incr is None else incr
+        job_id = f'{str(uuid.uuid4())}_{num_files}'
+        task = SaveDataRedisJob(
+            job_id=job_id,
+            data=data,
+            queue_name=_CacheConfigurations().queue_name,
+            enqueue=enqueue)
+
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
+        num_files = 0 if incr is None else incr
+        job_id = f'{str(uuid.uuid4())}_{num_files}'
+        task = SaveDataRedisJob(
+            job_id=job_id,
+            data=data,
+            queue_name=_CacheConfigurations().queue_name,
+            enqueue=enqueue)
+
+    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
+        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
+        num_files = 0 if incr is None else incr
+        job_id = f'{str(uuid.uuid4())}_{num_files}'
+        task = SaveDataRedisJob(
+            job_id=job_id,
+            data=data,
+            queue_name=_CacheConfigurations().queue_name,
+            enqueue=enqueue)
+    else:
+        raise ValueError(f'platform must be chosen from constants.PLATFORM_ENUM')
+    background_tasks.add_task(task)
+    return job_id
 
 
 save_data_jobs: Dict[str, SaveDataJob] = {}

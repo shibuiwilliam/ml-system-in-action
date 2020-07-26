@@ -6,52 +6,14 @@ import logging
 
 from middleware.profiler import do_cprofile
 from middleware.redis_client import redis_client
-from app.jobs import store_data_job
+from jobs import store_data_job
+from configurations.constants import PLATFORM_ENUM
+from configurations.configurations import _PlatformConfigurations
 from app.ml.active_predictor import Data, DataInterface, DataConverter, active_predictor
-from app.constants import CONSTANTS, PLATFORM_ENUM
-from app.configurations import _PlatformConfigurations, _CacheConfigurations
+from configurations.configurations import _CacheConfigurations
 
 
 logger = logging.getLogger(__name__)
-
-
-@do_cprofile
-def _save_data_job(data: Data,
-                   background_tasks: BackgroundTasks,
-                   enqueue: bool = False) -> str:
-    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
-        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
-        num_files = 0 if incr is None else incr
-        job_id = f'{str(uuid.uuid4())}_{num_files}'
-        task = store_data_job.SaveDataRedisJob(
-            job_id=job_id,
-            data=data,
-            queue_name=_CacheConfigurations().queue_name,
-            enqueue=enqueue)
-
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
-        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
-        num_files = 0 if incr is None else incr
-        job_id = f'{str(uuid.uuid4())}_{num_files}'
-        task = store_data_job.SaveDataRedisJob(
-            job_id=job_id,
-            data=data,
-            queue_name=_CacheConfigurations().queue_name,
-            enqueue=enqueue)
-
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
-        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
-        num_files = 0 if incr is None else incr
-        job_id = f'{str(uuid.uuid4())}_{num_files}'
-        task = store_data_job.SaveDataRedisJob(
-            job_id=job_id,
-            data=data,
-            queue_name=_CacheConfigurations().queue_name,
-            enqueue=enqueue)
-    else:
-        raise ValueError(f'platform must be chosen from constants.PLATFORM_ENUM')
-    background_tasks.add_task(task)
-    return job_id
 
 
 @do_cprofile
@@ -103,22 +65,22 @@ def _test_label(
 def _predict(data: Data,
              background_tasks: BackgroundTasks) -> Dict[str, List[float]]:
     __predict(data)
-    _save_data_job(data, background_tasks, False)
-    return {'prediction': data.prediction}
+    job_id = store_data_job._save_data_job(data, background_tasks, False)
+    return {'prediction': data.prediction, 'job_id': job_id}
 
 
 def _predict_label(
         data: Data,
         background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, Dict[str, float]]:
     label_proba = __predict_label(data)
-    _save_data_job(data, background_tasks, False)
-    return {'prediction': label_proba}
+    job_id = store_data_job._save_data_job(data, background_tasks, False)
+    return {'prediction': label_proba, 'job_id': job_id}
 
 
 async def _predict_async_post(
         data: Data,
         background_tasks: BackgroundTasks) -> Dict[str, str]:
-    job_id = _save_data_job(data, background_tasks, True)
+    job_id = store_data_job._save_data_job(data, background_tasks, True)
     return {'job_id': job_id}
 
 

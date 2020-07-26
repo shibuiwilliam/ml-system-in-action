@@ -8,7 +8,10 @@ RUN apt-get -y update && \
     pip install -r requirements_api.txt
 
 COPY ./app/ml/ /${PROJECT_DIR}/app/ml/
+COPY ./jobs/ /${PROJECT_DIR}/jobs/
+COPY ./middleware/ /${PROJECT_DIR}/middleware/
 COPY ./app/constants.py /${PROJECT_DIR}/app/constants.py
+COPY ./configurations/ /${PROJECT_DIR}/configurations/
 ENV RUN_FILE run_train_iris.sh
 COPY ./scripts/${RUN_FILE} /${PROJECT_DIR}/${RUN_FILE}
 RUN chmod +x ${RUN_FILE}

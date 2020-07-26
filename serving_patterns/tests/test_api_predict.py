@@ -4,12 +4,11 @@ from typing import List, Tuple
 import numpy as np
 
 from tests.utils import floats_almost_equal, nested_floats_almost_equal
-from app.constants import PLATFORM_ENUM
+from configurations.constants import PLATFORM_ENUM
 from app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
 from app.ml.active_predictor import DataConverter
 import app
 from app.api._predict import (
-    _save_data_job,
     __predict,
     __predict_label,
     _predict_from_redis_cache,
@@ -67,27 +66,6 @@ class MockJob():
 
 
 @pytest.mark.parametrize(
-    ('_uuid', 'data', 'enqueue', 'num', 'expected'),
-    [(test_uuid, True, MockData(), 0, f'{test_uuid}_0'),
-     (test_uuid, True, MockData(), 1, f'{test_uuid}_1'),
-     (test_uuid, False, MockData(), None, f'{test_uuid}_0'),
-     (test_uuid, False, MockData(prediction=[[0.1, 0.2, 0.7]]), 0, f'{test_uuid}_0')]
-)
-def test_save_data_job(mocker, _uuid, data, enqueue, num, expected):
-    mock_job = MockJob()
-    app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
-    mocker.patch(
-        'middleware.redis_client.redis_client.get',
-        return_value=num)
-    mocker.patch('uuid.uuid4', return_value=_uuid)
-    mocker.patch(
-        'app.jobs.store_data_job.SaveDataRedisJob',
-        return_value=mock_job)
-    job_id = _save_data_job(data, mock_BackgroundTasks, enqueue)
-    assert job_id == expected
-
-
-@pytest.mark.parametrize(
     ('prediction', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
@@ -134,7 +112,7 @@ def test_predict_from_redis_cache(mocker, job_id, data, expected):
         prediction=expected['prediction']
     )
 
-    mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data)
+    mocker.patch('jobs.store_data_job.load_data_redis', return_value=data)
 
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
@@ -187,9 +165,10 @@ def test_predict(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
-    mocker.patch('app.api._predict._save_data_job', return_value=job_id)
+    mocker.patch('jobs.store_data_job._save_data_job', return_value=job_id)
     result = _predict(MockData(), mock_BackgroundTasks)
     assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
+    assert 'job_id' in result
 
 
 @pytest.mark.parametrize(
@@ -201,9 +180,10 @@ def test_predict_label(mocker, output, expected):
     mocker.patch(
         'app.ml.active_predictor.active_predictor.predict',
         return_value=output)
-    mocker.patch('app.api._predict._save_data_job', return_value=job_id)
+    mocker.patch('jobs.store_data_job._save_data_job', return_value=job_id)
     result = _predict_label(MockData(), mock_BackgroundTasks)
     assert result['prediction']['a'] == pytest.approx(expected['prediction']['a'])
+    assert 'job_id' in result
 
 
 @pytest.mark.asyncio
@@ -212,7 +192,7 @@ def test_predict_label(mocker, output, expected):
     [(job_id)]
 )
 async def test_predict_async_post(mocker, job_id):
-    mocker.patch('app.api._predict._save_data_job', return_value=job_id)
+    mocker.patch('jobs.store_data_job._save_data_job', return_value=job_id)
     result = await _predict_async_post(MockData(), mock_BackgroundTasks)
     assert result['job_id'] == job_id
 
@@ -226,7 +206,7 @@ async def test_predict_async_post(mocker, job_id):
 def test_predict_async_get(mocker, job_id, data_dict, expected):
     app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
     mocker.patch(
-        'app.jobs.store_data_job.load_data_redis',
+        'jobs.store_data_job.load_data_redis',
         return_value=data_dict)
     result = _predict_async_get(job_id)
     assert result == expected
@@ -241,7 +221,7 @@ def test_predict_async_get(mocker, job_id, data_dict, expected):
 def test_predict_async_get_label(mocker, job_id, data_dict, expected):
     app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
     mocker.patch(
-        'app.jobs.store_data_job.load_data_redis',
+        'jobs.store_data_job.load_data_redis',
         return_value=data_dict)
     result = _predict_async_get_label(job_id)
     assert result == expected

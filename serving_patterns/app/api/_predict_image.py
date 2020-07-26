@@ -9,20 +9,15 @@ import base64
 
 from middleware.profiler import do_cprofile
 from middleware.redis_client import redis_client
-from app.jobs import store_data_job
+from jobs import store_data_job
+from configurations.constants import PLATFORM_ENUM
+from configurations.configurations import _PlatformConfigurations
 from app.ml.active_predictor import Data, DataInterface, DataConverter, active_predictor
-from app.constants import CONSTANTS, PLATFORM_ENUM
-from app.configurations import _PlatformConfigurations, _CacheConfigurations, _FileConfigurations
+from configurations.configurations import _CacheConfigurations
+from configurations.configurations import _FileConfigurations
 from app.api import _predict as _parent_predict
 
 logger = logging.getLogger(__name__)
-
-
-@do_cprofile
-def _save_data_job(data: Data,
-                   background_tasks: BackgroundTasks,
-                   enqueue: bool = False) -> str:
-    return _parent_predict._save_data_job(data, background_tasks, enqueue)
 
 
 @do_cprofile
@@ -80,8 +75,8 @@ async def _predict(data: Data,
     io_bytes = io.BytesIO(image)
     data.image_data = Image.open(io_bytes)
     __predict(data)
-    _save_data_job(data, background_tasks, False)
-    return {'prediction': data.prediction}
+    job_id = store_data_job._save_data_job(data, background_tasks, False)
+    return {'prediction': data.prediction, 'job_id': job_id}
 
 
 async def _predict_label(data: Data,
@@ -90,8 +85,8 @@ async def _predict_label(data: Data,
     io_bytes = io.BytesIO(image)
     data.image_data = Image.open(io_bytes)
     label_proba = __predict_label(data)
-    _save_data_job(data, background_tasks, False)
-    return {'prediction': label_proba}
+    job_id = store_data_job._save_data_job(data, background_tasks, False)
+    return {'prediction': label_proba, 'job_id': job_id}
 
 
 async def _predict_async_post(data: Data,
@@ -99,7 +94,7 @@ async def _predict_async_post(data: Data,
     image = base64.b64decode(str(data.image_data))
     io_bytes = io.BytesIO(image)
     data.image_data = Image.open(io_bytes)
-    job_id = _save_data_job(data, background_tasks, True)
+    job_id = store_data_job._save_data_job(data, background_tasks, True)
     return {'job_id': job_id}
 
 

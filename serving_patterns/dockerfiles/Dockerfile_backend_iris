@@ -9,6 +9,7 @@ RUN apt-get -y update && \
 
 COPY ./app/ml/ /${PROJECT_DIR}/app/ml/
 COPY ./app/constants.py /${PROJECT_DIR}/app/constants.py
+COPY ./configurations/ /${PROJECT_DIR}/configurations/
 ENV RUN_FILE run_train_iris.sh
 COPY ./scripts/${RUN_FILE} /${PROJECT_DIR}/${RUN_FILE}
 RUN chmod +x ${RUN_FILE} && \
@@ -25,7 +26,10 @@ RUN apt-get -y update && \
     pip install -r requirements_api.txt
 
 COPY ./app/ /${PROJECT_DIR}/app/
+COPY ./jobs/ /${PROJECT_DIR}/jobs/
+COPY ./middleware/ /${PROJECT_DIR}/middleware/
 COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./logging/ /${PROJECT_DIR}/logging/
 COPY --from=builder /${PROJECT_DIR}/models/* ./models/
 
 ENV RUN_FILE run_backend.sh

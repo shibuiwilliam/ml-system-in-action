@@ -69,6 +69,11 @@ _compose_build_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) build
 _compose_up_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) up -d
 _compose_down_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) down
 
+_compose_api_ms_horizontal := docker-compose_api_ms_horizontal.yml
+_compose_build_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) build
+_compose_up_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) up -d
+_compose_down_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) down
+
 _compose_image_ms_horizontal := docker-compose_image_ms_horizontal.yml
 _compose_build_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) build
 _compose_up_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) up -d
@@ -184,6 +189,18 @@ c_up_mobilenetv2:
 .PHONY: c_down_mobilenetv2
 c_down_mobilenetv2:
 	$(_compose_down_mobilenetv2)
+
+.PHONY: c_build_api_ms_h
+c_build_api_ms_h:
+	$(_compose_build_api_ms_horizontal)
+
+.PHONY: c_up_api_ms_h
+c_up_api_ms_h:
+	$(_compose_up_api_ms_horizontal)
+
+.PHONY: c_down_api_ms_h
+c_down_api_ms_h:
+	$(_compose_down_api_ms_horizontal)
 
 .PHONY: c_build_image_ms_h
 c_build_image_ms_h:

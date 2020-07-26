@@ -2,15 +2,19 @@ import pytest
 import json
 from PIL import Image
 from typing import List, Tuple, Any
+from fastapi import BackgroundTasks
 
-from app.constants import CONSTANTS
-from app.jobs import store_data_job
+from configurations.constants import PLATFORM_ENUM, CONSTANTS
+from jobs import store_data_job
+import jobs
 from app.ml.base_predictor import BaseData, BaseDataInterface
 
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
+test_uuid = '550e8400-e29b-41d4-a716-446655440000'
 mock_image = Image.new('RGB', size=(300, 300), color=(10, 10, 10))
 labels = ['a', 'b', 'c']
+mock_BackgroundTasks = BackgroundTasks()
 
 
 class MockData(BaseData):
@@ -31,6 +35,11 @@ class MockDataInterface(BaseDataInterface):
     input_type: str = 'float64'
     output_shape: Tuple[int] = (1, 3)
     output_type: str = 'float64'
+
+
+class MockJob():
+    def __call__(self):
+        return True
 
 
 @pytest.mark.parametrize(
@@ -147,7 +156,7 @@ def test_SaveDataFileJob(mocker, job_id, directory, data):
         data=data
     )
     mocker.patch(
-        'app.jobs.store_data_job.save_data_file_job',
+        'jobs.store_data_job.save_data_file_job',
         return_value=True)
     save_data_file_job()
     assert save_data_file_job.is_completed
@@ -166,10 +175,31 @@ def test_SaveDataRedisJob(mocker, job_id, data, queue_name, enqueue):
         enqueue=enqueue
     )
     mocker.patch(
-        'app.jobs.store_data_job.left_push_queue',
+        'jobs.store_data_job.left_push_queue',
         return_value=True)
     mocker.patch(
-        'app.jobs.store_data_job.save_data_redis_job',
+        'jobs.store_data_job.save_data_redis_job',
         return_value=True)
     save_data_redis_job()
     assert save_data_redis_job.is_completed
+
+
+@pytest.mark.parametrize(
+    ('_uuid', 'data', 'enqueue', 'num', 'expected'),
+    [(test_uuid, True, MockData(), 0, f'{test_uuid}_0'),
+     (test_uuid, True, MockData(), 1, f'{test_uuid}_1'),
+     (test_uuid, False, MockData(), None, f'{test_uuid}_0'),
+     (test_uuid, False, MockData(prediction=[[0.1, 0.2, 0.7]]), 0, f'{test_uuid}_0')]
+)
+def test_save_data_job(mocker, _uuid, data, enqueue, num, expected):
+    mock_job = MockJob()
+    jobs.store_data_job._save_data_job.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
+    mocker.patch(
+        'middleware.redis_client.redis_client.get',
+        return_value=num)
+    mocker.patch('uuid.uuid4', return_value=_uuid)
+    mocker.patch(
+        'jobs.store_data_job.SaveDataRedisJob',
+        return_value=mock_job)
+    job_id = store_data_job._save_data_job(data, mock_BackgroundTasks, enqueue)
+    assert job_id == expected

@@ -1,12 +1,6 @@
 import enum
 
 
-class PLATFORM_ENUM(enum.Enum):
-    DOCKER_COMPOSE = 'docker_compose'
-    KUBERNETES = 'kubernetes'
-    TEST = 'test'
-
-
 class PHYSICAL_SAVE_DATA(enum.Enum):
     NO_SAVE = 0
     SAVE = 1
@@ -54,14 +48,6 @@ class _Constants(object):
     @constant
     def MODEL_EXTENTIONS():
         return ['pkl', 'h5', 'hdf5']
-
-    @constant
-    def REDIS_INCREMENTS():
-        return 'increments'
-
-    @constant
-    def REDIS_QUEUE():
-        return 'redis_queue'
 
     @constant
     def PREDICTION_DEFAULT():

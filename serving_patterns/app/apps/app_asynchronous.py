@@ -2,9 +2,9 @@ import os
 from fastapi import FastAPI
 import logging
 
+from configurations.configurations import _PlatformConfigurations
 from app.routers import health, predict_asynchronous
-from app.constants import CONSTANTS
-from app.configurations import _PlatformConfigurations, _FastAPIConfigurations
+from app.configurations import _FastAPIConfigurations
 
 logger = logging.getLogger(__name__)
 logger.info(

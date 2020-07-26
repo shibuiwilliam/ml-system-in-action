@@ -5,9 +5,8 @@ import importlib
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-from app.constants import CONSTANTS
-from app.configurations import _CacheConfigurations
-from app.jobs import store_data_job
+from configurations.configurations import _CacheConfigurations
+from jobs import store_data_job
 from middleware.profiler import do_cprofile
 
 _predictor = importlib.import_module(os.getenv('PREDICTOR', 'app.api._predict'))

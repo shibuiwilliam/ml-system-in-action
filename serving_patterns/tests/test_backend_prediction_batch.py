@@ -37,11 +37,11 @@ MockDataConverter.meta_data = MockDataInterface
     [(test_job_id, MockData())]
 )
 def test_run_prediction(mocker, job_id, data):
-    mocker.patch('app.jobs.store_data_job.right_pop_queue', return_value=job_id)
+    mocker.patch('jobs.store_data_job.right_pop_queue', return_value=job_id)
     mocker.patch('app.api._predict._predict_from_redis_cache', return_value=data)
-    mocker.patch('app.jobs.store_data_job.save_data_redis_job', return_value=None)
-    mocker.patch('app.jobs.store_data_job.left_push_queue', return_value=None)
-    mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data.__dict__)
+    mocker.patch('jobs.store_data_job.save_data_redis_job', return_value=None)
+    mocker.patch('jobs.store_data_job.left_push_queue', return_value=None)
+    mocker.patch('jobs.store_data_job.load_data_redis', return_value=data.__dict__)
 
     prediction_batch._trigger_prediction_if_queue()
 
@@ -51,10 +51,10 @@ def test_run_prediction(mocker, job_id, data):
     [(None, None)]
 )
 def test_run_prediction_none(mocker, job_id, data):
-    mocker.patch('app.jobs.store_data_job.right_pop_queue', return_value=job_id)
+    mocker.patch('jobs.store_data_job.right_pop_queue', return_value=job_id)
     mocker.patch('app.api._predict._predict_from_redis_cache', return_value=data)
-    mocker.patch('app.jobs.store_data_job.save_data_redis_job', return_value=None)
-    mocker.patch('app.jobs.store_data_job.left_push_queue', return_value=None)
-    mocker.patch('app.jobs.store_data_job.load_data_redis', return_value=data)
+    mocker.patch('jobs.store_data_job.save_data_redis_job', return_value=None)
+    mocker.patch('jobs.store_data_job.left_push_queue', return_value=None)
+    mocker.patch('jobs.store_data_job.load_data_redis', return_value=data)
 
     prediction_batch._trigger_prediction_if_queue()

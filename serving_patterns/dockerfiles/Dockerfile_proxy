@@ -8,7 +8,10 @@ RUN apt-get -y update && \
     pip install -r requirements_proxy.txt
 
 COPY ./api_composition_proxy/ /${PROJECT_DIR}/api_composition_proxy/
+COPY ./jobs/ /${PROJECT_DIR}/jobs/
+COPY ./middleware/ /${PROJECT_DIR}/middleware/
 COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./logging/ /${PROJECT_DIR}/logging/
 ENV RUN_FILE run_proxy.sh
 COPY ./scripts/${RUN_FILE} /${PROJECT_DIR}/${RUN_FILE}
 RUN chmod +x ${RUN_FILE}
