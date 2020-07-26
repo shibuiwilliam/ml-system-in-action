@@ -35,8 +35,8 @@ async def _get_redirect(session, url: str) -> Dict[str, Any]:
         return resp
 
 
-@router.get('/health_check')
-async def health_check() -> Dict[str, Any]:
+@router.get('/health_all')
+async def health_all() -> Dict[str, Any]:
     logger.info(f'Health check target urls')
     responses = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
@@ -101,7 +101,7 @@ async def redirect_json(redirect_path: str, data: Data = Body(...)) -> Dict[str,
                     session,
                     helpers.path_builder(v, redirect_path),
                     data.data)
-                ) for v in _Services().services.values()]
+                ) for v in _Services().urls.values()]
         _responses = await asyncio.gather(*tasks)
         for r in _responses:
             for k, v in r.items():

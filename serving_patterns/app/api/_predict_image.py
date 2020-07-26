@@ -85,11 +85,31 @@ async def _predict(file: UploadFile = File(...),
     return {'prediction': data.prediction}
 
 
+async def _predict_json(data: Data,
+                        background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, List[float]]:
+    image = base64.b64decode(str(data.image_data))
+    io_bytes = io.BytesIO(image)
+    data.image_data = Image.open(io_bytes)
+    __predict(data)
+    _save_data_job(data, background_tasks, False)
+    return {'prediction': data.prediction}
+
+
 async def _predict_label(file: UploadFile = File(...),
                          background_tasks: BackgroundTasks = BackgroundTasks(),
                          data: Data = Data()) -> Dict[str, Dict[str, float]]:
     file_read = file.file.read()
     io_bytes = io.BytesIO(file_read)
+    data.image_data = Image.open(io_bytes)
+    label_proba = __predict_label(data)
+    _save_data_job(data, background_tasks, False)
+    return {'prediction': label_proba}
+
+
+async def _predict_label_json(data: Data,
+                              background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, List[float]]:
+    image = base64.b64decode(str(data.image_data))
+    io_bytes = io.BytesIO(image)
     data.image_data = Image.open(io_bytes)
     label_proba = __predict_label(data)
     _save_data_job(data, background_tasks, False)
@@ -102,6 +122,15 @@ async def _predict_async_post(
         data: Data = Data()) -> Dict[str, str]:
     file_read = file.file.read()
     io_bytes = io.BytesIO(file_read)
+    data.image_data = Image.open(io_bytes)
+    job_id = _save_data_job(data, background_tasks, True)
+    return {'job_id': job_id}
+
+
+async def _predict_async_post_json(data: Data,
+                                   background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, List[float]]:
+    image = base64.b64decode(str(data.image_data))
+    io_bytes = io.BytesIO(image)
     data.image_data = Image.open(io_bytes)
     job_id = _save_data_job(data, background_tasks, True)
     return {'job_id': job_id}
