@@ -93,6 +93,7 @@ _test_request_api := ./scripts/test_request_api.sh
 _test_request_resnet50 := ./scripts/test_request_resnet50.sh
 _test_request_inceptionv3 := ./scripts/test_request_inceptionv3.sh
 _test_request_mobilenetv2 := ./scripts/test_request_mobilenetv2.sh
+_test_request_ms_horizontal := ./scripts/test_request_ms_horizontal.sh
 
 _train_iris := docker build \
 				-t $(_train_iris_image_name):$(_train_iris_image_version) \
@@ -125,6 +126,8 @@ _extract_mobilenetv2 := docker build \
 				--name $(_extract_mobilenetv2_container_name) \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				$(_extract_mobilenetv2_image_name):$(_extract_mobilenetv2_image_version)
+
+_build_locust := docker build -t locust:latest -f dockerfiles/Dockerfile_locust .
 
 .PHONY: pip_freeze
 pip_freeze:
@@ -213,6 +216,18 @@ test_request_inceptionv3:
 .PHONY: test_request_mobilenetv2
 test_request_mobilenetv2:
 	$(_test_request_mobilenetv2)
+
+.PHONY: test_request_ms_horizontal
+test_request_ms_horizontal:
+	$(_test_request_ms_horizontal)
+
+.PHONY: build_locust
+build_locust:
+	$(_build_locust)
+
+.PHONY: run_locust
+run_locust:
+	docker run -it --rm -p 8089:8089 --name locust locust:latest locust -f ${ARGS}
 
 .PHONY: train_iris
 train_iris:
