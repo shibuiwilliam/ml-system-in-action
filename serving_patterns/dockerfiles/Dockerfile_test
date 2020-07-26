@@ -1,14 +1,15 @@
 FROM python:3.7-slim
 
-ENV PROJECT_DIR /serving_patterns/
-WORKDIR ${PROJECT_DIR}
-ADD requirements/requirements_api_test.txt ${PROJECT_DIR}
+ENV PROJECT_DIR serving_patterns
+WORKDIR /${PROJECT_DIR}
+ADD requirements/requirements_api_test.txt /${PROJECT_DIR}
 RUN apt-get -y update && \
     apt-get -y install gcc && \
     pip install -r requirements_api_test.txt
 
-COPY ./app/ ${PROJECT_DIR}app/
-COPY ./api_composition_proxy/ ${PROJECT_DIR}api_composition_proxy/
-COPY ./configurations/ ${PROJECT_DIR}configurations/
-COPY ./tests/ ${PROJECT_DIR}tests/
+COPY ./app/ /${PROJECT_DIR}/app/
+COPY ./middleware/ /${PROJECT_DIR}/middleware/
+COPY ./api_composition_proxy/ /${PROJECT_DIR}/api_composition_proxy/
+COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./tests/ /${PROJECT_DIR}/tests/
 CMD ['pytest', '-v', '-s', './tests/']

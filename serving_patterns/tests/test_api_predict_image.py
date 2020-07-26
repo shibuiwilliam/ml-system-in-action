@@ -80,7 +80,7 @@ def test_save_data_job(mocker, _uuid, data, enqueue, num, expected):
     mock_job = MockJob()
     app.api._predict.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
     mocker.patch(
-        'app.middleware.redis_client.redis_client.get',
+        'middleware.redis_client.redis_client.get',
         return_value=num)
     mocker.patch('uuid.uuid4', return_value=_uuid)
     mocker.patch(

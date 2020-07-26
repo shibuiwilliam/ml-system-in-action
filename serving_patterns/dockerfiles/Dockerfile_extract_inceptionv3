@@ -1,15 +1,15 @@
 FROM tensorflow/tensorflow:latest
 
-ENV PROJECT_DIR /serving_patterns/
-WORKDIR ${PROJECT_DIR}
-ADD requirements/requirements_api_tf2.txt ${PROJECT_DIR}
+ENV PROJECT_DIR serving_patterns
+WORKDIR /${PROJECT_DIR}
+ADD requirements/requirements_api_tf2.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install gcc curl && \
     pip install -r requirements_api_tf2.txt
 
-COPY ./app/ml/ ${PROJECT_DIR}app/ml/
-COPY ./app/constants.py ${PROJECT_DIR}app/constants.py
-COPY ./scripts/run_extract_inceptionv3.sh ${PROJECT_DIR}run_extract_inceptionv3.sh
+COPY ./app/ml/ /${PROJECT_DIR}/app/ml/
+COPY ./app/constants.py /${PROJECT_DIR}/app/constants.py
+COPY ./scripts/run_extract_inceptionv3.sh /${PROJECT_DIR}/run_extract_inceptionv3.sh
 
 RUN chmod +x run_extract_inceptionv3.sh
 

@@ -10,7 +10,7 @@ from PIL import Image
 
 
 from app.constants import CONSTANTS
-from app.middleware.redis_client import redis_client
+from middleware.redis_client import redis_client
 from app.ml.base_predictor import BaseData
 from app.configurations import _FileConfigurations
 

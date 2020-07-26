@@ -1,6 +1,6 @@
 from typing import Dict
 import logging
-from app.middleware.profiler import do_cprofile
+from middleware.profiler import do_cprofile
 
 logger = logging.getLogger(__name__)
 

@@ -7,12 +7,12 @@ import io
 import numpy as np
 import base64
 
-from app.middleware.profiler import do_cprofile
+from middleware.profiler import do_cprofile
+from middleware.redis_client import redis_client
 from app.jobs import store_data_job
 from app.ml.active_predictor import Data, DataInterface, DataConverter, active_predictor
 from app.constants import CONSTANTS, PLATFORM_ENUM
 from app.configurations import _PlatformConfigurations, _CacheConfigurations, _FileConfigurations
-from app.middleware.redis_client import redis_client
 from app.api import _predict as _parent_predict
 
 logger = logging.getLogger(__name__)
