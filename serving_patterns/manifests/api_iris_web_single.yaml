@@ -32,11 +32,20 @@ spec:
         - name: WORKERS
           value: "4"
         - name: APP_NAME
-          value: "app.apps.app_web_single"
+          value: "app.apps.app_web_single:app"
         - name: PORT
           value: "8888"
         - name: PROFILE
           value: "0"
+        - name: QUEUE_NAME
+          value: svc_api_queue
+        resources:
+          limits:
+            cpu: "2"
+            memory: "500Mi"
+          requests:
+            cpu: "2"
+            memory: "500Mi"
         ports:
         - containerPort: 8888
 

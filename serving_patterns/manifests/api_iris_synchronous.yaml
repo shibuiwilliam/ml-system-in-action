@@ -26,19 +26,28 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: iris_svc_onnx_runtime.yaml
+          value: iris_tree_onnx_runtime.yaml
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
           value: "4"
         - name: APP_NAME
-          value: "app.apps.app_synchronous"
+          value: "app.apps.app_synchronous:app"
         - name: PORT
           value: "8889"
         - name: PROFILE
           value: "0"
+        - name: QUEUE_NAME
+          value: tree_api_queue
         ports:
         - containerPort: 8889
+        resources:
+          limits:
+            cpu: "2"
+            memory: "500Mi"
+          requests:
+            cpu: "2"
+            memory: "500Mi"
 
 ---
 

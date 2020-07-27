@@ -17,38 +17,38 @@ class APIUser(HttpUser):
 
     @task(0)
     def get_health_all(self):
-        self.client.get(url='/health_all', verify=False)
+        self.client.get(url='/get_redirect/health', verify=False)
 
     @task(0)
     def get_redirect_predict(self):
-        self.client.get(url='/redirect/predict', verify=False)
+        self.client.get(url='/get_redirect/predict', verify=False)
 
     @task(0)
     def get_redirect_predict_label(self):
-        self.client.get(url='/redirect/predict/label', verify=False)
+        self.client.get(url='/get_redirect/predict/label', verify=False)
 
     @task(1)
-    def post_redirect_json_predict(self):
+    def post_redirect_predict(self):
         self.client.post(
-            url='/redirect_json/predict/json',
+            url='/post_redirect/predict',
             json=image_data,
             headers={'content-type': 'application/json'},
             verify=False
         )
 
     @task(1)
-    def post_redirect_json_predict_label(self):
+    def post_redirect_predict_label(self):
         self.client.post(
-            url='/redirect_json/predict/label/json',
+            url='/post_redirect/predict/label',
             json=image_data,
             headers={'content-type': 'application/json'},
             verify=False
         )
 
     @task(1)
-    def post_redirect_json_predict_async_label(self):
+    def post_redirect_predict_async(self):
         self.client.post(
-            url='/redirect_json/predict/async/json',
+            url='/post_redirect/predict/async',
             json=image_data,
             headers={'content-type': 'application/json'},
             verify=False

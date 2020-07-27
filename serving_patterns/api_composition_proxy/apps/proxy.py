@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import logging
 
-from api_composition_proxy.routers import get_proxy, post_proxy, async_proxy, health
+from api_composition_proxy.routers import get_proxy, post_proxy, health
 from api_composition_proxy.configurations import _FastAPIConfigurations
 from configurations.configurations import _PlatformConfigurations
 
@@ -33,10 +33,4 @@ app.include_router(
     post_proxy.router,
     prefix='/post_redirect',
     tags=['post_redirect']
-)
-
-app.include_router(
-    async_proxy.router,
-    prefix='/async',
-    tags=['async']
 )
