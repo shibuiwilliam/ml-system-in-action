@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-resnet50
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -43,11 +43,11 @@ spec:
         - containerPort: 8891
         resources:
           limits:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "3"
+            memory: "8000Mi"
           requests:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "3"
+            memory: "8000Mi"
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"

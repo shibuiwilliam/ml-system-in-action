@@ -32,10 +32,10 @@ spec:
         - containerPort: 8089
         resources:
           limits:
-            cpu: "2"
+            cpu: "1"
             memory: "1000Mi"
           requests:
-            cpu: "2"
+            cpu: "1"
             memory: "1000Mi"
 
 ---

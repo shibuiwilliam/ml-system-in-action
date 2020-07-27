@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-mobilenetv2
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -46,10 +46,17 @@ spec:
         resources:
           limits:
             cpu: "2"
-            memory: "1000Mi"
+            memory: "8000Mi"
           requests:
             cpu: "2"
-            memory: "1000Mi"
+            memory: "8000Mi"
+        volumeMounts:
+          - name: pvc-nfs
+            mountPath: "/mnt"
+      volumes:
+      - name: pvc-nfs
+        persistentVolumeClaim:
+          claimName: nfs
 
 ---
 

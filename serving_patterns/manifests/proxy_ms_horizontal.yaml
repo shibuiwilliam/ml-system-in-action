@@ -52,6 +52,13 @@ spec:
             memory: "500Mi"
         ports:
         - containerPort: 8000
+        volumeMounts:
+          - name: pvc-nfs
+            mountPath: "/mnt"
+      volumes:
+      - name: pvc-nfs
+        persistentVolumeClaim:
+          claimName: nfs
 
 ---
 
