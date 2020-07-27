@@ -28,7 +28,7 @@ spec:
         - name: MODEL_INTERFACE
           value: iris_svc_onnx_runtime.yaml
         - name: NUM_PROCS
-          value: "4"
+          value: "8"
         - name: APP_NAME
           value: "app.backend.prediction_batch"
         - name: PROFILE

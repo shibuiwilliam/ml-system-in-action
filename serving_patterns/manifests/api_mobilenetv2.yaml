@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-resnet50
+  name: api-mobilenetv2
   labels:
-    app: api-resnet50
+    app: api-mobilenetv2
   namespace: serving-pattern
 spec:
   selector:
     matchLabels:
-      app: api-resnet50
+      app: api-mobilenetv2
   replicas: 1
   template:
     metadata:
       labels:
-        app: api-resnet50
-      name: api-resnet50
+        app: api-mobilenetv2
+      name: api-mobilenetv2
     spec:
       containers:
-      - name: api-resnet50
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_resnet50:latest
+      - name: api-mobilenetv2
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_mobilenetv2:latest
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM
@@ -26,7 +26,7 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: resnet50.yaml
+          value: mobilenetv2.yaml
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
@@ -34,33 +34,35 @@ spec:
         - name: APP_NAME
           value: "app.apps.app_image:app"
         - name: PORT
-          value: "8891"
+          value: "8893"
         - name: PROFILE
           value: "0"
+        - name: TFS_GRPC
+          value: tfs-mobilenetv2.serving-pattern.svc.cluster.local:8510
         - name: QUEUE_NAME
-          value: resnet50_api_queue
+          value: mobilenetv2_api_queue
         ports:
-        - containerPort: 8891
+        - containerPort: 8893
         resources:
           limits:
             cpu: "2"
-            memory: "2000Mi"
+            memory: "1000Mi"
           requests:
             cpu: "2"
-            memory: "2000Mi"
+            memory: "1000Mi"
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-resnet50
+  name: api-mobilenetv2
   labels:
-    app: api-resnet50
+    app: api-mobilenetv2
   namespace: serving-pattern
 spec:
   ports:
-  - port: 8891
+  - port: 8893
     protocol: TCP
   selector:
-    app: api-resnet50
+    app: api-mobilenetv2

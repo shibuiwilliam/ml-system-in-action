@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-iris-tree
+  name: backend-resnet50
   labels:
-    app: backend-iris-tree
+    app: backend-resnet50
   namespace: serving-pattern
 spec:
   selector:
     matchLabels:
-      app: backend-iris-tree
-  replicas: 3
+      app: backend-resnet50
+  replicas: 1
   template:
     metadata:
       labels:
-        app: backend-iris-tree
-      name: backend-iris-tree
+        app: backend-resnet50
+      name: backend-resnet50
     spec:
       containers:
-      - name: backend-iris-tree
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_backend_iris:latest
+      - name: backend-resnet50
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_backend_resnet50:latest
         command: ["./run_backend.sh"]
         env:
         - name: PLATFORM
@@ -26,19 +26,19 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: iris_tree_onnx_runtime.yaml
+          value: resnet50.yaml
         - name: NUM_PROCS
-          value: "8"
+          value: "4"
         - name: APP_NAME
           value: "app.backend.prediction_batch"
         - name: PROFILE
           value: "0"
         - name: QUEUE_NAME
-          value: tree_api_queue
+          value: resnet50_api_queue
         resources:
           limits:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "1"
+            memory: "1000Mi"
           requests:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "1"
+            memory: "1000Mi"
