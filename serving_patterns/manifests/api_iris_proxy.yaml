@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-iris-proxy
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -28,7 +28,7 @@ spec:
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
-          value: "4"
+          value: "2"
         - name: APP_NAME
           value: "api_composition_proxy.apps.proxy:app"
         - name: PORT
@@ -45,11 +45,11 @@ spec:
           value: api-iris-asynchronous.serving-pattern.svc.cluster.local:8890
         resources:
           limits:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "1"
+            memory: "500Mi"
           requests:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "1"
+            memory: "500Mi"
         ports:
         - containerPort: 8000
 

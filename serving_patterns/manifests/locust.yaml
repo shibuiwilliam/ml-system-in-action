@@ -25,16 +25,18 @@ spec:
         - name: PLATFORM
           value: kubernetes
         - name: TARGET_FILE
-          value: api_all.py 
+          value: api_all.py
+        - name: POST_PREDICT_RATIO
+          value: "1"
         ports:
         - containerPort: 8089
         resources:
           limits:
             cpu: "2"
-            memory: "2000Mi"
+            memory: "1000Mi"
           requests:
             cpu: "2"
-            memory: "2000Mi"
+            memory: "1000Mi"
 
 ---
 

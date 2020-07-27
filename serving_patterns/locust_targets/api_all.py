@@ -34,3 +34,21 @@ class APIUser(HttpUser):
             headers={'content-type': 'application/json'},
             verify=False
         )
+
+    @task(int(os.getenv('REDIRECT_POST_PREDICT_RATIO', 0)))
+    def redirect_post_predict(self):
+        self.client.post(
+            url='/post_redirect/predict',
+            json={"data": {"input_data": [5.2, 3.1, 0.1, 1.0]}},
+            headers={'content-type': 'application/json'},
+            verify=False
+        )
+
+    @task(int(os.getenv('REDIRECT_POST_PREDICT_LABEL_RATIO', 0)))
+    def redirect_post_predict_label(self):
+        self.client.post(
+            url='/post_redirect/predict/label',
+            json={"data": {"input_data": [5.2, 3.1, 0.1, 1.0]}},
+            headers={'content-type': 'application/json'},
+            verify=False
+        )

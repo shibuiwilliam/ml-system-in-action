@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: backend-iris-tree
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -37,8 +37,8 @@ spec:
           value: tree_api_queue
         resources:
           limits:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "0.5"
+            memory: "500Mi"
           requests:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "0.5"
+            memory: "500Mi"

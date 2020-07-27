@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-iris-synchronous
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -43,11 +43,11 @@ spec:
         - containerPort: 8889
         resources:
           limits:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "0.5"
+            memory: "500Mi"
           requests:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "0.5"
+            memory: "500Mi"
 
 ---
 
