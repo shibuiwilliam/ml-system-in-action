@@ -1,22 +1,23 @@
+import os
 from locust import HttpUser, TaskSet, task, between, constant
 
 
 class APIUser(HttpUser):
     wait_time = between(1,10)
 
-    @task(0)
+    @task(int(os.getenv('GET_HEALTH_RATIO', 0)))
     def get_health(self):
         self.client.get(url='/health', verify=False)
 
-    @task(0)
+    @task(int(os.getenv('GET_PREDICT_RATIO', 0)))
     def get_predict(self):
         self.client.get(url='/predict', verify=False)
 
-    @task(0)
+    @task(int(os.getenv('GET_PREDICT_LABEL_RATIO', 0)))
     def get_predict_label(self):
         self.client.get(url='/predict/label', verify=False)
 
-    @task(1)
+    @task(int(os.getenv('POST_PREDICT_RATIO', 0)))
     def post_predict(self):
         self.client.post(
             url='/predict',
@@ -25,7 +26,7 @@ class APIUser(HttpUser):
             verify=False
         )
 
-    @task(1)
+    @task(int(os.getenv('POST_PREDICT_LABEL_RATIO', 0)))
     def post_predict_label(self):
         self.client.post(
             url='/predict/label',

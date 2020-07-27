@@ -38,11 +38,11 @@ spec:
         - name: QUEUE_NAME
           value: tree_api_queue
         - name: SERVICE_WEB_SINGLE
-          value: api-iris-web-single.serving-pattern.svc.cluster.local
+          value: api-iris-web-single.serving-pattern.svc.cluster.local:8888
         - name: SERVICE_SYNCHRONOUS
-          value: api-iris-synchronous.serving-pattern.svc.cluster.local
+          value: api-iris-synchronous.serving-pattern.svc.cluster.local:8889
         - name: SERVICE_ASYNCHRONOUS
-          value: api-iris-asynchronous.serving-pattern.svc.cluster.local
+          value: api-iris-asynchronous.serving-pattern.svc.cluster.local:8890
         resources:
           limits:
             cpu: "2"
