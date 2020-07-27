@@ -31,7 +31,7 @@ class _FileConfigurations():
     if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         shared_volume = '/shared_volume'
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
-        shared_volume = ''
+        shared_volume = '/mnt'
     else:
         shared_volume = '/tmp'
 

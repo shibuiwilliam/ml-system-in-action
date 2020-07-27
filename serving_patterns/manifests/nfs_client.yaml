@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nfs-busybox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nfs-busybox
+  template:
+    metadata:
+      labels:
+        name: nfs-busybox
+    spec:
+      containers:
+      - image: busybox
+        imagePullPolicy: Always
+        name: busybox
+        command:
+          - sh
+          - -c
+          - 'while true; do date >> /mnt/index.html; hostname >> /mnt/index.html; sleep $(($RANDOM % 5 + 5)); done'
+        volumeMounts:
+          - name: pvc-nfs
+            mountPath: "/mnt"
+      volumes:
+      - name: pvc-nfs
+        persistentVolumeClaim:
+          claimName: nfs
