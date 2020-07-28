@@ -17,7 +17,7 @@ LABEL_FILEPATH = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
 
 
 def main():
-    modelname = 'resnet50'
+    modelname = 'resnet50_onnx'
     interface_filename = f'{modelname}.yaml'
 
     labels = load_labels(LABEL_FILEPATH)
@@ -59,7 +59,7 @@ def main():
                     {MODEL_FILENAME: MODEL_RUNTIME.ONNX_RUNTIME},
                     {postprocess_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'app.ml.resnet50.resnet50_predictor',
+                   'app.ml.resnet50_onnx.resnet50_predictor',
                    label_filepath=LABEL_FILEPATH)
 
 

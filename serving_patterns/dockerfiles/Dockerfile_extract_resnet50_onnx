@@ -12,8 +12,8 @@ COPY ./jobs/ /${PROJECT_DIR}/jobs/
 COPY ./middleware/ /${PROJECT_DIR}/middleware/
 COPY ./configurations/ /${PROJECT_DIR}/configurations/
 COPY ./app/constants.py /${PROJECT_DIR}/app/constants.py
-COPY ./scripts/run_extract_resnet50.sh /${PROJECT_DIR}/run_extract_resnet50.sh
+COPY ./scripts/run_extract_resnet50_onnx.sh /${PROJECT_DIR}/run_extract_resnet50_onnx.sh
 
-RUN chmod +x run_extract_resnet50.sh
+RUN chmod +x run_extract_resnet50_onnx.sh
 
-CMD ./run_extract_resnet50.sh
+CMD ./run_extract_resnet50_onnx.sh

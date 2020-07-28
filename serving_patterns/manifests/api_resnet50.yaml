@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-resnet50
-  replicas: 2
+  replicas: 3
   template:
     metadata:
       labels:
@@ -30,13 +30,13 @@ spec:
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
-          value: "4"
+          value: "3"
         - name: APP_NAME
           value: "app.apps.app_image:app"
         - name: PORT
           value: "8891"
         - name: PROFILE
-          value: "0"
+          value: "1"
         - name: QUEUE_NAME
           value: resnet50_api_queue
         ports:

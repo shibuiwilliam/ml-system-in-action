@@ -5,10 +5,10 @@ services:
     container_name: serving_patterns_image_api
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_api_resnet50
+      dockerfile: dockerfiles/Dockerfile_api_resnet50_onnx
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=resnet50.yaml
+      - MODEL_INTERFACE=resnet50_onnx.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - APP_NAME=app.apps.app_image:app
@@ -28,10 +28,10 @@ services:
     container_name: serving_patterns_image_backend
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile_backend_resnet50
+      dockerfile: dockerfiles/Dockerfile_backend_resnet50_onnx
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=resnet50.yaml
+      - MODEL_INTERFACE=resnet50_onnx.yaml
       - NUM_PROCS=4
       - BATCH_CODE=app.backend.prediction_batch
       - PROFILE=0

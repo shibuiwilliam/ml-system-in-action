@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: backend-resnet50
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -28,7 +28,7 @@ spec:
         - name: MODEL_INTERFACE
           value: resnet50.yaml
         - name: NUM_PROCS
-          value: "4"
+          value: "2"
         - name: BATCH_CODE
           value: "app.backend.prediction_batch"
         - name: PREDICTOR
@@ -40,10 +40,10 @@ spec:
         resources:
           limits:
             cpu: "2"
-            memory: "6000Mi"
+            memory: "8000Mi"
           requests:
             cpu: "2"
-            memory: "6000Mi"
+            memory: "8000Mi"
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"
