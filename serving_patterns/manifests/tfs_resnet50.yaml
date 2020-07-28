@@ -26,9 +26,9 @@ spec:
         - name: REST_API_PORT
           value: "8511"
         - name: MODEL_NAME
-          value: resnet50
+          value: resnet_v2_50
         - name: MODEL_BASE_PATH
-          value: /models/resnet50
+          value: /models/resnet_v2_50
         ports:
         - containerPort: 8510
         resources:

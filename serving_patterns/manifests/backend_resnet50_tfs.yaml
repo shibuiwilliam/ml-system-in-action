@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-resnet50-onnx
+  name: backend-resnet50-tfs
   labels:
-    app: backend-resnet50-onnx
+    app: backend-resnet50-tfs
   namespace: serving-pattern
 spec:
   selector:
     matchLabels:
-      app: backend-resnet50-onnx
-  replicas: 1
+      app: backend-resnet50-tfs
+  replicas: 2
   template:
     metadata:
       labels:
-        app: backend-resnet50-onnx
-      name: backend-resnet50-onnx
+        app: backend-resnet50-tfs
+      name: backend-resnet50-tfs
     spec:
       containers:
-      - name: backend-resnet50-onnx
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_backend_resnet50_onnx:latest
+      - name: backend-resnet50-tfs
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_backend_resnet50_tfs:latest
         command: ["./run_backend.sh"]
         env:
         - name: PLATFORM
@@ -26,24 +26,26 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: resnet50.yaml
+          value: resnet50_tfs.yaml
         - name: NUM_PROCS
-          value: "2"
+          value: "4"
         - name: BATCH_CODE
           value: "app.backend.prediction_batch"
         - name: PREDICTOR
           value: "app.api._predict_image"
         - name: PROFILE
           value: "0"
+        - name: TFS_GRPC
+          value: tfs-resnet50.serving-pattern.svc.cluster.local:8510
         - name: QUEUE_NAME
           value: resnet50_api_queue
         resources:
           limits:
-            cpu: "2"
-            memory: "8000Mi"
+            cpu: "1"
+            memory: "4000Mi"
           requests:
-            cpu: "2"
-            memory: "8000Mi"
+            cpu: "1"
+            memory: "4000Mi"
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"
