@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tfs-resnet50
+  labels:
+    app: tfs-resnet50
+  namespace: serving-pattern
+spec:
+  selector:
+    matchLabels:
+      app: tfs-resnet50
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: tfs-resnet50
+      name: tfs-resnet50
+    spec:
+      containers:
+      - name: tfs-resnet50
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_tfs_resnet50:latest
+        command: ["/usr/bin/tf_serving_entrypoint.sh"]
+        env:
+        - name: PORT
+          value: "8510"
+        - name: REST_API_PORT
+          value: "8511"
+        - name: MODEL_NAME
+          value: resnet50
+        - name: MODEL_BASE_PATH
+          value: /models/resnet50
+        ports:
+        - containerPort: 8510
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4000Mi"
+          requests:
+            cpu: "2"
+            memory: "4000Mi"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tfs-resnet50
+  labels:
+    app: tfs-resnet50
+  namespace: serving-pattern
+spec:
+  ports:
+  - port: 8510
+    protocol: TCP
+  selector:
+    app: tfs-resnet50
