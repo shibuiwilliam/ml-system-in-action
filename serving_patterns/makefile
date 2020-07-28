@@ -19,6 +19,11 @@ _extract_resnet50_onnx_image_name := serving_patterns_extract_resnet50_onnx
 _extract_resnet50_onnx_image_version := latest
 _extract_resnet50_onnx_container_name := serving_patterns_extract_resnet50_onnx
 
+_extract_resnet50_tfs_container_file := Dockerfile_extract_resnet50_tfs
+_extract_resnet50_tfs_image_name := serving_patterns_extract_resnet50_tfs
+_extract_resnet50_tfs_image_version := latest
+_extract_resnet50_tfs_container_name := serving_patterns_extract_resnet50_tfs
+
 _extract_inceptionv3_container_file := Dockerfile_extract_inceptionv3
 _extract_inceptionv3_image_name := serving_patterns_extract_inceptionv3
 _extract_inceptionv3_image_version := latest
@@ -58,6 +63,11 @@ _compose_resnet50_onnx := docker-compose_resnet50_onnx.yml
 _compose_build_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) build
 _compose_up_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) up -d
 _compose_down_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) down
+
+_compose_resnet50_tfs := docker-compose_resnet50_tfs.yml
+_compose_build_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) build
+_compose_up_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) up -d
+_compose_down_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) down
 
 _compose_inceptionv3 := docker-compose_inceptionv3.yml
 _compose_build_inceptionv3 := docker-compose -f $(_compose_inceptionv3) build
@@ -116,6 +126,14 @@ _extract_resnet50_onnx := docker build \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				$(_extract_resnet50_onnx_image_name):$(_extract_resnet50_onnx_image_version)
 
+_extract_resnet50_tfs := docker build \
+				-t $(_extract_resnet50_tfs_image_name):$(_extract_resnet50_tfs_image_version) \
+				-f $(_dockerfile_dir)/$(_extract_resnet50_tfs_container_file) . && \
+ 			docker run --rm \
+				--name $(_extract_resnet50_tfs_container_name) \
+				-v $(_absolute_path)/models/:/serving_patterns/models/ \
+				$(_extract_resnet50_tfs_image_name):$(_extract_resnet50_tfs_image_version)
+
 _extract_inceptionv3 := docker build \
 				-t $(_extract_inceptionv3_image_name):$(_extract_inceptionv3_image_version) \
 				-f $(_dockerfile_dir)/$(_extract_inceptionv3_container_file) . && \
@@ -165,6 +183,18 @@ c_up_resnet50_onnx:
 .PHONY: c_down_resnet50_onnx
 c_down_resnet50_onnx:
 	$(_compose_down_resnet50_onnx)
+
+.PHONY: c_build_resnet50_tfs
+c_build_resnet50_tfs:
+	$(_compose_build_resnet50_tfs)
+
+.PHONY: c_up_resnet50_tfs
+c_up_resnet50_tfs:
+	$(_compose_up_resnet50_tfs)
+
+.PHONY: c_down_resnet50_tfs
+c_down_resnet50_tfs:
+	$(_compose_down_resnet50_tfs)
 
 .PHONY: c_build_inceptionv3
 c_build_inceptionv3:
@@ -253,6 +283,10 @@ train_iris:
 .PHONY: extract_resnet50_onnx
 extract_resnet50_onnx:
 	$(_extract_resnet50_onnx)
+
+.PHONY: extract_resnet50_tfs
+extract_resnet50_tfs:
+	$(_extract_resnet50_tfs)
 
 .PHONY: extract_inceptionv3
 extract_inceptionv3:

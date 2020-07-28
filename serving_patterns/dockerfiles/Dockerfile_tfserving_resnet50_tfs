@@ -1,0 +1,29 @@
+FROM tensorflow/tensorflow:latest as builder
+
+ENV PROJECT_DIR serving_patterns
+WORKDIR /${PROJECT_DIR}
+ADD requirements/requirements_api_tf2.txt /${PROJECT_DIR}/
+RUN apt-get -y update && \
+    apt-get -y install gcc curl && \
+    pip install -r requirements_api_tf2.txt
+
+COPY ./app/ml/ /${PROJECT_DIR}/app/ml/
+COPY ./app/constants.py /${PROJECT_DIR}/app/constants.py
+COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./scripts/run_extract_resnet50_tfs.sh /${PROJECT_DIR}/run_extract_resnet50_tfs.sh
+RUN chmod +x run_extract_resnet50_tfs.sh && \
+    ./run_extract_resnet50_tfs.sh
+
+
+FROM tensorflow/serving:latest
+
+ENV MODEL_BASE_PATH=/models/resnet_v2_50
+ENV MODEL_NAME=resnet_v2_50
+
+COPY --from=builder /serving_patterns/models/savedmodel/resnet_v2_50 ${MODEL_BASE_PATH}
+EXPOSE 8500
+EXPOSE 8501
+
+COPY ./scripts/tf_serving_entrypoint.sh /usr/bin/tf_serving_entrypoint.sh
+RUN chmod +x /usr/bin/tf_serving_entrypoint.sh
+ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]

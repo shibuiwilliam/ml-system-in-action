@@ -51,7 +51,7 @@ def main():
 
     tf.saved_model.save(model, SAVEDMODEL_DIR)
 
-    modelname = 'mobilenetv2'
+    modelname = 'resnet50_tfs'
     interface_filename = f'{modelname}.yaml'
     preprocess_filename = f'{modelname}_preprocess_transformer.pkl'
     postprocess_filename = f'{modelname}_softmax_transformer.pkl'
