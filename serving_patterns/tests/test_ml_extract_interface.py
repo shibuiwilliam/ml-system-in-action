@@ -1,5 +1,5 @@
 import pytest
-from app.ml import extract_interface
+from src.app.ml import extract_interface
 from typing import Tuple, List
 
 

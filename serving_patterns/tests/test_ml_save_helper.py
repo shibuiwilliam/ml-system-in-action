@@ -2,8 +2,8 @@ import pytest
 import os
 import tempfile
 
-from app.ml import save_helper
-from app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
+from src.app.ml import save_helper
+from src.app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 
 
 _models = [
@@ -40,7 +40,7 @@ def test_dump_sklearn(mocker):
                            DATA_TYPE.IMAGE,
                            _models,
                            PREDICTION_TYPE.CLASSIFICATION,
-                           'app.ml.test',
+                           'src.app.ml.test',
                            'option')])
 def test_save_interface(
         mocker,

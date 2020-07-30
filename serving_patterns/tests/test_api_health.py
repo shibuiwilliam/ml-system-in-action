@@ -1,5 +1,5 @@
 import pytest
-from app.api._health import health, health_sync, health_async
+from src.app.api._health import health, health_sync, health_async
 
 
 HEALTH = {'health': 'ok'}

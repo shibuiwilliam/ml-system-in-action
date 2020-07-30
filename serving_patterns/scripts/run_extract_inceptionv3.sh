@@ -12,4 +12,4 @@ if [ ! -f "${label_file}" ]; then
     sed -i 's/"tench"/"background","tench"/' "${label_file}"
 fi
 
-PYTHONPATH=./ python -m app.ml.inceptionv3.extract_inceptionv3
+PYTHONPATH=./ python -m src.app.ml.inceptionv3.extract_inceptionv3

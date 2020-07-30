@@ -32,7 +32,7 @@ spec:
         - name: WORKERS
           value: "4"
         - name: APP_NAME
-          value: "app.apps.app_web_single:app"
+          value: "src.app.apps.app_web_single:app"
         - name: PORT
           value: "8888"
         - name: PROFILE

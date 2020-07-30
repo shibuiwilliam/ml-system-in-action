@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List
-from app.configurations import _ModelConfigurations
-from app.constants import PREDICTION_TYPE
+from src.app.configurations import _ModelConfigurations
+from src.app.constants import PREDICTION_TYPE
 
 
 def test_ModelConfigurations():

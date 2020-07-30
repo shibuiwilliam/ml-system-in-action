@@ -4,10 +4,10 @@ from PIL import Image
 from typing import List, Tuple, Any
 from fastapi import BackgroundTasks
 
-from configurations.constants import PLATFORM_ENUM, CONSTANTS
-from jobs import store_data_job
-import jobs
-from app.ml.base_predictor import BaseData, BaseDataInterface
+from src.configurations.constants import PLATFORM_ENUM, CONSTANTS
+from src.jobs import store_data_job
+import src.jobs
+from src.app.ml.base_predictor import BaseData, BaseDataInterface
 
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
@@ -47,7 +47,7 @@ class MockJob():
     [(CONSTANTS.REDIS_QUEUE, 'abc', True)]
 )
 def test_left_push_queue(mocker, queue_name, key, expected):
-    mocker.patch('middleware.redis_client.redis_client.lpush', return_value=expected)
+    mocker.patch('src.middleware.redis_client.redis_client.lpush', return_value=expected)
     result = store_data_job.left_push_queue(queue_name, key)
     assert result == expected
 
@@ -57,8 +57,8 @@ def test_left_push_queue(mocker, queue_name, key, expected):
     [(CONSTANTS.REDIS_QUEUE, 1, 'abc')]
 )
 def test_right_pop_queue(mocker, queue_name, num, key):
-    mocker.patch('middleware.redis_client.redis_client.llen', return_value=num)
-    mocker.patch('middleware.redis_client.redis_client.rpop', return_value=key)
+    mocker.patch('src.middleware.redis_client.redis_client.llen', return_value=num)
+    mocker.patch('src.middleware.redis_client.redis_client.rpop', return_value=key)
     result = store_data_job.right_pop_queue(queue_name)
     assert result == key
 
@@ -68,8 +68,8 @@ def test_right_pop_queue(mocker, queue_name, num, key):
     [(CONSTANTS.REDIS_QUEUE, 0)]
 )
 def test_right_pop_queue_none(mocker, queue_name, num):
-    mocker.patch('middleware.redis_client.redis_client.llen', return_value=num)
-    mocker.patch('middleware.redis_client.redis_client.rpop', return_value=None)
+    mocker.patch('src.middleware.redis_client.redis_client.llen', return_value=num)
+    mocker.patch('src.middleware.redis_client.redis_client.rpop', return_value=None)
     result = store_data_job.right_pop_queue(queue_name)
     assert result is None
 
@@ -79,7 +79,7 @@ def test_right_pop_queue_none(mocker, queue_name, num):
     [(test_job_id, {'data': [1.0, -1.0], 'prediction': None})]
 )
 def test_load_data_redis(mocker, key, data):
-    mocker.patch('middleware.redis_client.redis_client.get', return_value=data)
+    mocker.patch('src.middleware.redis_client.redis_client.get', return_value=data)
     mocker.patch('json.loads', return_value=data)
     result = store_data_job.load_data_redis(key)
     assert result['data'] == data['data']
@@ -114,10 +114,10 @@ class Test:
         def get(key):
             return self.mock_redis_cache.get(key, None)
         mocker.patch(
-            'middleware.redis_client.redis_client.incr',
+            'src.middleware.redis_client.redis_client.incr',
             return_value=0)
         mocker.patch(
-            'middleware.redis_client.redis_client.set').side_effect = set
+            'src.middleware.redis_client.redis_client.set').side_effect = set
 
         result = store_data_job.save_data_redis_job(job_id, data)
         assert result
@@ -135,10 +135,10 @@ class Test:
         def get(key):
             return self.mock_redis_cache.get(key, None)
         mocker.patch(
-            'middleware.redis_client.redis_client.incr',
+            'src.middleware.redis_client.redis_client.incr',
             return_value=0)
         mocker.patch(
-            'middleware.redis_client.redis_client.set').side_effect = set
+            'src.middleware.redis_client.redis_client.set').side_effect = set
 
         result = store_data_job.save_data_dict_redis_job(job_id, data)
         assert result
@@ -156,7 +156,7 @@ def test_SaveDataFileJob(mocker, job_id, directory, data):
         data=data
     )
     mocker.patch(
-        'jobs.store_data_job.save_data_file_job',
+        'src.jobs.store_data_job.save_data_file_job',
         return_value=True)
     save_data_file_job()
     assert save_data_file_job.is_completed
@@ -175,10 +175,10 @@ def test_SaveDataRedisJob(mocker, job_id, data, queue_name, enqueue):
         enqueue=enqueue
     )
     mocker.patch(
-        'jobs.store_data_job.left_push_queue',
+        'src.jobs.store_data_job.left_push_queue',
         return_value=True)
     mocker.patch(
-        'jobs.store_data_job.save_data_redis_job',
+        'src.jobs.store_data_job.save_data_redis_job',
         return_value=True)
     save_data_redis_job()
     assert save_data_redis_job.is_completed
@@ -193,13 +193,13 @@ def test_SaveDataRedisJob(mocker, job_id, data, queue_name, enqueue):
 )
 def test_save_data_job(mocker, _uuid, data, enqueue, num, expected):
     mock_job = MockJob()
-    jobs.store_data_job._save_data_job.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
+    src.jobs.store_data_job._save_data_job.PLATFORM = PLATFORM_ENUM.DOCKER_COMPOSE.value
     mocker.patch(
-        'middleware.redis_client.redis_client.get',
+        'src.middleware.redis_client.redis_client.get',
         return_value=num)
     mocker.patch('uuid.uuid4', return_value=_uuid)
     mocker.patch(
-        'jobs.store_data_job.SaveDataRedisJob',
+        'src.jobs.store_data_job.SaveDataRedisJob',
         return_value=mock_job)
     job_id = store_data_job._save_data_job(data, mock_BackgroundTasks, enqueue)
     assert job_id == expected

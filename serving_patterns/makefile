@@ -1,5 +1,6 @@
 _absolute_path := $(shell pwd)
 _dockerfile_dir := dockerfiles
+_dockercompose_dir := docker-composes
 
 _image_name := serving_patterns_api
 _image_version := latest
@@ -54,37 +55,37 @@ _mobilenetv2_api_image_name := serving_patterns_mobilenetv2_api
 _mobilenetv2_api_image_version := latest
 _mobilenetv2_api_container_name := serving_patterns_mobilenetv2_api
 
-_compose_api := docker-compose_api.yml
+_compose_api := $(_dockercompose_dir)/docker-compose_api.yml
 _compose_build_api := docker-compose -f $(_compose_api) build
 _compose_up_api := docker-compose -f $(_compose_api) up -d
 _compose_down_api := docker-compose -f $(_compose_api) down
 
-_compose_resnet50_onnx := docker-compose_resnet50_onnx.yml
+_compose_resnet50_onnx := $(_dockercompose_dir)/docker-compose_resnet50_onnx.yml
 _compose_build_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) build
 _compose_up_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) up -d
 _compose_down_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) down
 
-_compose_resnet50_tfs := docker-compose_resnet50_tfs.yml
+_compose_resnet50_tfs := $(_dockercompose_dir)/docker-compose_resnet50_tfs.yml
 _compose_build_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) build
 _compose_up_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) up -d
 _compose_down_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) down
 
-_compose_inceptionv3 := docker-compose_inceptionv3.yml
+_compose_inceptionv3 := $(_dockercompose_dir)/docker-compose_inceptionv3.yml
 _compose_build_inceptionv3 := docker-compose -f $(_compose_inceptionv3) build
 _compose_up_inceptionv3 := docker-compose -f $(_compose_inceptionv3) up -d
 _compose_down_inceptionv3 := docker-compose -f $(_compose_inceptionv3) down
 
-_compose_mobilenetv2 := docker-compose_mobilenetv2.yml
+_compose_mobilenetv2 := $(_dockercompose_dir)/docker-compose_mobilenetv2.yml
 _compose_build_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) build
 _compose_up_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) up -d
 _compose_down_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) down
 
-_compose_api_ms_horizontal := docker-compose_api_ms_horizontal.yml
+_compose_api_ms_horizontal := $(_dockercompose_dir)/docker-compose_api_ms_horizontal.yml
 _compose_build_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) build
 _compose_up_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) up -d
 _compose_down_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) down
 
-_compose_image_ms_horizontal := docker-compose_image_ms_horizontal.yml
+_compose_image_ms_horizontal := $(_dockercompose_dir)/docker-compose_image_ms_horizontal.yml
 _compose_build_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) build
 _compose_up_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) up -d
 _compose_down_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) down
@@ -296,5 +297,8 @@ extract_inceptionv3:
 extract_mobilenetv2:
 	$(_extract_mobilenetv2)
 
+.PHONY: extract_all
+extract_all: train_iris extract_resnet50_onnx extract_resnet50_tfs extract_inceptionv3 extract_mobilenetv2 test_d
+
 .PHONY: build_all
-build_all: train_iris extract_resnet50_onnx extract_inceptionv3 c_build_api c_build_resnet50_onnx c_build_inceptionv3 c_build_mobilenetv2
+build_all: extract_all c_build_api c_build_resnet50_onnx c_build_resnet50_tfs c_build_inceptionv3 c_build_mobilenetv2

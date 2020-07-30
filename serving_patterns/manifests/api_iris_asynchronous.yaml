@@ -32,7 +32,7 @@ spec:
         - name: WORKERS
           value: "8"
         - name: APP_NAME
-          value: "app.apps.app_asynchronous:app"
+          value: "src.app.apps.app_asynchronous:app"
         - name: PORT
           value: "8890"
         - name: PROFILE

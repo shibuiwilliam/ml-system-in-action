@@ -11,7 +11,7 @@ LABELS=labels
 PREDICT=predict
 LABEL=label
 ASYNC=async
-JSON_PATH=./app/ml/data/good_cat_base64_data.json
+JSON_PATH=./src/app/ml/data/good_cat_base64_data.json
 
 function which_is_it() {
     echo "******* ${1} *******"

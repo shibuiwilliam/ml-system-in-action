@@ -3,7 +3,7 @@ import numpy
 import tensorflow
 import tensorflow_hub
 
-from app.ml import extract_from_tfhub
+from src.app.ml import extract_from_tfhub
 
 
 @pytest.mark.parametrize(

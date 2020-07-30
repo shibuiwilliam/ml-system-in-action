@@ -4,14 +4,17 @@ ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_proxy.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
-    apt-get -y install gcc && \
+    apt-get -y install gcc libev-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     pip install -r requirements_proxy.txt
 
-COPY ./api_composition_proxy/ /${PROJECT_DIR}/api_composition_proxy/
-COPY ./jobs/ /${PROJECT_DIR}/jobs/
-COPY ./middleware/ /${PROJECT_DIR}/middleware/
-COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./src/api_composition_proxy/ /${PROJECT_DIR}/src/api_composition_proxy/
+COPY ./src/jobs/ /${PROJECT_DIR}/src/jobs/
+COPY ./src/middleware/ /${PROJECT_DIR}/src/middleware/
+COPY ./src/configurations/ /${PROJECT_DIR}/src/configurations/
 COPY ./logging/ /${PROJECT_DIR}/logging/
+
 ENV RUN_FILE run_proxy.sh
 COPY ./scripts/${RUN_FILE} /${PROJECT_DIR}/${RUN_FILE}
 RUN chmod +x ${RUN_FILE}

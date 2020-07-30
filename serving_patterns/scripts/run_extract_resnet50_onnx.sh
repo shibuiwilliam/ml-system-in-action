@@ -24,4 +24,4 @@ fi
 [ ! -f "${label_file}" ] && curl --output ${label_file} https://raw.githubusercontent.com/anishathalye/imagenet-simple-labels/master/imagenet-simple-labels.json
 
 
-PYTHONPATH=./ python -m app.ml.resnet50_onnx.extract_resnet50
+PYTHONPATH=./ python -m src.app.ml.resnet50_onnx.extract_resnet50

@@ -9,7 +9,7 @@ WORKERS=${WORKERS:-4}
 UVICORN_WORKER=${UVICORN_WORKER:-"uvicorn.workers.UvicornWorker"}
 LOGLEVEL=${LOGLEVEL:-"debug"}
 LOGCONFIG=${LOGCONFIG:-"./logging/logging.conf"}
-APP_NAME=${APP_NAME:-"app.apps.app_web_single:app"}
+APP_NAME=${APP_NAME:-"src.app.apps.app_web_single:app"}
 
 
 if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then

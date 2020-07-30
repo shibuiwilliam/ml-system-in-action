@@ -2,4 +2,4 @@
 
 set -eu
 
-PYTHONPATH=./ python -m app.ml.iris.iris_trainer
+PYTHONPATH=./ python -m src.app.ml.iris.iris_trainer

@@ -1,5 +1,5 @@
 import pytest
-from middleware import redis_utils
+from src.middleware import redis_utils
 
 
 @pytest.mark.parametrize(

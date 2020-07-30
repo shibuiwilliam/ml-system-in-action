@@ -4,13 +4,16 @@ ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_api_tf2.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
-    apt-get -y install gcc curl && \
+    apt-get -y install gcc curl libev-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     pip install -r requirements_api_tf2.txt
 
-COPY ./app/ml/ /${PROJECT_DIR}/app/ml/
-COPY ./app/constants.py /${PROJECT_DIR}/app/constants.py
-COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./src/app/ml/ /${PROJECT_DIR}/src/app/ml/
+COPY ./src/app/constants.py /${PROJECT_DIR}/src/app/constants.py
+COPY ./src/configurations/ /${PROJECT_DIR}/src/configurations/
 COPY ./scripts/run_extract_resnet50_tfs.sh /${PROJECT_DIR}/run_extract_resnet50_tfs.sh
+
 RUN chmod +x run_extract_resnet50_tfs.sh && \
     ./run_extract_resnet50_tfs.sh
 
@@ -21,13 +24,12 @@ ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_api_tf2_serving.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
-    apt-get -y install gcc && \
+    apt-get -y install gcc libev-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     pip install -r requirements_api_tf2_serving.txt
 
-COPY ./app/ /${PROJECT_DIR}/app/
-COPY ./jobs/ /${PROJECT_DIR}/jobs/
-COPY ./middleware/ /${PROJECT_DIR}/middleware/
-COPY ./configurations/ /${PROJECT_DIR}/configurations/
+COPY ./src/ /${PROJECT_DIR}/src/
 COPY ./logging/ /${PROJECT_DIR}/logging/
 COPY --from=builder /${PROJECT_DIR}/models/* ./models/
 

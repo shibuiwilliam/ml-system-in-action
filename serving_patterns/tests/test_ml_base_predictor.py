@@ -2,7 +2,7 @@ import pytest
 from typing import List
 import numpy as np
 
-from app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter
+from src.app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter
 
 
 f_data = [[0.1, 0.9, 1.1, 1.1]]

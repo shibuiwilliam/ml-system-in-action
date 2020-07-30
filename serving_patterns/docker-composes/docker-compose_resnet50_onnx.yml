@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  api_resnet50:
+    container_name: serving_patterns_api_resnet50
+    build:
+      context: ..
+      dockerfile: dockerfiles/Dockerfile_api_resnet50_onnx
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=resnet50_onnx.yaml
+      - GUNICORN_UVICORN=GUNICORN
+      - WORKERS=4
+      - APP_NAME=src.app.apps.app_image:app
+      - PORT=8891
+      - PROFILE=0
+      - QUEUE_NAME=image_queue
+    ports:
+      - "8891:8891"
+    command: ./run_api.sh
+    volumes:
+      - shared_volume:/shared_volume
+    depends_on:
+      - backend_resnet50
+      - redis
+
+  backend_resnet50:
+    container_name: serving_patterns_backend_resnet50
+    build:
+      context: ..
+      dockerfile: dockerfiles/Dockerfile_backend_resnet50_onnx
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=resnet50_onnx.yaml
+      - NUM_PROCS=4
+      - BATCH_CODE=src.app.backend.prediction_batch
+      - PROFILE=0
+      - PREDICTOR=src.app.api._predict_image
+      - QUEUE_NAME=image_queue
+    command: ./run_backend.sh
+    volumes:
+      - shared_volume:/shared_volume
+    depends_on:
+      - redis
+
+  redis:
+    container_name: serving_patterns_redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+
+volumes:
+  shared_volume:
+    driver_opts:
+      type: none
+      device: /tmp
+      o: bind

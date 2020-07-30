@@ -2,7 +2,7 @@ import pytest
 from PIL import Image
 import numpy as np
 
-from app.ml import transformers
+from src.app.ml import transformers
 
 
 mock_image = Image.new('RGB', size=(300, 300), color=(10, 10, 10))

@@ -30,9 +30,9 @@ spec:
         - name: NUM_PROCS
           value: "4"
         - name: BATCH_CODE
-          value: "app.backend.prediction_batch"
+          value: "src.app.backend.prediction_batch"
         - name: PREDICTOR
-          value: "app.api._predict_image"
+          value: "src.app.api._predict_image"
         - name: PROFILE
           value: "0"
         - name: TFS_GRPC

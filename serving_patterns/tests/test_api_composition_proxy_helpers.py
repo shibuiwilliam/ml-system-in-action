@@ -1,5 +1,5 @@
 import pytest
-from api_composition_proxy import helpers
+from src.api_composition_proxy import helpers
 
 
 @pytest.mark.parametrize(

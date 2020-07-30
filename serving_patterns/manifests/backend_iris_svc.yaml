@@ -30,7 +30,7 @@ spec:
         - name: NUM_PROCS
           value: "8"
         - name: APP_NAME
-          value: "app.backend.prediction_batch"
+          value: "src.app.backend.prediction_batch"
         - name: PROFILE
           value: "0"
         - name: QUEUE_NAME
