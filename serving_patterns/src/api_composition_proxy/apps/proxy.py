@@ -1,21 +1,20 @@
 from fastapi import FastAPI
 import logging
 
-from src.api_composition_proxy.routers import get_proxy, post_proxy, health
-from src.api_composition_proxy.configurations import _FastAPIConfigurations
-from src.configurations.configurations import _PlatformConfigurations
+from src.api_composition_proxy.routers import proxy, health
+from src.api_composition_proxy.configurations import FastAPIConfigurations
+from src.configurations.configurations import PlatformConfigurations
+
 
 logger = logging.getLogger(__name__)
-logger.info(
-    f'starts {_FastAPIConfigurations().title}:{_FastAPIConfigurations().version}')
-logger.info(f'platform: {_PlatformConfigurations().platform}')
+logger.info(f'starts {FastAPIConfigurations.title}:{FastAPIConfigurations.version}')
+logger.info(f'platform: {PlatformConfigurations.platform}')
 
 app = FastAPI(
-    title=_FastAPIConfigurations().title,
-    description=_FastAPIConfigurations().description,
-    version=_FastAPIConfigurations().version,
+    title=FastAPIConfigurations.title,
+    description=FastAPIConfigurations.description,
+    version=FastAPIConfigurations.version,
 )
-
 
 app.include_router(
     health.router,
@@ -24,13 +23,7 @@ app.include_router(
 )
 
 app.include_router(
-    get_proxy.router,
-    prefix='/get_redirect',
-    tags=['get_redirect']
-)
-
-app.include_router(
-    post_proxy.router,
-    prefix='/post_redirect',
-    tags=['post_redirect']
+    proxy.router,
+    prefix='/redirect',
+    tags=['redirect']
 )

@@ -12,9 +12,11 @@ services:
       - APP_NAME=src.api_composition_proxy.apps.proxy:app
       - PORT=8000
       - PROFILE=0
-      - SERVICE_WEB_SINGLE=web_single:8888
-      - SERVICE_SYNCHRONOUS=synchronous:8889
+      - SERVICE_WEB_SINGLE=web_single_ms_h:8888
+      - SERVICE_SYNCHRONOUS=synchronous_ms_h:8889
+      - SERVICE_ASYNCHRONOUS=asynchronous_ms_h:8890
       - QUEUE_NAME=api_queue
+      - CUSTOMIZED_REDIRECT_MAP={"SERVICE_WEB_SINGLE":{"predict":"predict/label"},"SERVICE_SYNCHRONOUS":{"predict":"predict/label"},"SERVICE_ASYNCHRONOUS":{"predict/label":"predict"}}
     ports:
       - "8000:8000"
     command: ./run_proxy.sh
