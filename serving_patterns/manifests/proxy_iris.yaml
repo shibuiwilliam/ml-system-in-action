@@ -43,6 +43,8 @@ spec:
           value: api-iris-synchronous.serving-pattern.svc.cluster.local:8889
         - name: SERVICE_ASYNCHRONOUS
           value: api-iris-asynchronous.serving-pattern.svc.cluster.local:8890
+        - name: CUSTOMIZED_REDIRECT_MAP
+          value: '{"SERVICE_WEB_SINGLE":{"predict":"predict/label"},"SERVICE_SYNCHRONOUS":{"predict":"predict/label"},"SERVICE_ASYNCHRONOUS":{"predict/label":"predict"}}'
         resources:
           limits:
             cpu: "0.5"

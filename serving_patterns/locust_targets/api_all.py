@@ -3,7 +3,7 @@ from locust import HttpUser, TaskSet, task, between, constant
 
 
 class APIUser(HttpUser):
-    wait_time = between(1,10)
+    wait_time = between(1, 10)
 
     @task(int(os.getenv('GET_HEALTH_RATIO', 0)))
     def get_health(self):
@@ -38,7 +38,7 @@ class APIUser(HttpUser):
     @task(int(os.getenv('REDIRECT_POST_PREDICT_RATIO', 0)))
     def redirect_post_predict(self):
         self.client.post(
-            url='/post_redirect/predict',
+            url='/redirect/predict',
             json={"data": {"input_data": [5.2, 3.1, 0.1, 1.0]}},
             headers={'content-type': 'application/json'},
             verify=False
@@ -47,7 +47,7 @@ class APIUser(HttpUser):
     @task(int(os.getenv('REDIRECT_POST_PREDICT_LABEL_RATIO', 0)))
     def redirect_post_predict_label(self):
         self.client.post(
-            url='/post_redirect/predict/label',
+            url='/redirect/predict/label',
             json={"data": {"input_data": [5.2, 3.1, 0.1, 1.0]}},
             headers={'content-type': 'application/json'},
             verify=False
