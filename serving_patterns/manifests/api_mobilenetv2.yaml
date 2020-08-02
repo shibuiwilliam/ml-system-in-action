@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-mobilenetv2
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -31,6 +31,12 @@ spec:
           value: GUNICORN
         - name: WORKERS
           value: "4"
+        - name: BACKLOG
+          value: "64"
+        - name: LIMIT_MAX_REQUESTS
+          value: "1024"
+        - name: MAX_REQUESTS_JITTER
+          value: "128"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: PORT
@@ -38,7 +44,7 @@ spec:
         - name: PROFILE
           value: "0"
         - name: TFS_GRPC
-          value: tfs-mobilenetv2.serving-pattern.svc.cluster.local:8510
+          value: tfs-mobilenetv2.serving-pattern.svc.cluster.local:8512
         - name: QUEUE_NAME
           value: mobilenetv2_api_queue
         ports:

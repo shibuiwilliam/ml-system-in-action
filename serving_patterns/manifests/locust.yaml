@@ -25,8 +25,8 @@ spec:
         - name: PLATFORM
           value: kubernetes
         - name: TARGET_FILE
-          value: api_all.py
-        - name: REDIRECT_POST_PREDICT_LABEL_RATIO
+          value: proxy_image_classification_all.py
+        - name: POST_PREDICT_LABEL_RATIO
           value: "1"
         ports:
         - containerPort: 8089

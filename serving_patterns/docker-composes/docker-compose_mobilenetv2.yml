@@ -13,7 +13,7 @@ services:
       - WORKERS=4
       - APP_NAME=src.app.apps.app_image:app
       - PORT=8893
-      - TFS_GRPC=prep_pred_tfs:8510
+      - TFS_GRPC=prep_pred_tfs:8512
       - PROFILE=0
       - QUEUE_NAME=tfs_queue
     ports:
@@ -32,13 +32,13 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile_tfserving_mobilenetv2
     environment:
-      - PORT=8510
-      - REST_API_PORT=8511
+      - PORT=8512
+      - REST_API_PORT=8513
       - MODEL_NAME=mobilenetv2
       - MODEL_BASE_PATH=/models/mobilenetv2
     ports:
-      - "8510:8510"
-      - "8511:8511"
+      - "8512:8512"
+      - "8513:8513"
     entrypoint: ["/usr/bin/tf_serving_entrypoint.sh"]
 
   prep_pred_backend_mobilenetv2:
@@ -51,7 +51,7 @@ services:
       - MODEL_INTERFACE=mobilenetv2.yaml
       - NUM_PROCS=4
       - BATCH_CODE=src.app.backend.prediction_batch
-      - TFS_GRPC=prep_pred_tfs:8510
+      - TFS_GRPC=prep_pred_tfs:8512
       - PROFILE=0
       - PREDICTOR=src.app.api._predict_image
       - QUEUE_NAME=tfs_queue

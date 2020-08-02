@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-iris-proxy
-  replicas: 6
+  replicas: 3
   template:
     metadata:
       labels:
@@ -29,6 +29,12 @@ spec:
           value: GUNICORN
         - name: WORKERS
           value: "2"
+        - name: BACKLOG
+          value: "128"
+        - name: LIMIT_MAX_REQUESTS
+          value: "2048"
+        - name: MAX_REQUESTS_JITTER
+          value: "256"
         - name: APP_NAME
           value: "src.api_composition_proxy.apps.proxy:app"
         - name: PORT
@@ -36,20 +42,18 @@ spec:
         - name: PROFILE
           value: "0"
         - name: QUEUE_NAME
-          value: tree_api_queue
-        - name: SERVICE_WEB_SINGLE
-          value: api-iris-web-single.serving-pattern.svc.cluster.local:8888
-        - name: SERVICE_SYNCHRONOUS
-          value: api-iris-synchronous.serving-pattern.svc.cluster.local:8889
-        - name: SERVICE_ASYNCHRONOUS
-          value: api-iris-asynchronous.serving-pattern.svc.cluster.local:8890
+          value: resnet50_api_queue
+        - name: SERVICE_MOBILENETV2_TFS
+          value: api-mobilenetv2.serving-pattern.svc.cluster.local:8893
+        - name: SERVICE_RESNET50_ONNX
+          value: api-resnet50-onnx.serving-pattern.svc.cluster.local:8891
         resources:
           limits:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
           requests:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
         ports:
         - containerPort: 8000
         volumeMounts:
