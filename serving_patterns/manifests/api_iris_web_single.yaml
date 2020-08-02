@@ -41,11 +41,11 @@ spec:
           value: svc_api_queue
         resources:
           limits:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
           requests:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
         ports:
         - containerPort: 8888
 

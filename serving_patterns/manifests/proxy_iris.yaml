@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-iris-proxy
-  replicas: 6
+  replicas: 3
   template:
     metadata:
       labels:
@@ -47,11 +47,11 @@ spec:
           value: '{"SERVICE_WEB_SINGLE":{"predict":"predict/label"},"SERVICE_SYNCHRONOUS":{"predict":"predict/label"},"SERVICE_ASYNCHRONOUS":{"predict/label":"predict"}}'
         resources:
           limits:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
           requests:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
         ports:
         - containerPort: 8000
 
