@@ -32,11 +32,11 @@ spec:
         - name: WORKERS
           value: "2"
         - name: BACKLOG
-          value: "16"
-        - name: LIMIT_MAX_REQUESTS
-          value: "128"
-        - name: MAX_REQUESTS_JITTER
           value: "32"
+        - name: LIMIT_MAX_REQUESTS
+          value: "256"
+        - name: MAX_REQUESTS_JITTER
+          value: "64"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: PORT
@@ -57,15 +57,15 @@ spec:
           httpGet:
             port: 8891
             path: /health
-          failureThreshold: 2
-          periodSeconds: 1
+          failureThreshold: 5
+          periodSeconds: 5
         resources:
           limits:
             cpu: "2"
-            memory: "4000Mi"
+            memory: "2000Mi"
           requests:
             cpu: "2"
-            memory: "4000Mi"
+            memory: "2000Mi"
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"

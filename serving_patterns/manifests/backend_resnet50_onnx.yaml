@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: backend-resnet50-onnx
-  replicas: 2
+  replicas: 3
   template:
     metadata:
       labels:
@@ -39,10 +39,10 @@ spec:
           value: resnet50_api_queue
         resources:
           limits:
-            cpu: "4"
+            cpu: "8"
             memory: "4000Mi"
           requests:
-            cpu: "4"
+            cpu: "8"
             memory: "4000Mi"
         volumeMounts:
           - name: pvc-nfs

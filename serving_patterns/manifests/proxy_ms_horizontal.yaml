@@ -68,8 +68,8 @@ spec:
           httpGet:
             port: 8000
             path: /health
-          failureThreshold: 2
-          periodSeconds: 1
+          failureThreshold: 5
+          periodSeconds: 5
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"
