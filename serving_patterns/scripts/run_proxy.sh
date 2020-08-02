@@ -10,6 +10,7 @@ UVICORN_WORKER=${UVICORN_WORKER:-"uvicorn.workers.UvicornWorker"}
 LOGLEVEL=${LOGLEVEL:-"debug"}
 LOGCONFIG=${LOGCONFIG:-"./logging/logging.conf"}
 BACKLOG=${BACKLOG:-2048}
+LIMIT_MAX_REQUESTS=${LIMIT_MAX_REQUESTS:-65536}
 APP_NAME=${APP_NAME:-"src.api_composition_proxy.apps.proxy:app"}
 
 
@@ -20,7 +21,8 @@ if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
         -k ${UVICORN_WORKER}  \
         --log-level ${LOGLEVEL} \
         --log-config ${LOGCONFIG} \
-        --backlog {BACKLOG} \
+        --backlog ${BACKLOG} \
+        --max_requests ${LIMIT_MAX_REQUESTS} \
         --reload
 
 else
@@ -30,6 +32,7 @@ else
         --workers ${WORKERS} \
         --log-level ${LOGLEVEL} \
         --log-config ${LOGCONFIG} \
-        --backlog {BACKLOG} \
+        --backlog ${BACKLOG} \
+        --limit-max-requests ${LIMIT_MAX_REQUESTS} \
         --reload
 fi
