@@ -28,7 +28,11 @@ spec:
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
-          value: "2"
+          value: "4"
+        - name: BACKLOG
+          value: "65536"
+        - name: LIMIT_MAX_REQUESTS
+          value: "4294967296"
         - name: APP_NAME
           value: "src.api_composition_proxy.apps.proxy:app"
         - name: PORT

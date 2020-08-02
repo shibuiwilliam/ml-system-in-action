@@ -11,6 +11,7 @@ LOGLEVEL=${LOGLEVEL:-"debug"}
 LOGCONFIG=${LOGCONFIG:-"./logging/logging.conf"}
 BACKLOG=${BACKLOG:-2048}
 LIMIT_MAX_REQUESTS=${LIMIT_MAX_REQUESTS:-65536}
+MAX_REQUESTS_JITTER=${MAX_REQUESTS_JITTER:-2048}
 APP_NAME=${APP_NAME:-"src.app.apps.app_web_single:app"}
 
 
@@ -22,7 +23,8 @@ if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
         --log-level ${LOGLEVEL} \
         --log-config ${LOGCONFIG} \
         --backlog ${BACKLOG} \
-        --max_requests ${LIMIT_MAX_REQUESTS} \
+        --max-requests ${LIMIT_MAX_REQUESTS} \
+        --max-requests-jitter ${MAX_REQUESTS_JITTER} \
         --reload
 
 else

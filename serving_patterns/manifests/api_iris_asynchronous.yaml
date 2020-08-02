@@ -31,6 +31,10 @@ spec:
           value: GUNICORN
         - name: WORKERS
           value: "8"
+        - name: BACKLOG
+          value: "2048"
+        - name: LIMIT_MAX_REQUESTS
+          value: "65536"
         - name: APP_NAME
           value: "src.app.apps.app_asynchronous:app"
         - name: PORT

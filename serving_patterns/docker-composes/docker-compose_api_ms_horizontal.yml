@@ -9,6 +9,8 @@ services:
     environment:
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=8
+      - BACKLOG=65536
+      - LIMIT_MAX_REQUESTS=4294967296
       - APP_NAME=src.api_composition_proxy.apps.proxy:app
       - PORT=8000
       - PROFILE=0
@@ -31,6 +33,8 @@ services:
       - MODEL_INTERFACE=iris_svc_sklearn.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
+      - BACKLOG=2048
+      - LIMIT_MAX_REQUESTS=65536
       - APP_NAME=src.app.apps.app_web_single:app
       - PORT=8888
       - PROFILE=0
@@ -51,6 +55,8 @@ services:
       - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
+      - BACKLOG=2048
+      - LIMIT_MAX_REQUESTS=65536
       - APP_NAME=src.app.apps.app_synchronous:app
       - PORT=8889
       - PROFILE=0
@@ -71,6 +77,8 @@ services:
       - MODEL_INTERFACE=iris_tree_onnx_runtime.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
+      - BACKLOG=2048
+      - LIMIT_MAX_REQUESTS=65536
       - APP_NAME=src.app.apps.app_asynchronous:app
       - PORT=8890
       - PROFILE=0
