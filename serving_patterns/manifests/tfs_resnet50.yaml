@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: tfs-resnet50
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -22,15 +22,15 @@ spec:
         command: ["/usr/bin/tf_serving_entrypoint.sh"]
         env:
         - name: PORT
-          value: "8510"
+          value: "8514"
         - name: REST_API_PORT
-          value: "8511"
+          value: "8515"
         - name: MODEL_NAME
           value: resnet_v2_50
         - name: MODEL_BASE_PATH
           value: /models/resnet_v2_50
         ports:
-        - containerPort: 8510
+        - containerPort: 8514
         resources:
           limits:
             cpu: "2"
@@ -50,7 +50,7 @@ metadata:
   namespace: serving-pattern
 spec:
   ports:
-  - port: 8510
+  - port: 8514
     protocol: TCP
   selector:
     app: tfs-resnet50

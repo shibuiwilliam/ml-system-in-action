@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-resnet50-tfs
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -31,6 +31,12 @@ spec:
           value: GUNICORN
         - name: WORKERS
           value: "4"
+        - name: BACKLOG
+          value: "64"
+        - name: LIMIT_MAX_REQUESTS
+          value: "1024"
+        - name: MAX_REQUESTS_JITTER
+          value: "128"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: PORT
@@ -38,11 +44,23 @@ spec:
         - name: PROFILE
           value: "0"
         - name: TFS_GRPC
-          value: tfs-resnet50.serving-pattern.svc.cluster.local:8510
+          value: tfs-resnet50.serving-pattern.svc.cluster.local:8514
         - name: QUEUE_NAME
           value: resnet50_api_queue
         ports:
         - containerPort: 8894
+        livenessProbe:
+          httpGet:
+            port: 8894
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8894
+            path: /health
+          failureThreshold: 2
+          periodSeconds: 1
         resources:
           limits:
             cpu: "2"

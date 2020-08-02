@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-resnet50-onnx
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:
@@ -30,24 +30,42 @@ spec:
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
-          value: "3"
+          value: "2"
+        - name: BACKLOG
+          value: "32"
+        - name: LIMIT_MAX_REQUESTS
+          value: "256"
+        - name: MAX_REQUESTS_JITTER
+          value: "64"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: PORT
           value: "8891"
         - name: PROFILE
-          value: "1"
+          value: "0"
         - name: QUEUE_NAME
           value: resnet50_api_queue
         ports:
         - containerPort: 8891
+        livenessProbe:
+          httpGet:
+            port: 8891
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8891
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
         resources:
           limits:
-            cpu: "3"
-            memory: "8000Mi"
+            cpu: "2"
+            memory: "2000Mi"
           requests:
-            cpu: "3"
-            memory: "8000Mi"
+            cpu: "2"
+            memory: "2000Mi"
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"

@@ -25,18 +25,18 @@ spec:
         - name: PLATFORM
           value: kubernetes
         - name: TARGET_FILE
-          value: image_classification_all.py
+          value: proxy_image_classification_all.py
         - name: POST_PREDICT_LABEL_RATIO
           value: "1"
         ports:
         - containerPort: 8089
         resources:
           limits:
-            cpu: "1"
-            memory: "1000Mi"
+            cpu: "2"
+            memory: "2000Mi"
           requests:
-            cpu: "1"
-            memory: "1000Mi"
+            cpu: "2"
+            memory: "2000Mi"
 
 ---
 

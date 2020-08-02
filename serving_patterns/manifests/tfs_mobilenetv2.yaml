@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: tfs-mobilenetv2
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -22,21 +22,21 @@ spec:
         command: ["/usr/bin/tf_serving_entrypoint.sh"]
         env:
         - name: PORT
-          value: "8510"
+          value: "8512"
         - name: REST_API_PORT
-          value: "8511"
+          value: "8513"
         - name: MODEL_NAME
           value: mobilenetv2
         - name: MODEL_BASE_PATH
           value: /models/mobilenetv2
         ports:
-        - containerPort: 8510
+        - containerPort: 8512
         resources:
           limits:
-            cpu: "2"
+            cpu: "4"
             memory: "4000Mi"
           requests:
-            cpu: "2"
+            cpu: "4"
             memory: "4000Mi"
 
 ---
@@ -50,7 +50,7 @@ metadata:
   namespace: serving-pattern
 spec:
   ports:
-  - port: 8510
+  - port: 8512
     protocol: TCP
   selector:
     app: tfs-mobilenetv2

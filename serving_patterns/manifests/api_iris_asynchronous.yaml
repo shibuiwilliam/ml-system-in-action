@@ -31,6 +31,12 @@ spec:
           value: GUNICORN
         - name: WORKERS
           value: "8"
+        - name: BACKLOG
+          value: "2048"
+        - name: LIMIT_MAX_REQUESTS
+          value: "65536"
+        - name: MAX_REQUESTS_JITTER
+          value: "2048"
         - name: APP_NAME
           value: "src.app.apps.app_asynchronous:app"
         - name: PORT
@@ -41,13 +47,25 @@ spec:
           value: tree_api_queue
         ports:
         - containerPort: 8890
+        livenessProbe:
+          httpGet:
+            port: 8890
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8890
+            path: /health
+          failureThreshold: 2
+          periodSeconds: 1
         resources:
           limits:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
           requests:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
 
 ---
 

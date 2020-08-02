@@ -13,7 +13,7 @@ services:
       - WORKERS=4
       - APP_NAME=src.app.apps.app_image:app
       - PORT=8894
-      - TFS_GRPC=prep_pred_tfs:8510
+      - TFS_GRPC=prep_pred_tfs:8514
       - PROFILE=0
       - QUEUE_NAME=tfs_queue
     ports:
@@ -32,13 +32,13 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile_tfserving_resnet50
     environment:
-      - PORT=8510
-      - REST_API_PORT=8511
+      - PORT=8514
+      - REST_API_PORT=8515
       - MODEL_NAME=resnet_v2_50
       - MODEL_BASE_PATH=/models/resnet_v2_50
     ports:
-      - "8510:8510"
-      - "8511:8511"
+      - "8514:8514"
+      - "8515:8515"
     entrypoint: ["/usr/bin/tf_serving_entrypoint.sh"]
 
   prep_pred_backend_resnet50:
@@ -51,7 +51,7 @@ services:
       - MODEL_INTERFACE=resnet50_tfs.yaml
       - NUM_PROCS=4
       - BATCH_CODE=src.app.backend.prediction_batch
-      - TFS_GRPC=prep_pred_tfs:8510
+      - TFS_GRPC=prep_pred_tfs:8514
       - PROFILE=0
       - PREDICTOR=src.app.api._predict_image
       - QUEUE_NAME=tfs_queue

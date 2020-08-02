@@ -9,6 +9,9 @@ WORKERS=${WORKERS:-4}
 UVICORN_WORKER=${UVICORN_WORKER:-"uvicorn.workers.UvicornWorker"}
 LOGLEVEL=${LOGLEVEL:-"debug"}
 LOGCONFIG=${LOGCONFIG:-"./logging/logging.conf"}
+BACKLOG=${BACKLOG:-2048}
+LIMIT_MAX_REQUESTS=${LIMIT_MAX_REQUESTS:-65536}
+MAX_REQUESTS_JITTER=${MAX_REQUESTS_JITTER:-2048}
 APP_NAME=${APP_NAME:-"src.app.apps.app_web_single:app"}
 
 
@@ -16,9 +19,13 @@ if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
     gunicorn ${APP_NAME} \
         -b ${HOST}:${PORT} \
         -w ${WORKERS} \
-        -k ${UVICORN_WORKER}  \
+        -k ${UVICORN_WORKER} \
         --log-level ${LOGLEVEL} \
-        --log-config ${LOGCONFIG}
+        --log-config ${LOGCONFIG} \
+        --backlog ${BACKLOG} \
+        --max-requests ${LIMIT_MAX_REQUESTS} \
+        --max-requests-jitter ${MAX_REQUESTS_JITTER} \
+        --reload
 
 else
     uvicorn ${APP_NAME} \
@@ -26,5 +33,8 @@ else
         --port ${PORT} \
         --workers ${WORKERS} \
         --log-level ${LOGLEVEL} \
-        --log-config ${LOGCONFIG}
+        --log-config ${LOGCONFIG} \
+        --backlog ${BACKLOG} \
+        --limit-max-requests ${LIMIT_MAX_REQUESTS} \
+        --reload
 fi

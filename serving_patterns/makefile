@@ -90,9 +90,9 @@ _compose_build_image_ms_horizontal := docker-compose -f $(_compose_image_ms_hori
 _compose_up_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) up -d
 _compose_down_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) down
 
-_requirements_api_test := requirements_api_test.txt
-_pip_freeze_test := pip freeze > requirements/$(_requirements_api_test)
-_pip_install_test := pip install -r requirements/$(_requirements_api_test)
+_requirements_test := requirements_test.txt
+_pip_freeze_test := pip freeze > requirements/$(_requirements_test)
+_pip_install_test := pip install -r requirements/$(_requirements_test)
 
 _pytest := pytest -v -s ./tests/
 _pytest_d := docker build \
@@ -301,4 +301,4 @@ extract_mobilenetv2:
 extract_all: train_iris extract_resnet50_onnx extract_resnet50_tfs extract_inceptionv3 extract_mobilenetv2 test_d
 
 .PHONY: build_all
-build_all: extract_all c_build_api c_build_resnet50_onnx c_build_resnet50_tfs c_build_inceptionv3 c_build_mobilenetv2
+build_all: extract_all c_build_api c_build_resnet50_onnx c_build_resnet50_tfs c_build_inceptionv3 c_build_mobilenetv2 build_locust

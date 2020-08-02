@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-iris-proxy
-  replicas: 6
+  replicas: 3
   template:
     metadata:
       labels:
@@ -28,7 +28,13 @@ spec:
         - name: GUNICORN_UVICORN
           value: GUNICORN
         - name: WORKERS
-          value: "2"
+          value: "4"
+        - name: BACKLOG
+          value: "65536"
+        - name: LIMIT_MAX_REQUESTS
+          value: "4294967296"
+        - name: MAX_REQUESTS_JITTER
+          value: "2048"
         - name: APP_NAME
           value: "src.api_composition_proxy.apps.proxy:app"
         - name: PORT
@@ -43,13 +49,15 @@ spec:
           value: api-iris-synchronous.serving-pattern.svc.cluster.local:8889
         - name: SERVICE_ASYNCHRONOUS
           value: api-iris-asynchronous.serving-pattern.svc.cluster.local:8890
+        - name: CUSTOMIZED_REDIRECT_MAP
+          value: '{"SERVICE_WEB_SINGLE":{"predict":"predict/label"},"SERVICE_SYNCHRONOUS":{"predict":"predict/label"},"SERVICE_ASYNCHRONOUS":{"predict/label":"predict"}}'
         resources:
           limits:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
           requests:
-            cpu: "0.5"
-            memory: "500Mi"
+            cpu: "2"
+            memory: "1000Mi"
         ports:
         - containerPort: 8000
 

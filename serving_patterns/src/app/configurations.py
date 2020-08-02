@@ -1,12 +1,10 @@
 import os
 from src.configurations.constants import PLATFORM_ENUM
-from src.configurations.configurations import _PlatformConfigurations
 from src.app.constants import CONSTANTS, PHYSICAL_SAVE_DATA, DATA_TYPE
 from src.app.ml.extract_interface import extract_interface_yaml
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 class _FastAPIConfigurations():
@@ -40,5 +38,7 @@ class _ModelConfigurations():
     physical_save_data = os.getenv('PHYSICAL_SAVE_DATA', PHYSICAL_SAVE_DATA.SAVE)
 
 
-logger.info(f'model configurations: {_ModelConfigurations.__dict__}')
-logger.info(f'fastapi configurations: {_FastAPIConfigurations.__dict__}')
+FastAPIConfigurations = _FastAPIConfigurations()
+ModelConfigurations = _ModelConfigurations()
+logger.info(f'model configurations: {ModelConfigurations.__dict__}')
+logger.info(f'fastapi configurations: {FastAPIConfigurations.__dict__}')

@@ -1,6 +1,8 @@
+from typing import Dict
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def path_builder(url: str, path: str) -> str:
     if path == '' or path is None:
@@ -24,3 +26,32 @@ def url_path_builder(hostname: str, path: str, https: bool = False) -> str:
     hostname = url_builder(hostname, https)
     url = path_builder(hostname, path)
     return url
+
+
+def customized_redirect_builder(
+        alias: str,
+        url: str,
+        redirect_path: str,
+        customized_redirect_map: Dict[str, Dict[str, str]] = None) -> str:
+    '''
+    {
+        ALIAS_0:
+        {
+            REDIRECT_PATH_0: redirect_path_0,
+            REDIRECT_PATH_1: redirect_path_1,
+        },
+        ALIAS_1:
+        {
+            REDIRECT_PATH_0: redirect_path_0,
+            REDIRECT_PATH_2: redirect_path_2,
+        }
+    }
+    '''
+
+    path = path_builder(url, redirect_path)
+    if customized_redirect_map is None:
+        return path
+    if alias in customized_redirect_map.keys():
+        if redirect_path in customized_redirect_map[alias].keys():
+            path = path_builder(url, customized_redirect_map[alias][redirect_path])
+    return path

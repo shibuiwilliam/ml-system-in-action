@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: backend-resnet50-onnx
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -26,24 +26,24 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: resnet50.yaml
+          value: resnet50_onnx.yaml
         - name: NUM_PROCS
-          value: "2"
+          value: "4"
         - name: BATCH_CODE
           value: "src.app.backend.prediction_batch"
         - name: PREDICTOR
           value: "src.app.api._predict_image"
         - name: PROFILE
-          value: "0"
+          value: "1"
         - name: QUEUE_NAME
           value: resnet50_api_queue
         resources:
           limits:
-            cpu: "2"
-            memory: "8000Mi"
+            cpu: "8"
+            memory: "4000Mi"
           requests:
-            cpu: "2"
-            memory: "8000Mi"
+            cpu: "8"
+            memory: "4000Mi"
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"

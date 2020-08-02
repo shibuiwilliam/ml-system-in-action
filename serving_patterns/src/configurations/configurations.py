@@ -36,6 +36,12 @@ class _FileConfigurations():
         shared_volume = '/tmp'
 
 
-logger.info(f'platform configurations: {_PlatformConfigurations.__dict__}')
-logger.info(f'redis cache configurations: {_RedisCacheConfigurations.__dict__}')
-logger.info(f'file configurations: {_FileConfigurations.__dict__}')
+PlatformConfigurations = _PlatformConfigurations()
+CacheConfigurations = _CacheConfigurations()
+RedisCacheConfigurations = _RedisCacheConfigurations()
+FileConfigurations = _FileConfigurations()
+
+logger.info(f'platform configurations: {PlatformConfigurations.__dict__}')
+logger.info(f'cache configurations: {CacheConfigurations.__dict__}')
+logger.info(f'redis cache configurations: {RedisCacheConfigurations.__dict__}')
+logger.info(f'file configurations: {FileConfigurations.__dict__}')

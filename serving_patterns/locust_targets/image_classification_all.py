@@ -1,10 +1,10 @@
 import os
 from locust import HttpUser, TaskSet, task, between, constant
-from locust_targets import image_data
+import image_data
 
 
 class APIUser(HttpUser):
-    wait_time = between(1,10)
+    wait_time = between(1, 10)
 
     @task(int(os.getenv('GET_HEALTH_RATIO', 0)))
     def get_health(self):

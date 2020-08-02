@@ -40,3 +40,34 @@ def test_url_builder(hostname, https, expected):
 def test_url_path_builder(hostname, path, https, expected):
     result = helpers.url_path_builder(hostname, path, https)
     assert result == expected
+
+
+@pytest.mark.parametrize(('alias',
+                          'url',
+                          'redirect_path',
+                          'customized_redirect_map',
+                          'expected'),
+                         [('SVC',
+                           'http://localhost/',
+                           'predict',
+                           {'SVC': {'predict': 'predict/label'}},
+                           'http://localhost/predict/label'),
+                          ('SVC',
+                           'http://localhost/',
+                           'apredict',
+                           {'SVC': {'predict': 'predict/label'}},
+                           'http://localhost/apredict'),
+                          ('ASVC',
+                           'http://localhost/',
+                           'apredict',
+                           {'SVC': {'predict': 'predict/label'}},
+                           'http://localhost/apredict')])
+def test_customized_redirect_builder(
+        alias,
+        url,
+        redirect_path,
+        customized_redirect_map,
+        expected):
+    result = helpers.customized_redirect_builder(
+        alias, url, redirect_path, customized_redirect_map)
+    assert result == expected
