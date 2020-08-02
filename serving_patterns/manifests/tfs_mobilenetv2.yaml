@@ -33,10 +33,10 @@ spec:
         - containerPort: 8512
         resources:
           limits:
-            cpu: "2"
+            cpu: "4"
             memory: "4000Mi"
           requests:
-            cpu: "2"
+            cpu: "4"
             memory: "4000Mi"
 
 ---

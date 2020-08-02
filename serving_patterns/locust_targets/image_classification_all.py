@@ -1,6 +1,6 @@
 import os
 from locust import HttpUser, TaskSet, task, between, constant
-from locust_targets import image_data
+import image_data
 
 
 class APIUser(HttpUser):

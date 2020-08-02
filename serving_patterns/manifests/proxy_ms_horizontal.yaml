@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-iris-proxy
+  name: api-image-proxy
   labels:
-    app: api-iris-proxy
+    app: api-image-proxy
   namespace: serving-pattern
 spec:
   selector:
     matchLabels:
-      app: api-iris-proxy
+      app: api-image-proxy
   replicas: 3
   template:
     metadata:
       labels:
-        app: api-iris-proxy
-      name: api-iris-proxy
+        app: api-image-proxy
+      name: api-image-proxy
     spec:
       containers:
-      - name: api-iris-proxy
+      - name: api-image-proxy
         image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_proxy:latest
         command: ["./run_proxy.sh"]
         env:
@@ -43,19 +43,33 @@ spec:
           value: "0"
         - name: QUEUE_NAME
           value: resnet50_api_queue
-        - name: SERVICE_MOBILENETV2_TFS
-          value: api-mobilenetv2.serving-pattern.svc.cluster.local:8893
         - name: SERVICE_RESNET50_ONNX
           value: api-resnet50-onnx.serving-pattern.svc.cluster.local:8891
+        - name: SERVICE_MOBILENETV2_TFS
+          value: api-mobilenetv2.serving-pattern.svc.cluster.local:8893
+        - name: CUSTOMIZED_REDIRECT_MAP
+          value: '{"SERVICE_RESNET50_ONNX":{"predict/label":"predict/async", "predict":"predict/async"}}'
         resources:
           limits:
             cpu: "2"
-            memory: "1000Mi"
+            memory: "2000Mi"
           requests:
             cpu: "2"
-            memory: "1000Mi"
+            memory: "2000Mi"
         ports:
         - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            port: 8000
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8000
+            path: /health
+          failureThreshold: 2
+          periodSeconds: 1
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"
@@ -69,13 +83,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-iris-proxy
+  name: api-image-proxy
   labels:
-    app: api-iris-proxy
+    app: api-image-proxy
   namespace: serving-pattern
 spec:
   ports:
   - port: 8000
     protocol: TCP
   selector:
-    app: api-iris-proxy
+    app: api-image-proxy

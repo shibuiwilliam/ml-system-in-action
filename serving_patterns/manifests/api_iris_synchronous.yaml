@@ -47,6 +47,18 @@ spec:
           value: tree_api_queue
         ports:
         - containerPort: 8889
+        livenessProbe:
+          httpGet:
+            port: 8889
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8889
+            path: /health
+          failureThreshold: 2
+          periodSeconds: 1
         resources:
           limits:
             cpu: "2"

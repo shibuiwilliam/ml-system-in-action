@@ -49,6 +49,18 @@ spec:
           value: resnet50_api_queue
         ports:
         - containerPort: 8894
+        livenessProbe:
+          httpGet:
+            port: 8894
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8894
+            path: /health
+          failureThreshold: 2
+          periodSeconds: 1
         resources:
           limits:
             cpu: "2"

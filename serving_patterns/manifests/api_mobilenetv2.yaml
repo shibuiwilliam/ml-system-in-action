@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-mobilenetv2
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -32,11 +32,11 @@ spec:
         - name: WORKERS
           value: "4"
         - name: BACKLOG
-          value: "64"
+          value: "32"
         - name: LIMIT_MAX_REQUESTS
-          value: "1024"
+          value: "256"
         - name: MAX_REQUESTS_JITTER
-          value: "128"
+          value: "64"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: PORT
@@ -49,13 +49,25 @@ spec:
           value: mobilenetv2_api_queue
         ports:
         - containerPort: 8893
+        livenessProbe:
+          httpGet:
+            port: 8893
+            path: /health
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8893
+            path: /health
+          failureThreshold: 2
+          periodSeconds: 1
         resources:
           limits:
-            cpu: "2"
-            memory: "8000Mi"
+            cpu: "4"
+            memory: "4000Mi"
           requests:
-            cpu: "2"
-            memory: "8000Mi"
+            cpu: "4"
+            memory: "4000Mi"
         volumeMounts:
           - name: pvc-nfs
             mountPath: "/mnt"
