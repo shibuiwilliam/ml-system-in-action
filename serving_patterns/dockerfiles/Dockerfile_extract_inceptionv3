@@ -2,12 +2,12 @@ FROM tensorflow/tensorflow:latest
 
 ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
-ADD requirements/requirements_test.txt /${PROJECT_DIR}/
+ADD requirements/requirements_api_tf2.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install gcc curl libev-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    pip install -r requirements_test.txt
+    pip install -r requirements_api_tf2.txt
 
 COPY ./src/ /${PROJECT_DIR}/src/
 COPY ./scripts/run_extract_inceptionv3.sh /${PROJECT_DIR}/run_extract_inceptionv3.sh
