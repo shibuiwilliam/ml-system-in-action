@@ -4,9 +4,7 @@ ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_api_tf2.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
-    apt-get -y install gcc curl libev-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
+    apt-get -y install gcc curl && \
     pip install -r requirements_api_tf2.txt
 
 COPY ./src/ /${PROJECT_DIR}/src/

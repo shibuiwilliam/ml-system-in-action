@@ -4,9 +4,7 @@ ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_proxy.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
-    apt-get -y install gcc libev-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
+    apt-get -y install gcc curl && \
     pip install -r requirements_proxy.txt
 
 COPY ./src/api_composition_proxy/ /${PROJECT_DIR}/src/api_composition_proxy/
