@@ -94,7 +94,12 @@ _requirements_test := requirements_test.txt
 _pip_freeze_test := pip freeze > requirements/$(_requirements_test)
 _pip_install_test := pip install -r requirements/$(_requirements_test)
 
-_pytest := pytest -v -s ./tests/
+_test_request_api := ./scripts/test_request_api.sh
+_test_request_resnet50_onnx := ./scripts/test_request_resnet50_onnx.sh
+_test_request_inceptionv3 := ./scripts/test_request_inceptionv3.sh
+_test_request_mobilenetv2 := ./scripts/test_request_mobilenetv2.sh
+_test_request_image_ms_horizontal := ./scripts/test_request_image_ms_horizontal.sh
+
 _pytest_d := docker build \
 				-t $(_image_name):$(_test_image_version) \
 				-f $(_dockerfile_dir)/$(_test_container_file) . && \
@@ -103,13 +108,7 @@ _pytest_d := docker build \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				-e PROFILE=0 \
 				-e PLATFORM=test \
-				$(_image_name):$(_test_image_version) $(_pytest)
-
-_test_request_api := ./scripts/test_request_api.sh
-_test_request_resnet50_onnx := ./scripts/test_request_resnet50_onnx.sh
-_test_request_inceptionv3 := ./scripts/test_request_inceptionv3.sh
-_test_request_mobilenetv2 := ./scripts/test_request_mobilenetv2.sh
-_test_request_image_ms_horizontal := ./scripts/test_request_image_ms_horizontal.sh
+				$(_image_name):$(_test_image_version) pytest -v -s ./tests/
 
 _train_iris := docker build \
 				-t $(_train_iris_image_name):$(_train_iris_image_version) \

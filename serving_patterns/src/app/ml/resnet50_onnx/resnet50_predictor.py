@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 LABELS = load_labels(_ModelConfigurations().options['label_filepath'])
 
 
-
 class _Data(BaseData):
     image_data: Any = None
     test_data: str = os.path.join('./src/app/ml/data', 'good_cat.jpg')
@@ -40,7 +39,7 @@ class _Classifier(BasePredictor):
         self.model_runners = model_runners
         self.classifiers = OrderedDict()
         self.input_name = None
-        self.label_name = None
+        self.output_name = None
         self.load_model()
 
     def load_model(self):
@@ -59,7 +58,7 @@ class _Classifier(BasePredictor):
                         'predictor': rt.InferenceSession(k)
                     }
                     self.input_name = self.classifiers[k]['predictor'].get_inputs()[0].name
-                    self.label_name = self.classifiers[k]['predictor'].get_outputs()[0].name
+                    self.output_name = self.classifiers[k]['predictor'].get_outputs()[0].name
                 else:
                     pass
         logger.info(f'initialized {self.__class__.__name__}')
@@ -72,7 +71,7 @@ class _Classifier(BasePredictor):
                 _prediction = np.array(v['predictor'].transform(_prediction))
             elif v['runner'] == MODEL_RUNTIME.ONNX_RUNTIME.value:
                 _prediction = np.array(v['predictor'].run(
-                    [self.label_name],
+                    [self.output_name],
                     {self.input_name: _prediction.astype(np.float32)}
                 ))
         output = _prediction

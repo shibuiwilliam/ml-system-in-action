@@ -1,8 +1,10 @@
 import onnxruntime as rt
 import os
-import joblib
 from PIL import Image
 import numpy as np
+import torch
+import torch.nn as nn
+from torchvision.models.resnet import resnet50
 
 from src.app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 from src.app.ml.save_helper import save_interface, load_labels, dump_sklearn
@@ -19,6 +21,20 @@ LABEL_FILEPATH = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
 def main():
     modelname = 'resnet50_onnx'
     interface_filename = f'{modelname}.yaml'
+
+    model = resnet50(pretrained=True)
+    x_dummy = torch.rand((1, 3, 224, 224))
+    model.eval()
+    torch.onnx.export(
+        model,
+        x_dummy,
+        RESNET50_MODEL,
+        export_params=True,
+        opset_version=10,
+        do_constant_folding=True,
+        input_names=['input'],
+        output_names=['output'],
+    )
 
     labels = load_labels(LABEL_FILEPATH)
 
