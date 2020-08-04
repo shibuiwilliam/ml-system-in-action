@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest as builder
+FROM tensorflow/tensorflow:2.2.0 as builder
 
 ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
@@ -16,7 +16,7 @@ RUN chmod +x run_extract_resnet50_tfs.sh && \
     ./run_extract_resnet50_tfs.sh
 
 
-FROM tensorflow/serving:latest
+FROM tensorflow/serving:2.2.0
 
 ENV MODEL_BASE_PATH=/models/resnet_v2_50
 ENV MODEL_NAME=resnet_v2_50

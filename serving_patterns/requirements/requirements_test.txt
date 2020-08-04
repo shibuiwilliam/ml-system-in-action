@@ -27,7 +27,7 @@ more-itertools==8.4.0
 numpy>=1.18.5
 oauthlib==3.1.0
 onnx>=1.7.0
-onnxconverter-common==1.7.0
+onnxconverter-common>=1.7.0
 onnxruntime>=1.4.0
 opt-einsum==3.2.1
 packaging==20.4
@@ -57,8 +57,8 @@ scipy==1.4.1
 six==1.15.0
 skl2onnx==1.7.0
 starlette>=0.13.4
-tensorflow-hub>=0.8.0
-tensorflow-serving-api>=2.2.0
+tensorflow-hub==0.8.0
+tensorflow-serving-api==2.2.0
 termcolor==1.1.0
 threadpoolctl==2.1.0
 toml==0.10.1
