@@ -55,40 +55,45 @@ _mobilenetv2_api_image_name := serving_patterns_mobilenetv2_api
 _mobilenetv2_api_image_version := latest
 _mobilenetv2_api_container_name := serving_patterns_mobilenetv2_api
 
-_compose_api := $(_dockercompose_dir)/docker-compose_api.yml
-_compose_build_api := docker-compose -f $(_compose_api) build
-_compose_up_api := docker-compose -f $(_compose_api) up -d
-_compose_down_api := docker-compose -f $(_compose_api) down
+_c_api := $(_dockercompose_dir)/docker-compose_api.yml
+_c_build_api := docker-compose -f $(_c_api) build
+_c_up_api := docker-compose -f $(_c_api) up -d
+_c_down_api := docker-compose -f $(_c_api) down
 
-_compose_resnet50_onnx := $(_dockercompose_dir)/docker-compose_resnet50_onnx.yml
-_compose_build_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) build
-_compose_up_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) up -d
-_compose_down_resnet50_onnx := docker-compose -f $(_compose_resnet50_onnx) down
+_c_resnet50_onnx := $(_dockercompose_dir)/docker-compose_resnet50_onnx.yml
+_c_build_resnet50_onnx := docker-compose -f $(_c_resnet50_onnx) build
+_c_up_resnet50_onnx := docker-compose -f $(_c_resnet50_onnx) up -d
+_c_down_resnet50_onnx := docker-compose -f $(_c_resnet50_onnx) down
 
-_compose_resnet50_tfs := $(_dockercompose_dir)/docker-compose_resnet50_tfs.yml
-_compose_build_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) build
-_compose_up_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) up -d
-_compose_down_resnet50_tfs := docker-compose -f $(_compose_resnet50_tfs) down
+_c_resnet50_tfs := $(_dockercompose_dir)/docker-compose_resnet50_tfs.yml
+_c_build_resnet50_tfs := docker-compose -f $(_c_resnet50_tfs) build
+_c_up_resnet50_tfs := docker-compose -f $(_c_resnet50_tfs) up -d
+_c_down_resnet50_tfs := docker-compose -f $(_c_resnet50_tfs) down
 
-_compose_inceptionv3 := $(_dockercompose_dir)/docker-compose_inceptionv3.yml
-_compose_build_inceptionv3 := docker-compose -f $(_compose_inceptionv3) build
-_compose_up_inceptionv3 := docker-compose -f $(_compose_inceptionv3) up -d
-_compose_down_inceptionv3 := docker-compose -f $(_compose_inceptionv3) down
+_c_inceptionv3 := $(_dockercompose_dir)/docker-compose_inceptionv3.yml
+_c_build_inceptionv3 := docker-compose -f $(_c_inceptionv3) build
+_c_up_inceptionv3 := docker-compose -f $(_c_inceptionv3) up -d
+_c_down_inceptionv3 := docker-compose -f $(_c_inceptionv3) down
 
-_compose_mobilenetv2 := $(_dockercompose_dir)/docker-compose_mobilenetv2.yml
-_compose_build_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) build
-_compose_up_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) up -d
-_compose_down_mobilenetv2 := docker-compose -f $(_compose_mobilenetv2) down
+_c_mobilenetv2 := $(_dockercompose_dir)/docker-compose_mobilenetv2.yml
+_c_build_mobilenetv2 := docker-compose -f $(_c_mobilenetv2) build
+_c_up_mobilenetv2 := docker-compose -f $(_c_mobilenetv2) up -d
+_c_down_mobilenetv2 := docker-compose -f $(_c_mobilenetv2) down
 
-_compose_api_ms_horizontal := $(_dockercompose_dir)/docker-compose_api_ms_horizontal.yml
-_compose_build_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) build
-_compose_up_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) up -d
-_compose_down_api_ms_horizontal := docker-compose -f $(_compose_api_ms_horizontal) down
+_c_api_ms_horizontal := $(_dockercompose_dir)/docker-compose_api_ms_horizontal.yml
+_c_build_api_ms_horizontal := docker-compose -f $(_c_api_ms_horizontal) build
+_c_up_api_ms_horizontal := docker-compose -f $(_c_api_ms_horizontal) up -d
+_c_down_api_ms_horizontal := docker-compose -f $(_c_api_ms_horizontal) down
 
-_compose_image_ms_horizontal := $(_dockercompose_dir)/docker-compose_image_ms_horizontal.yml
-_compose_build_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) build
-_compose_up_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) up -d
-_compose_down_image_ms_horizontal := docker-compose -f $(_compose_image_ms_horizontal) down
+_c_image_ms_horizontal := $(_dockercompose_dir)/docker-compose_image_ms_horizontal.yml
+_c_build_image_ms_horizontal := docker-compose -f $(_c_image_ms_horizontal) build
+_c_up_image_ms_horizontal := docker-compose -f $(_c_image_ms_horizontal) up -d
+_c_down_image_ms_horizontal := docker-compose -f $(_c_image_ms_horizontal) down
+
+_c_resnet50_load_test := $(_dockercompose_dir)/docker-compose_resnet50_load_test.yml
+_c_build_resnet50_load_test := docker-compose -f $(_c_resnet50_load_test) build
+_c_up_resnet50_load_test := docker-compose -f $(_c_resnet50_load_test) up -d
+_c_down_resnet50_load_test := docker-compose -f $(_c_resnet50_load_test) down
 
 _requirements_test := requirements_test.txt
 _pip_freeze_test := pip freeze > requirements/$(_requirements_test)
@@ -158,91 +163,103 @@ pip_freeze:
 
 .PHONY: clean
 clean:
-	$(_compose_down)
+	$(_c_down)
 
 .PHONY: c_build_api
 c_build_api:
-	$(_compose_build_api)
+	$(_c_build_api)
 
 .PHONY: c_up_api
 c_up_api:
-	$(_compose_up_api)
+	$(_c_up_api)
 
 .PHONY: c_down_api
 c_down_api:
-	$(_compose_down_api)
+	$(_c_down_api)
 
 .PHONY: c_build_resnet50_onnx
 c_build_resnet50_onnx:
-	$(_compose_build_resnet50_onnx)
+	$(_c_build_resnet50_onnx)
 
 .PHONY: c_up_resnet50_onnx
 c_up_resnet50_onnx:
-	$(_compose_up_resnet50_onnx)
+	$(_c_up_resnet50_onnx)
 
 .PHONY: c_down_resnet50_onnx
 c_down_resnet50_onnx:
-	$(_compose_down_resnet50_onnx)
+	$(_c_down_resnet50_onnx)
 
 .PHONY: c_build_resnet50_tfs
 c_build_resnet50_tfs:
-	$(_compose_build_resnet50_tfs)
+	$(_c_build_resnet50_tfs)
 
 .PHONY: c_up_resnet50_tfs
 c_up_resnet50_tfs:
-	$(_compose_up_resnet50_tfs)
+	$(_c_up_resnet50_tfs)
 
 .PHONY: c_down_resnet50_tfs
 c_down_resnet50_tfs:
-	$(_compose_down_resnet50_tfs)
+	$(_c_down_resnet50_tfs)
 
 .PHONY: c_build_inceptionv3
 c_build_inceptionv3:
-	$(_compose_build_inceptionv3)
+	$(_c_build_inceptionv3)
 
 .PHONY: c_up_inceptionv3
 c_up_inceptionv3:
-	$(_compose_up_inceptionv3)
+	$(_c_up_inceptionv3)
 
 .PHONY: c_down_inceptionv3
 c_down_inceptionv3:
-	$(_compose_down_inceptionv3)
+	$(_c_down_inceptionv3)
 
 .PHONY: c_build_mobilenetv2
 c_build_mobilenetv2:
-	$(_compose_build_mobilenetv2)
+	$(_c_build_mobilenetv2)
 
 .PHONY: c_up_mobilenetv2
 c_up_mobilenetv2:
-	$(_compose_up_mobilenetv2)
+	$(_c_up_mobilenetv2)
 
 .PHONY: c_down_mobilenetv2
 c_down_mobilenetv2:
-	$(_compose_down_mobilenetv2)
+	$(_c_down_mobilenetv2)
 
 .PHONY: c_build_api_ms_h
 c_build_api_ms_h:
-	$(_compose_build_api_ms_horizontal)
+	$(_c_build_api_ms_horizontal)
 
 .PHONY: c_up_api_ms_h
 c_up_api_ms_h:
-	$(_compose_up_api_ms_horizontal)
+	$(_c_up_api_ms_horizontal)
 
 .PHONY: c_down_api_ms_h
 c_down_api_ms_h:
-	$(_compose_down_api_ms_horizontal)
+	$(_c_down_api_ms_horizontal)
 
 .PHONY: c_build_image_ms_h
 c_build_image_ms_h:
-	$(_compose_build_image_ms_horizontal)
+	$(_c_build_image_ms_horizontal)
 
 .PHONY: c_up_image_ms_h
 c_up_image_ms_h:
-	$(_compose_up_image_ms_horizontal)
+	$(_c_up_image_ms_horizontal)
 
 .PHONY: c_down_image_ms_h
 c_down_image_ms_h:
-	$(_compose_down_image_ms_horizontal)
+	$(_c_down_image_ms_horizontal)
+
+.PHONY: c_build_resnet50_load_test
+c_build_resnet50_load_test:
+	$(_c_build_resnet50_load_test)
+
+.PHONY: c_up_resnet50_load_test
+c_up_resnet50_load_test:
+	$(_c_up_resnet50_load_test)
+
+.PHONY: c_down_resnet50_load_test
+c_down_resnet50_load_test:
+	$(_c_down_resnet50_load_test)
 
 .PHONY: test_d
 test_d:

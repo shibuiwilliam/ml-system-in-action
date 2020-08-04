@@ -14,7 +14,7 @@ mock_image = Image.new('RGB', size=(300, 300), color=(10, 10, 10))
      (mock_image, (124, 124), (1, 3, 124, 124))]
 )
 def test_onnx_image_preprocess_transformer(mocker, image, image_size, prediction_shape):
-    onnx_image_preprocess_transformer = transformers.ONNXImagePreprocessTransformer(image_size, prediction_shape)
+    onnx_image_preprocess_transformer = transformers.PytorchImagePreprocessTransformer(image_size, prediction_shape)
     result = onnx_image_preprocess_transformer.transform(image)
     assert result.shape == prediction_shape
 
@@ -25,7 +25,7 @@ def test_onnx_image_preprocess_transformer(mocker, image, image_size, prediction
      (np.array(mock_image.resize((224, 224))), (224, 224), (1, 3, 224, 224))]
 )
 def test_onnx_image_preprocess_transformer_np(mocker, np_image, image_size, prediction_shape):
-    onnx_image_preprocess_transformer = transformers.ONNXImagePreprocessTransformer(image_size, prediction_shape)
+    onnx_image_preprocess_transformer = transformers.PytorchImagePreprocessTransformer(image_size, prediction_shape)
     result = onnx_image_preprocess_transformer.transform(np_image)
     assert result.shape == prediction_shape
 

@@ -11,6 +11,9 @@ services:
       - MODEL_INTERFACE=inceptionv3.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
+      - BACKLOG=64
+      - LIMIT_MAX_REQUESTS=1024
+      - MAX_REQUESTS_JITTER=128
       - APP_NAME=src.app.apps.app_image:app
       - PORT=8892
       - TFS_GRPC=prep_pred_tfs:8500

@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
-class ONNXImagePreprocessTransformer(BaseEstimator, TransformerMixin):
+class PytorchImagePreprocessTransformer(BaseEstimator, TransformerMixin):
     def __init__(
             self,
             image_size: Tuple[int] = (224, 224),

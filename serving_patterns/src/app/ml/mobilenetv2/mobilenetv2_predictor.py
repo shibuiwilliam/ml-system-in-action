@@ -14,7 +14,7 @@ from tensorflow_serving.apis import prediction_service_pb2_grpc
 from src.app.configurations import _ModelConfigurations
 from src.app.constants import MODEL_RUNTIME
 from src.app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
-from src.app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransformer
+from src.app.ml.transformers import PytorchImagePreprocessTransformer, SoftmaxTransformer
 from src.app.ml.save_helper import load_labels
 
 import logging

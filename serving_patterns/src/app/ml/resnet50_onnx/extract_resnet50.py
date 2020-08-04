@@ -8,7 +8,7 @@ from torchvision.models.resnet import resnet50
 
 from src.app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 from src.app.ml.save_helper import save_interface, load_labels, dump_sklearn
-from src.app.ml.transformers import ONNXImagePreprocessTransformer, SoftmaxTransformer
+from src.app.ml.transformers import PytorchImagePreprocessTransformer, SoftmaxTransformer
 
 
 MODEL_DIR = './models/'
@@ -38,7 +38,7 @@ def main():
 
     labels = load_labels(LABEL_FILEPATH)
 
-    preprocess = ONNXImagePreprocessTransformer()
+    preprocess = PytorchImagePreprocessTransformer()
 
     image = Image.open(SAMPLE_IMAGE)
     np_image = preprocess.transform(image)

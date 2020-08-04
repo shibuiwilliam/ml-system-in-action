@@ -11,6 +11,9 @@ services:
       - MODEL_INTERFACE=resnet50_onnx.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
+      - BACKLOG=64
+      - LIMIT_MAX_REQUESTS=1024
+      - MAX_REQUESTS_JITTER=128
       - APP_NAME=src.app.apps.app_image:app
       - PORT=8891
       - PROFILE=0
