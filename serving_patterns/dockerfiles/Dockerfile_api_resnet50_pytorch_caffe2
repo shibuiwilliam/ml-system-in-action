@@ -9,31 +9,33 @@ RUN apt-get -y update && \
     conda update -n base -c defaults conda && \
     conda env update -f conda_pytorch.yaml && \
     conda install pytorch torchvision cpuonly -c pytorch && \
+    conda install -c conda-forge onnx && \
     conda clean -y --all && \
     pip install  --no-cache-dir -r requirements_pytorch.txt
 
 COPY ./src/app/ml/ /${PROJECT_DIR}/src/app/ml/
 COPY ./src/app/constants.py /${PROJECT_DIR}/src/app/constants.py
 COPY ./src/configurations/ /${PROJECT_DIR}/src/configurations/
-COPY ./scripts/run_extract_resnet50_onnx.sh /${PROJECT_DIR}/run_extract_resnet50_onnx.sh
+COPY ./scripts/run_extract_resnet50_pytorch_caffe2.sh /${PROJECT_DIR}/run_extract_resnet50_pytorch_caffe2.sh
 
-RUN chmod +x run_extract_resnet50_onnx.sh && \
-    ./run_extract_resnet50_onnx.sh
+RUN chmod +x run_extract_resnet50_pytorch_caffe2.sh && \
+    ./run_extract_resnet50_pytorch_caffe2.sh
 
 
 FROM continuumio/miniconda:latest
 
 ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
-ADD requirements/requirements_api.txt /${PROJECT_DIR}/
+ADD requirements/requirements_pytorch.txt /${PROJECT_DIR}/
 ADD requirements/conda_pytorch.yaml /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc curl && \
     conda update -n base -c defaults conda && \
     conda env update -f conda_pytorch.yaml && \
     conda install pytorch torchvision cpuonly -c pytorch && \
+    conda install -c conda-forge onnx && \
     conda clean -y --all && \
-    pip install  --no-cache-dir -r requirements_api.txt
+    pip install  --no-cache-dir -r requirements_pytorch.txt
 
 COPY ./src/ /${PROJECT_DIR}/src/
 COPY ./logging/ /${PROJECT_DIR}/logging/

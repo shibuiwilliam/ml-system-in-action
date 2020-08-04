@@ -5,7 +5,7 @@ WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_api.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc curl && \
-    pip install -r requirements_api.txt
+    pip install  --no-cache-dir -r requirements_api.txt
 
 COPY ./src/ /${PROJECT_DIR}/src/
 

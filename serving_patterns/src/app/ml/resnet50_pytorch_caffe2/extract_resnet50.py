@@ -19,7 +19,7 @@ LABEL_FILEPATH = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
 
 
 def main():
-    modelname = 'resnet50_onnx'
+    modelname = 'resnet50_pytorch_caffe2'
     interface_filename = f'{modelname}.yaml'
 
     model = resnet50(pretrained=True)
@@ -73,10 +73,10 @@ def main():
                    'float32',
                    DATA_TYPE.IMAGE,
                    [{preprocess_filename: MODEL_RUNTIME.SKLEARN},
-                    {MODEL_FILENAME: MODEL_RUNTIME.ONNX_RUNTIME},
+                    {MODEL_FILENAME: MODEL_RUNTIME.PYTORCH_CAFFE2},
                     {postprocess_filename: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
-                   'src.app.ml.resnet50_onnx.resnet50_predictor',
+                   'src.app.ml.resnet50_pytorch_caffe2.resnet50_predictor',
                    label_filepath=LABEL_FILEPATH)
 
 

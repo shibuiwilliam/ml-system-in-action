@@ -5,7 +5,7 @@ WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_proxy.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc curl && \
-    pip install -r requirements_proxy.txt
+    pip install  --no-cache-dir -r requirements_proxy.txt
 
 COPY ./src/api_composition_proxy/ /${PROJECT_DIR}/src/api_composition_proxy/
 COPY ./src/jobs/ /${PROJECT_DIR}/src/jobs/

@@ -5,7 +5,7 @@ WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_api_tf2.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc curl && \
-    pip install -r requirements_api_tf2.txt
+    pip install  --no-cache-dir -r requirements_api_tf2.txt
 
 COPY ./src/app/ml/ /${PROJECT_DIR}/src/app/ml/
 COPY ./src/app/constants.py /${PROJECT_DIR}/src/app/constants.py
@@ -23,7 +23,7 @@ WORKDIR /${PROJECT_DIR}
 ADD requirements/requirements_api_tf2_serving.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install apt-utils gcc && \
-    pip install -r requirements_api_tf2_serving.txt
+    pip install  --no-cache-dir -r requirements_api_tf2_serving.txt
 
 COPY ./src/ /${PROJECT_DIR}/src/
 COPY ./logging/ /${PROJECT_DIR}/logging/

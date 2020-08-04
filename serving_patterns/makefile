@@ -97,7 +97,7 @@ _c_down_resnet50_load_test := docker-compose -f $(_c_resnet50_load_test) down
 
 _requirements_test := requirements_test.txt
 _pip_freeze_test := pip freeze > requirements/$(_requirements_test)
-_pip_install_test := pip install -r requirements/$(_requirements_test)
+_pip_install_test := pip install  --no-cache-dir -r requirements/$(_requirements_test)
 
 _test_request_api := ./scripts/test_request_api.sh
 _test_request_resnet50_onnx := ./scripts/test_request_resnet50_onnx.sh

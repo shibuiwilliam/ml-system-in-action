@@ -15,10 +15,10 @@ RUN apt-get -y update && \
 COPY ./src/app/ml/ /${PROJECT_DIR}/src/app/ml/
 COPY ./src/app/constants.py /${PROJECT_DIR}/src/app/constants.py
 COPY ./src/configurations/ /${PROJECT_DIR}/src/configurations/
-COPY ./scripts/run_extract_resnet50_onnx.sh /${PROJECT_DIR}/run_extract_resnet50_onnx.sh
+COPY ./scripts/run_extract_resnet50_pytorch_caffe2.sh /${PROJECT_DIR}/run_extract_resnet50_pytorch_caffe2.sh
 
-RUN chmod +x run_extract_resnet50_onnx.sh && \
-    ./run_extract_resnet50_onnx.sh
+RUN chmod +x run_extract_resnet50_pytorch_caffe2.sh && \
+    ./run_extract_resnet50_pytorch_caffe2.sh
 
 
 FROM continuumio/miniconda:latest
@@ -39,7 +39,7 @@ COPY ./src/ /${PROJECT_DIR}/src/
 COPY ./logging/ /${PROJECT_DIR}/logging/
 COPY --from=builder /${PROJECT_DIR}/models/* ./models/
 
-ENV RUN_FILE run_api.sh
+ENV RUN_FILE run_backend.sh
 COPY ./scripts/${RUN_FILE} /${PROJECT_DIR}/${RUN_FILE}
 RUN chmod +x ${RUN_FILE}
-CMD ./run_api.sh
+CMD ./run_backend.sh

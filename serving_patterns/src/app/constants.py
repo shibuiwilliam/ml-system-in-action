@@ -14,7 +14,7 @@ class PREDICTION_TYPE(enum.Enum):
 class MODEL_RUNTIME(enum.Enum):
     SKLEARN = 'sklearn'
     ONNX_RUNTIME = 'onnx_runtime'
-    PYTORCH = 'pytorch'
+    PYTORCH_CAFFE2 = 'pytorch_caffe2'
     TF_SERVING = 'tf_serving'
 
 
