@@ -30,7 +30,7 @@ TIMEOUT_SECOND = int(os.getenv('TIMEOUT_SECOND', 5.0))
 
 class _Data(BaseData):
     image_data: Any = None
-    test_data: str = os.path.join('./src/app/ml/data', 'good_cat.jpg')
+    test_data: str = os.path.join('./src/app/ml/data', 'iris.jpg')
     labels: List[str] = LABELS
 
 

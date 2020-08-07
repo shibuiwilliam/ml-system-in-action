@@ -16,7 +16,7 @@ services:
       - MAX_REQUESTS_JITTER=128
       - APP_NAME=src.app.apps.app_image:app
       - PORT=8893
-      - TFS_GRPC=prep_pred_tfs:8512
+      - TFS_GRPC=prep_pred_tfs_mobilenetv2:8512
       - PROFILE=0
       - QUEUE_NAME=tfs_queue
     ports:

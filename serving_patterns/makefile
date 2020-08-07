@@ -35,6 +35,11 @@ _extract_mobilenetv2_image_name := serving_patterns_extract_mobilenetv2
 _extract_mobilenetv2_image_version := latest
 _extract_mobilenetv2_container_name := serving_patterns_extract_mobilenetv2
 
+_extract_mobilenetv2_plant_container_file := Dockerfile_extract_mobilenetv2_plant
+_extract_mobilenetv2_plant_image_name := serving_patterns_extract_mobilenetv2_plant
+_extract_mobilenetv2_plant_image_version := latest
+_extract_mobilenetv2_plant_container_name := serving_patterns_extract_mobilenetv2_plant
+
 _inceptionv3_tfs_container_file := Dockerfile_tfserving_inceptionv3
 _inceptionv3_tfs_image_name := serving_patterns_inceptionv3_tfs
 _inceptionv3_tfs_image_version := latest
@@ -154,6 +159,14 @@ _extract_mobilenetv2 := docker build \
 				--name $(_extract_mobilenetv2_container_name) \
 				-v $(_absolute_path)/models/:/serving_patterns/models/ \
 				$(_extract_mobilenetv2_image_name):$(_extract_mobilenetv2_image_version)
+
+_extract_mobilenetv2_plant := docker build \
+				-t $(_extract_mobilenetv2_plant_image_name):$(_extract_mobilenetv2_plant_image_version) \
+				-f $(_dockerfile_dir)/$(_extract_mobilenetv2_plant_container_file) . && \
+ 			docker run --rm \
+				--name $(_extract_mobilenetv2_plant_container_name) \
+				-v $(_absolute_path)/models/:/serving_patterns/models/ \
+				$(_extract_mobilenetv2_plant_image_name):$(_extract_mobilenetv2_plant_image_version)
 
 _build_locust := docker build -t locust:latest -f dockerfiles/Dockerfile_locust .
 
@@ -312,6 +325,10 @@ extract_inceptionv3:
 .PHONY: extract_mobilenetv2
 extract_mobilenetv2:
 	$(_extract_mobilenetv2)
+
+.PHONY: extract_mobilenetv2_plant
+extract_mobilenetv2_plant:
+	$(_extract_mobilenetv2_plant)
 
 .PHONY: extract_all
 extract_all: train_iris extract_resnet50_onnx extract_resnet50_tfs extract_inceptionv3 extract_mobilenetv2 test_d

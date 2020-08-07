@@ -1,15 +1,34 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Any
 import yaml
 import json
+import csv
 import joblib
 
 from src.app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 
 
-def load_labels(label_filepath: str):
+def load_labels(label_filepath: str) -> Dict[Any, Any]:
+    if label_filepath.endswith('.json'):
+        return _load_labels_json(label_filepath)
+    elif label_filepath.endswith('.csv'):
+        return _load_labels_csv(label_filepath)
+
+
+def _load_labels_json(label_filepath: str) -> Dict[Any, Any]:
     with open(label_filepath, 'r') as f:
         return json.load(f)
+
+
+def _load_labels_csv(label_filepath: str) -> Dict[Any, Any]:
+    labels = {}
+    with open(label_filepath, 'r') as f:
+        r = list(csv.reader(f))
+        for i in range(len(r)):
+            if i==0:
+                continue
+            labels[int(r[i][0])] = r[i][1]
+    return labels
 
 
 def dump_sklearn(model, name: str):

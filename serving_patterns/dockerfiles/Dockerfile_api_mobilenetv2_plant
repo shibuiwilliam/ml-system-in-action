@@ -1,0 +1,34 @@
+FROM tensorflow/tensorflow:2.2.0 as builder
+
+ENV PROJECT_DIR serving_patterns
+WORKDIR /${PROJECT_DIR}
+ADD requirements/requirements_api_tf2.txt /${PROJECT_DIR}/
+RUN apt-get -y update && \
+    apt-get -y install apt-utils gcc curl && \
+    pip install  --no-cache-dir -r requirements_api_tf2.txt
+
+COPY ./src/app/ml/ /${PROJECT_DIR}/src/app/ml/
+COPY ./src/app/constants.py /${PROJECT_DIR}/src/app/constants.py
+COPY ./src/*.py /${PROJECT_DIR}/src/
+COPY ./scripts/run_extract_mobilenetv2_plant.sh /${PROJECT_DIR}/run_extract_mobilenetv2_plant.sh
+RUN chmod +x run_extract_mobilenetv2_plant.sh && \
+    ./run_extract_mobilenetv2_plant.sh
+
+
+FROM tensorflow/tensorflow:2.2.0
+
+ENV PROJECT_DIR serving_patterns
+WORKDIR /${PROJECT_DIR}
+ADD requirements/requirements_api_tf2_serving.txt /${PROJECT_DIR}/
+RUN apt-get -y update && \
+    apt-get -y install apt-utils gcc && \
+    pip install  --no-cache-dir -r requirements_api_tf2_serving.txt
+
+COPY ./src/ /${PROJECT_DIR}/src/
+COPY ./logging/ /${PROJECT_DIR}/logging/
+COPY --from=builder /${PROJECT_DIR}/models/* ./models/
+
+ENV RUN_FILE run_api.sh
+COPY ./scripts/${RUN_FILE} /${PROJECT_DIR}/${RUN_FILE}
+RUN chmod +x ${RUN_FILE}
+CMD ./run_api.sh
