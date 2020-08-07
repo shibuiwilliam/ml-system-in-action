@@ -7,10 +7,10 @@ import logging
 from src.middleware.profiler import do_cprofile
 from src.middleware.redis_client import redis_client
 from src.jobs import store_data_job
-from src.configurations.constants import PLATFORM_ENUM
-from src.configurations.configurations import _PlatformConfigurations
+from src.constants import PLATFORM_ENUM
+from src.configurations import _PlatformConfigurations
 from src.app.ml.active_predictor import Data, DataInterface, DataConverter, active_predictor
-from src.configurations.configurations import _CacheConfigurations
+from src.configurations import _CacheConfigurations
 
 
 logger = logging.getLogger(__name__)
@@ -62,25 +62,29 @@ def _test_label(
     return {'prediction': label_proba}
 
 
-def _predict(data: Data,
-             background_tasks: BackgroundTasks) -> Dict[str, List[float]]:
+def _predict(
+        data: Data,
+        job_id: str,
+        background_tasks: BackgroundTasks) -> Dict[str, List[float]]:
     __predict(data)
-    job_id = store_data_job._save_data_job(data, background_tasks, False)
+    store_data_job._save_data_job(data, job_id, background_tasks, False)
     return {'prediction': data.prediction, 'job_id': job_id}
 
 
 def _predict_label(
         data: Data,
+        job_id: str,
         background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, Dict[str, float]]:
     label_proba = __predict_label(data)
-    job_id = store_data_job._save_data_job(data, background_tasks, False)
+    store_data_job._save_data_job(data, job_id, background_tasks, False)
     return {'prediction': label_proba, 'job_id': job_id}
 
 
 async def _predict_async_post(
         data: Data,
+        job_id: str,
         background_tasks: BackgroundTasks) -> Dict[str, str]:
-    job_id = store_data_job._save_data_job(data, background_tasks, True)
+    store_data_job._save_data_job(data, job_id, background_tasks, True)
     return {'job_id': job_id}
 
 

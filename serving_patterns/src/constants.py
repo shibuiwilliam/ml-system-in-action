@@ -7,6 +7,12 @@ class PLATFORM_ENUM(enum.Enum):
     TEST = 'test'
 
 
+class JOB_ID_ENUM(enum.Enum):
+    UUID = 'uuid'
+    INCREMENTAL = 'incremental'
+    UUID_INCREMENTAL = 'uuid_incremental'
+
+
 def constant(f):
     def fset(self, value):
         raise TypeError

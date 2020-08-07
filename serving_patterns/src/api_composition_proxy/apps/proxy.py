@@ -3,7 +3,7 @@ import logging
 
 from src.api_composition_proxy.routers import proxy, health
 from src.api_composition_proxy.configurations import FastAPIConfigurations
-from src.configurations.configurations import PlatformConfigurations
+from src.configurations import PlatformConfigurations
 
 
 logger = logging.getLogger(__name__)

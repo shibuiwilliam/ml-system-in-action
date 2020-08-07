@@ -10,7 +10,7 @@ RUN apt-get -y update && \
 COPY ./src/api_composition_proxy/ /${PROJECT_DIR}/src/api_composition_proxy/
 COPY ./src/jobs/ /${PROJECT_DIR}/src/jobs/
 COPY ./src/middleware/ /${PROJECT_DIR}/src/middleware/
-COPY ./src/configurations/ /${PROJECT_DIR}/src/configurations/
+COPY ./src/*.py /${PROJECT_DIR}/src/
 COPY ./logging/ /${PROJECT_DIR}/logging/
 
 ENV RUN_FILE run_proxy.sh

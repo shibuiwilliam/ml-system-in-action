@@ -19,6 +19,7 @@ services:
       - SERVICE_SYNCHRONOUS=synchronous_ms_h:8889
       - SERVICE_ASYNCHRONOUS=asynchronous_ms_h:8890
       - QUEUE_NAME=api_queue
+      - ENQUEUE=1
       - CUSTOMIZED_REDIRECT_MAP={"SERVICE_WEB_SINGLE":{"predict":"predict/label"},"SERVICE_SYNCHRONOUS":{"predict":"predict/label"},"SERVICE_ASYNCHRONOUS":{"predict/label":"predict"}}
     ports:
       - "8000:8000"

@@ -9,7 +9,7 @@ RUN apt-get -y update && \
 
 COPY ./src/app/ml/ /${PROJECT_DIR}/src/app/ml/
 COPY ./src/app/constants.py /${PROJECT_DIR}/src/app/constants.py
-COPY ./src/configurations/ /${PROJECT_DIR}/src/configurations/
+COPY ./src/*.py /${PROJECT_DIR}/src/
 COPY ./scripts/run_extract_mobilenetv2.sh /${PROJECT_DIR}/run_extract_mobilenetv2.sh
 
 RUN chmod +x run_extract_mobilenetv2.sh && \

@@ -1,15 +1,15 @@
-from fastapi import APIRouter, Body
-import os
+from fastapi import APIRouter, Body, BackgroundTasks
 import logging
 import aiohttp
 import asyncio
-from PIL import Image
 from typing import Dict, Any
 from pydantic import BaseModel
 import uuid
 
 from src.api_composition_proxy.configurations import ServiceConfigurations
 from src.api_composition_proxy import helpers
+from src.jobs import store_data_job
+from src.helper import get_job_id
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +67,13 @@ async def _post_redirect(session, url: str, data: Dict[Any, Any], alias: str) ->
 
 
 @router.post('/{redirect_path:path}')
-async def post_redirect(redirect_path: str, data: Data = Body(...)) -> Dict[str, Any]:
-    logger.info(f'POST redirect to: /{redirect_path}')
+async def post_redirect(redirect_path: str,
+                        data: Data,
+                        background_tasks: BackgroundTasks) -> Dict[str, Any]:
+    data.data['job_id'] = get_job_id()
+    logger.info(f'POST redirect to: /{redirect_path} as {data.data["job_id"]}')
+    if ServiceConfigurations.enqueue:
+        store_data_job._save_data_job(data.data, data.data['job_id'], background_tasks, True)
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
             asyncio.ensure_future(

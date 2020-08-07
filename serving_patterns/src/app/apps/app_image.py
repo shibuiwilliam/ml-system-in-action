@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 import logging
 
-from src.configurations.configurations import _PlatformConfigurations
+from src.configurations import _PlatformConfigurations
 from src.app.routers import health, predict_image
 from src.app.configurations import _FastAPIConfigurations
 

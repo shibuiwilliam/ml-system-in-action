@@ -1,6 +1,6 @@
 import redis
 
-from src.configurations.configurations import _RedisCacheConfigurations
+from src.configurations import _RedisCacheConfigurations
 
 
 redis_client = redis.Redis(

@@ -3,6 +3,7 @@ import json
 import logging
 
 from src.api_composition_proxy import helpers
+from src.configurations import RedisCacheConfigurations
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +14,7 @@ class _ServiceConfigurations():
     customized_redirect_map = None
     if 'CUSTOMIZED_REDIRECT_MAP' in os.environ.keys():
         customized_redirect_map = json.loads(os.getenv('CUSTOMIZED_REDIRECT_MAP'))
+    enqueue = int(os.getenv('ENQUEUE', 1))
 
 
 class _FastAPIConfigurations():
@@ -31,3 +33,4 @@ FastAPIConfigurations = _FastAPIConfigurations()
 
 logger.info(f'fastapi configurations: {ServiceConfigurations.__dict__}')
 logger.info(f'service configurations: {FastAPIConfigurations.__dict__}')
+logger.info(f'redis cache configurations: {RedisCacheConfigurations.__dict__}')

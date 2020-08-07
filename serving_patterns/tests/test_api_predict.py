@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 
 from tests.utils import floats_almost_equal, nested_floats_almost_equal
-from src.configurations.constants import PLATFORM_ENUM
+from src.constants import PLATFORM_ENUM
 from src.app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
 from src.app.ml.active_predictor import DataConverter
 import src.app
@@ -46,6 +46,7 @@ class MockData(BaseData):
 
 class MockDataInterface(BaseDataInterface):
     pass
+
 
 MockDataInterface.input_shape = (1, 4)
 MockDataInterface.input_type = 'float32'
@@ -166,9 +167,9 @@ def test_predict(mocker, output, expected):
         'src.app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     mocker.patch('src.jobs.store_data_job._save_data_job', return_value=job_id)
-    result = _predict(MockData(), mock_BackgroundTasks)
+    result = _predict(MockData(), test_uuid, mock_BackgroundTasks)
     assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
-    assert 'job_id' in result
+    assert result['job_id'] == test_uuid
 
 
 @pytest.mark.parametrize(
@@ -181,9 +182,9 @@ def test_predict_label(mocker, output, expected):
         'src.app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     mocker.patch('src.jobs.store_data_job._save_data_job', return_value=job_id)
-    result = _predict_label(MockData(), mock_BackgroundTasks)
+    result = _predict_label(MockData(), test_uuid, mock_BackgroundTasks)
     assert result['prediction']['a'] == pytest.approx(expected['prediction']['a'])
-    assert 'job_id' in result
+    assert result['job_id'] == test_uuid
 
 
 @pytest.mark.asyncio
@@ -193,7 +194,7 @@ def test_predict_label(mocker, output, expected):
 )
 async def test_predict_async_post(mocker, job_id):
     mocker.patch('src.jobs.store_data_job._save_data_job', return_value=job_id)
-    result = await _predict_async_post(MockData(), mock_BackgroundTasks)
+    result = await _predict_async_post(MockData(), job_id, mock_BackgroundTasks)
     assert result['job_id'] == job_id
 
 

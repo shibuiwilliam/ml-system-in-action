@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import os
 
-from src.configurations.constants import PLATFORM_ENUM
+from src.constants import PLATFORM_ENUM
 from tests.utils import floats_almost_equal, nested_floats_almost_equal, get_image_data
 from src.app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
 from src.app.ml.active_predictor import DataConverter

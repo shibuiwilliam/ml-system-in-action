@@ -1,5 +1,5 @@
 import os
-from src.configurations.constants import PLATFORM_ENUM
+from src.constants import PLATFORM_ENUM
 from src.app.constants import CONSTANTS, PHYSICAL_SAVE_DATA, DATA_TYPE
 from src.app.ml.extract_interface import extract_interface_yaml
 import logging

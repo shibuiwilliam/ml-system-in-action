@@ -8,11 +8,11 @@ import numpy as np
 import uuid
 from PIL import Image
 
-from src.configurations.constants import PLATFORM_ENUM, CONSTANTS
-from src.configurations.configurations import _PlatformConfigurations
+from src.constants import PLATFORM_ENUM, CONSTANTS
+from src.configurations import _PlatformConfigurations
 from src.middleware.redis_client import redis_client
-from src.configurations.configurations import _FileConfigurations
-from src.configurations.configurations import _CacheConfigurations
+from src.configurations import _FileConfigurations
+from src.configurations import _CacheConfigurations
 
 
 logger = logging.getLogger(__name__)
@@ -60,7 +60,6 @@ def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
             data_dict[k] = filepath
         else:
             data_dict[k] = v
-    redis_client.incr(CONSTANTS.REDIS_INCREMENTS)
     logger.info({job_id: data_dict})
     redis_client.set(job_id, json.dumps(data_dict))
     return True
@@ -95,19 +94,20 @@ class SaveDataRedisJob(SaveDataJob):
         save_data_jobs[self.job_id] = self
         logger.info(
             f'registered job: {self.job_id} in {self.__class__.__name__}')
-        self.is_completed = save_data_redis_job(self.job_id, self.data)
+        if isinstance(self.data, Dict):
+            self.is_completed = save_data_dict_redis_job(self.job_id, self.data)
+        else:
+            self.is_completed = save_data_redis_job(self.job_id, self.data)
         if self.enqueue:
             self.is_completed = left_push_queue(self.queue_name, self.job_id)
         logger.info(f'completed save data: {self.job_id}')
 
 
 def _save_data_job(data: Any,
+                   job_id: str,
                    background_tasks: BackgroundTasks,
                    enqueue: bool = False) -> str:
     if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
-        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
-        num_files = 0 if incr is None else incr
-        job_id = f'{str(uuid.uuid4())}_{num_files}'
         task = SaveDataRedisJob(
             job_id=job_id,
             data=data,
@@ -115,9 +115,6 @@ def _save_data_job(data: Any,
             enqueue=enqueue)
 
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
-        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
-        num_files = 0 if incr is None else incr
-        job_id = f'{str(uuid.uuid4())}_{num_files}'
         task = SaveDataRedisJob(
             job_id=job_id,
             data=data,
@@ -125,9 +122,6 @@ def _save_data_job(data: Any,
             enqueue=enqueue)
 
     elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
-        incr = redis_client.get(CONSTANTS.REDIS_INCREMENTS)
-        num_files = 0 if incr is None else incr
-        job_id = f'{str(uuid.uuid4())}_{num_files}'
         task = SaveDataRedisJob(
             job_id=job_id,
             data=data,

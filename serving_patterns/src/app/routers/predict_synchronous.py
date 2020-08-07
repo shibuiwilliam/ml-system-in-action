@@ -3,6 +3,7 @@ import logging
 
 from src.app.api import _predict
 from src.app.ml.active_predictor import Data
+from src.helper import get_job_id
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -16,7 +17,8 @@ def test():
 @router.post('')
 def predict(data: Data,
             background_tasks: BackgroundTasks):
-    return _predict._predict(data, background_tasks)
+    job_id = data.job_id if data.job_id is not None else get_job_id()
+    return _predict._predict(data, job_id, background_tasks)
 
 
 @router.get('/labels')
@@ -32,4 +34,5 @@ def test_label():
 @router.post('/label')
 def predict_label(data: Data,
                   background_tasks: BackgroundTasks = BackgroundTasks()):
-    return _predict._predict_label(data, background_tasks)
+    job_id = data.job_id if data.job_id is not None else get_job_id()
+    return _predict._predict_label(data, job_id, background_tasks)

@@ -5,7 +5,7 @@ import importlib
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-from src.configurations.configurations import _CacheConfigurations
+from src.configurations import _CacheConfigurations
 from src.jobs import store_data_job
 from src.middleware.profiler import do_cprofile
 

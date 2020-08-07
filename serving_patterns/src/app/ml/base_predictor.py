@@ -7,6 +7,7 @@ import numpy as np
 class BaseData(BaseModel):
     input_data: Union[List[float], List[List[float]]] = None
     prediction: Union[List[float], List[List[float]], float] = None
+    job_id: str = None
 
 
 class BaseDataInterface(BaseModel):
