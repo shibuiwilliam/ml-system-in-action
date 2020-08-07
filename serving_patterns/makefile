@@ -317,4 +317,4 @@ extract_mobilenetv2:
 extract_all: train_iris extract_resnet50_onnx extract_resnet50_tfs extract_inceptionv3 extract_mobilenetv2 test_d
 
 .PHONY: build_all
-build_all: extract_all c_build_api c_build_resnet50_onnx c_build_resnet50_tfs c_build_inceptionv3 c_build_mobilenetv2 build_locust
+build_all: extract_all c_build_api c_build_resnet50_onnx c_build_resnet50_tfs c_build_inceptionv3 c_build_mobilenetv2 c_build_api_ms_h c_build_image_ms_h build_locust

@@ -15,8 +15,8 @@ services:
       - APP_NAME=src.api_composition_proxy.apps.proxy:app
       - PORT=8000
       - PROFILE=0
-      - SERVICE_RESNET50=ms_horizontal_resnet50_api:8891
-      - SERVICE_MOBILENETV2=ms_horizontal_mobilenetv2_api:8893
+      - SERVICE_RESNET50=api_resnet50_ms_h:8891
+      - SERVICE_MOBILENETV2=api_mobilenetv2_ms_h:8893
       - QUEUE_NAME=api_queue
     ports:
       - "8000:8000"
@@ -26,10 +26,10 @@ services:
     container_name: serving_patterns_api_resnet50_ms_h
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_api_resnet50
+      dockerfile: dockerfiles/Dockerfile_api_resnet50_onnx
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=resnet50.yaml
+      - MODEL_INTERFACE=resnet50_onnx.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - BACKLOG=64
@@ -52,10 +52,10 @@ services:
     container_name: serving_patterns_backend_resnet50_ms_h
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_backend_resnet50
+      dockerfile: dockerfiles/Dockerfile_backend_resnet50_onnx
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=resnet50.yaml
+      - MODEL_INTERFACE=resnet50_onnx.yaml
       - NUM_PROCS=4
       - BACKLOG=64
       - LIMIT_MAX_REQUESTS=1024
@@ -85,7 +85,7 @@ services:
       - MAX_REQUESTS_JITTER=128
       - APP_NAME=src.app.apps.app_image:app
       - PORT=8893
-      - TFS_GRPC=ms_horizontal_mobilenetv2_tfs:8512
+      - TFS_GRPC=tfs_mobilenetv2_ms_h:8512
       - PROFILE=0
       - QUEUE_NAME=mobilenetv2_queue
     ports:

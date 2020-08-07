@@ -22,7 +22,7 @@ def __predict(data: Data):
     output_np = active_predictor.predict(input_np)
     reshaped_output_nps = DataConverter.reshape_output(output_np)
     data.prediction = reshaped_output_nps.tolist()
-    logger.info(f'prediction: {data.__dict__}')
+    logger.info(f'job_id: {data.job_id}, prediction: {data.prediction}')
 
 
 @do_cprofile
@@ -88,7 +88,6 @@ async def _predict_async_post(
     return {'job_id': job_id}
 
 
-@do_cprofile
 def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
     result = {job_id: {'prediction': []}}
     if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
@@ -110,7 +109,6 @@ def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
         return result
 
 
-@do_cprofile
 def _predict_async_get_label(job_id: str) -> Dict[str, Dict[str, Dict[str, float]]]:
     result = {job_id: {'prediction': []}}
     if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:

@@ -3,6 +3,7 @@ import logging
 
 from src.app.api import _predict_image
 from src.app.ml.active_predictor import Data
+from src.helper import get_job_id
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -17,7 +18,8 @@ async def test():
 @router.post('')
 async def predict(data: Data,
                   background_tasks: BackgroundTasks = BackgroundTasks()):
-    result = await _predict_image._predict(data, background_tasks)
+    job_id = data.job_id if data.job_id is not None else get_job_id()
+    result = await _predict_image._predict(data, job_id, background_tasks)
     return result
 
 
@@ -35,14 +37,16 @@ async def test_label():
 @router.post('/label')
 async def predict_label(data: Data,
                         background_tasks: BackgroundTasks = BackgroundTasks()):
-    result = await _predict_image._predict_label(data, background_tasks)
+    job_id = data.job_id if data.job_id is not None else get_job_id()
+    result = await _predict_image._predict_label(data, job_id, background_tasks)
     return result
 
 
 @router.post('/async')
 async def predict_async(data: Data,
                         background_tasks: BackgroundTasks = BackgroundTasks()):
-    return await _predict_image._predict_async_post(data, background_tasks)
+    job_id = data.job_id if data.job_id is not None else get_job_id()
+    return await _predict_image._predict_async_post(data, job_id, background_tasks)
 
 
 @router.get('/async/{job_id}')

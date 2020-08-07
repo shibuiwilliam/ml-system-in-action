@@ -60,7 +60,7 @@ def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
             data_dict[k] = filepath
         else:
             data_dict[k] = v
-    logger.info({job_id: data_dict})
+    logger.info(f'job_id: {job_id}')
     redis_client.set(job_id, json.dumps(data_dict))
     return True
 

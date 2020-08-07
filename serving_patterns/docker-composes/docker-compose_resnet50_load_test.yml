@@ -27,32 +27,6 @@ services:
     depends_on:
       - redis
 
-  pytorch_caffe2_api_resnet50:
-    container_name: pytorch_caffe2_api_resnet50
-    build:
-      context: ..
-      dockerfile: dockerfiles/Dockerfile_api_resnet50_pytorch_caffe2
-    environment:
-      - PLATFORM=docker_compose
-      - MODEL_INTERFACE=resnet50_pytorch_caffe2.yaml
-      - GUNICORN_UVICORN=GUNICORN
-      - WORKERS=2
-      - BACKLOG=16
-      - LIMIT_MAX_REQUESTS=128
-      - MAX_REQUESTS_JITTER=32
-      - APP_NAME=src.app.apps.app_image:app
-      - PORT=8895
-      - PROFILE=1
-      - LOGLEVEL=info
-      - QUEUE_NAME=image_queue
-    ports:
-      - "8895:8895"
-    command: ./run_api.sh
-    volumes:
-      - shared_volume:/shared_volume
-    depends_on:
-      - redis
-
   tf_api_resnet50:
     container_name: tf_api_resnet50
     build:
