@@ -53,8 +53,7 @@ def main():
     inp, out = sess.get_inputs()[0], sess.get_outputs()[0]
     print(f"input name='{inp.name}' shape={inp.shape} type={inp.type}")
     print(f"output name='{out.name}' shape={out.shape} type={out.type}")
-    input_name = sess.get_inputs()[0].name
-    pred_onx = sess.run(None, {input_name: np_image})
+    pred_onx = sess.run([out], {inp.name: np_image})
 
     postprocess = SoftmaxTransformer()
     postprocess_name = f'{modelname}_softmax_transformer'

@@ -1,0 +1,9 @@
+stages:
+  prepare:
+    cmd: PYTHONPATH=./ python -m src.app.ml.iris.iris_prepare_data
+    deps:
+      - src/app/ml/iris/data/iris_data.csv
+      - src/app/ml/iris/data/iris_label.csv
+      - src/app/ml/iris/iris_prepare_data.py
+    outs:
+      - src/app/ml/iris/data/prepared

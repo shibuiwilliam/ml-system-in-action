@@ -1,0 +1,3 @@
+outs:
+- md5: 1b86aad28048546e9ed7423c8deb5cde
+  path: y_train.npy

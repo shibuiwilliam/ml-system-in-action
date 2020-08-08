@@ -22,12 +22,6 @@ LABEL_FILEPATH = os.path.join(DATA_DIR, 'iris_label.csv')
 DATA_FILEPATH = os.path.join(DATA_DIR, 'iris_data.csv')
 
 
-# def make_label_file(label_filepath: str):
-#     labels = ['setosa', 'versicolor', 'virginica']
-#     with open(label_filepath, 'w') as f:
-#         json.dump(labels, f)
-
-
 def split_dataset(data: List[List[Any]], target: List[Any]) -> Dict[str, np.ndarray]:
     x_train, x_test, y_train, y_test = train_test_split(
         data,
