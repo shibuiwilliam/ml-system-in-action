@@ -10,34 +10,34 @@ import yaml
 import json
 import joblib
 import numpy as np
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 
 from src.app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
-from src.app.ml.save_helper import save_interface, dump_sklearn
+from src.app.ml.save_helper import save_interface, dump_sklearn, load_data, load_labels
 
 
 MODEL_DIR = './models/'
-LABEL_FILEPATH = os.path.join(MODEL_DIR, 'iris_labels.json')
+DATA_DIR = './src/app/ml/iris/data/'
+LABEL_FILEPATH = os.path.join(DATA_DIR, 'iris_label.csv')
+DATA_FILEPATH = os.path.join(DATA_DIR, 'iris_data.csv')
 
 
-def make_label_file(label_filepath: str):
-    labels = ['setosa', 'versicolor', 'virginica']
-    with open(label_filepath, 'w') as f:
-        json.dump(labels, f)
+# def make_label_file(label_filepath: str):
+#     labels = ['setosa', 'versicolor', 'virginica']
+#     with open(label_filepath, 'w') as f:
+#         json.dump(labels, f)
 
 
-def get_data() -> Dict[str, np.ndarray]:
-    iris = datasets.load_iris()
-    print(
-        f'input datatype: {type(iris.data)}, {iris.data.dtype}, {iris.data.shape}'
-    )
+def split_dataset(data: List[List[Any]], target: List[Any]) -> Dict[str, np.ndarray]:
     x_train, x_test, y_train, y_test = train_test_split(
-        iris.data,
-        iris.target,
+        data,
+        target,
         shuffle=True,
         test_size=0.3)
-    x_train = x_train.astype('float32')
-    y_train = y_train.astype('float32')
+    x_train = np.array(x_train).astype('float32')
+    y_train = np.array(y_train).astype('float32')
+    x_test = np.array(x_test).astype('float32')
+    y_test = np.array(y_test).astype('float32')
     return {'x_train': x_train,
             'x_test': x_test,
             'y_train': y_train,
@@ -96,12 +96,8 @@ def save_onnx(model,
 
     def test_run():
         sess = rt.InferenceSession(filepath)
-        inp, out = sess.get_inputs()[0], sess.get_outputs()[0]
-        # print("input name='{}' and shape={} and type={}".format(inp.name, inp.shape, inp.type))
-        # print("output name='{}' and shape={} and type={}".format(out.name, out.shape, out.type))
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: x_test.astype('float32')})
-        # print(pred_sonx)
         score = metrics.accuracy_score(y_test, pred_onx[0])
         print(score)
 
@@ -110,8 +106,11 @@ def save_onnx(model,
 
 def main():
     os.makedirs(MODEL_DIR, exist_ok=True)
-    data = get_data()
-    make_label_file(LABEL_FILEPATH)
+    labels = load_labels(LABEL_FILEPATH)
+    _full_data = load_data(DATA_FILEPATH)
+    _data = [d[:4] for d in _full_data]
+    _target = [d[4] for d in _full_data]
+    data = split_dataset(_data, _target)
 
     svc_pipeline = define_svc_pipeline()
     svc_modelname = 'iris_svc'

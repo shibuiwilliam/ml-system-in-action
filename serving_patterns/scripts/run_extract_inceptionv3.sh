@@ -3,9 +3,11 @@
 set -eu
 
 target_dir=./models
-label_file=${target_dir}/imagenet_labels_1001.json
+data_dir=./src/app/ml/inceptionv3/data/
+label_file=${data_dir}/imagenet_labels_1001.json
 
 mkdir -p ${target_dir}
+mkdir -p ${data_dir}
 
 if [ ! -f "${label_file}" ]; then
     curl --output ${label_file} https://raw.githubusercontent.com/anishathalye/imagenet-simple-labels/master/imagenet-simple-labels.json

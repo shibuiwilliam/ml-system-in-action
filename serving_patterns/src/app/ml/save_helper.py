@@ -25,10 +25,27 @@ def _load_labels_csv(label_filepath: str) -> Dict[Any, Any]:
     with open(label_filepath, 'r') as f:
         r = list(csv.reader(f))
         for i in range(len(r)):
-            if i==0:
+            if i == 0:
                 continue
             labels[int(r[i][0])] = r[i][1]
     return labels
+
+
+def load_data(data_filepath: str) -> Any:
+    if data_filepath.endswith('.csv'):
+        return _load_data_csv(data_filepath)
+
+
+def _load_data_csv(data_filepath: str,
+                   column_first: bool = True) -> List[List[Any]]:
+    data = []
+    with open(data_filepath, 'r') as f:
+        r = list(csv.reader(f))
+        for i in range(len(r)):
+            if column_first and i == 0:
+                continue
+            data.append(r[i])
+    return data
 
 
 def dump_sklearn(model, name: str):
@@ -46,9 +63,10 @@ def save_interface(model_name: str,
                    prediction_type: PREDICTION_TYPE,
                    runner: str,
                    **kwargs: Dict) -> None:
-    if not (interface_filepath.endswith('yaml') or interface_filepath.endswith('yml')):
+    if not (interface_filepath.endswith('yaml')
+            or interface_filepath.endswith('yml')):
         interface_filepath = f'{interface_filepath}.yaml'
-    _models = [{k:v.value for k,v in m.items()} for m in models]
+    _models = [{k: v.value for k, v in m.items()} for m in models]
     with open(interface_filepath, 'w') as f:
         f.write(yaml.dump({
             model_name: {
@@ -63,7 +81,7 @@ def save_interface(model_name: str,
                     'models': _models,
                     'prediction_type': prediction_type.value,
                     'runner': runner,
-                }, 
+                },
                 'options': kwargs,
             }
         }, default_flow_style=False))
