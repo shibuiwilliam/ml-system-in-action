@@ -1,3 +1,0 @@
-save_model_name: iris_svc
-save_format: onnx
-ml_model: svc

@@ -6,7 +6,7 @@ import json
 import csv
 import joblib
 
-from src.app.constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
+import constants
 
 
 def load_labels(label_filepath: str) -> Dict[Any, Any]:
@@ -67,9 +67,9 @@ def save_interface(model_name: str,
                    input_type: str,
                    output_shape: List[int],
                    output_type: str,
-                   data_type: DATA_TYPE,
-                   models: List[Dict[str, MODEL_RUNTIME]],
-                   prediction_type: PREDICTION_TYPE,
+                   data_type: constants.DATA_TYPE,
+                   models: List[Dict[str, constants.MODEL_RUNTIME]],
+                   prediction_type: constants.PREDICTION_TYPE,
                    runner: str,
                    **kwargs: Dict) -> None:
     if not (interface_filepath.endswith('yaml')

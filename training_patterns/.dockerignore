@@ -10,3 +10,6 @@ __pycache__
 *.dvc
 dvc.yaml
 dvc.lock
+*.npy
+src/iris_batch/models
+src/iris_pipeline/models

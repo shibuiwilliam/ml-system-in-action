@@ -1,0 +1,15 @@
+FROM python:3.7-slim as builder
+
+ENV PROJECT_DIR training_patterns
+WORKDIR /${PROJECT_DIR}
+ADD requirements/requirements_train.txt /${PROJECT_DIR}/
+RUN apt-get -y update && \
+    apt-get -y install apt-utils gcc curl && \
+    pip install  --no-cache-dir -r requirements_train.txt
+
+WORKDIR /${PROJECT_DIR}/src/iris_pipeline/data/
+COPY ./src/*.py /${PROJECT_DIR}/src/
+COPY ./src/iris_pipeline/*.py /${PROJECT_DIR}/src/iris_pipeline/
+COPY ./src/iris_pipeline/data/*.csv /${PROJECT_DIR}/src/iris_pipeline/data/
+
+WORKDIR /${PROJECT_DIR}/src/iris_pipeline/
