@@ -1,0 +1,3 @@
+outs:
+- md5: 28d9d10dd1daba40373de108e8b0846a
+  path: iris_svc.onnx

@@ -2,14 +2,36 @@ from sklearn import metrics
 import onnxruntime as rt
 import os
 import numpy as np
-import argparse
 import joblib
+from typing import Dict, Any
+import yaml
+import sys
+
+sys.path.append(os.path.abspath(".."))
+from constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
+from ml import save_helper
 
 
+PARAMS_YAML = './evaluate_params.yaml'
 MODEL_DIR = './models/'
-DATA_DIR = './src/app/ml/iris/data/'
-X_TEST_NPY = os.path.join(DATA_DIR, 'x_test.npy')
-Y_TEST_NPY = os.path.join(DATA_DIR, 'y_test.npy')
+DATA_DIR = './data/'
+PREPARED_DIR = os.path.join(DATA_DIR, 'prepared')
+X_TEST_NPY = os.path.join(PREPARED_DIR, 'x_test.npy')
+Y_TEST_NPY = os.path.join(PREPARED_DIR, 'y_test.npy')
+DOWNSTREAM_DIR = os.path.join(DATA_DIR, 'evaluated')
+
+
+def get_params() -> Dict[str, Any]:
+    params = {
+        'evaluation_model_filename': os.getenv('EVALUATION_MODEL_FILENAME', 'iris_svc.pkl')
+    }
+    if os.path.exists(PARAMS_YAML):
+        with open(PARAMS_YAML, 'r') as f:
+            _params = yaml.load(f, Loader=yaml.SafeLoader)
+        for k, v in _params.items():
+            params[k] = v
+
+    return params
 
 
 def evaluate_sklearn_model(filepath: str, x_test: np.ndarray, y_test: np.ndarray):
@@ -32,18 +54,14 @@ def evaluate_onnx_model(
 
 
 def main():
-    parser = argparse.ArgumentParser(description='iris evaluation.')
-    parser.add_argument(
-        '--evaluation_model_filename',
-        required=False,
-        type=str,
-        default=str(os.getenv('EVALUATION_MODEL_FILENAME', 'iris_svc.pkl')))
-    args = parser.parse_args()
+    os.makedirs(DOWNSTREAM_DIR, exist_ok=True)
+
+    params = get_params()
 
     x_test = np.load(X_TEST_NPY)
     y_test = np.load(Y_TEST_NPY)
 
-    model_filename = args.evaluation_model_filename
+    model_filename = params['evaluation_model_filename']
 
     if model_filename.endswith('.pkl'):
         evaluate_sklearn_model(os.path.join(MODEL_DIR, model_filename), x_test, y_test)

@@ -1,0 +1,45 @@
+prepare_data:
+  cmd: python iris_prepare_data.py
+  deps:
+  - path: ./data/iris_data.csv
+    md5: e600ea704f4b6d06480393650bfa2978
+  - path: ./data/iris_label.csv
+    md5: 341afd7c40a9f2e0dc1fcd77ba97cd96
+  - path: ./iris_prepare_data.py
+    md5: 2d68bb98583c46461f600e72e0626dcf
+  params:
+    prepare_params.yaml:
+      test_rate: 0.3
+  outs:
+  - path: ./data/prepared
+    md5: 047841512f35938f29c08e6adcdc3541.dir
+train:
+  cmd: python iris_train.py
+  deps:
+  - path: ./data/iris_label.csv
+    md5: 341afd7c40a9f2e0dc1fcd77ba97cd96
+  - path: ./data/prepared/x_train.npy
+    md5: c95f7e30c4a39c0432434c3e5bd27f24
+  - path: ./data/prepared/y_train.npy
+    md5: 3010687e6561e4f553f060a06f5eb60c
+  params:
+    train_params.yaml:
+      ml_model: svc
+      save_format: onnx
+      save_model_name: iris_svc
+  outs:
+  - path: ./data/trained
+    md5: d751713988987e9331980363e24189ce.dir
+evaluate:
+  cmd: python iris_evaluate.py
+  deps:
+  - path: ./data/prepared/x_test.npy
+    md5: 73399e5e98fc7c0fdf237b9e0306b6ff
+  - path: ./data/prepared/y_test.npy
+    md5: 601bb96a29291e8598ad87a9861cb677
+  params:
+    evaluate_params.yaml:
+      evaluation_model_filename: iris_svc.onnx
+  outs:
+  - path: ./data/evaluated
+    md5: d751713988987e9331980363e24189ce.dir

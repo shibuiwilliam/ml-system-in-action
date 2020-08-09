@@ -1,0 +1,3 @@
+outs:
+- md5: 90f2414a71623c0cc87da76bf4514fd4
+  path: iris_svc_onnx_runtime.yaml
