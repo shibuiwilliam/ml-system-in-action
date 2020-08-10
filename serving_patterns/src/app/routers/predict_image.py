@@ -43,17 +43,17 @@ async def predict_label(data: Data,
 
 
 @router.post('/async')
-async def predict_async(data: Data,
-                        background_tasks: BackgroundTasks = BackgroundTasks()):
+async def predict_async_post(data: Data,
+                             background_tasks: BackgroundTasks = BackgroundTasks()):
     job_id = data.job_id if data.job_id is not None else get_job_id()
     return await _predict_image._predict_async_post(data, job_id, background_tasks)
 
 
 @router.get('/async/{job_id}')
-def predict_async(job_id: str):
+def predict_async_get_job_id(job_id: str):
     return _predict_image._predict_async_get(job_id)
 
 
 @router.get('/async/label/{job_id}')
-def predict_async(job_id: str):
+def predict_async_get_label_job_id(job_id: str):
     return _predict_image._predict_async_get_label(job_id)

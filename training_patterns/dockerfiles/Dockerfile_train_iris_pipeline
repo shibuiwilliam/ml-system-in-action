@@ -7,9 +7,10 @@ RUN apt-get -y update && \
     apt-get -y install apt-utils gcc curl && \
     pip install  --no-cache-dir -r requirements_train.txt
 
-WORKDIR /${PROJECT_DIR}/src/iris_pipeline/data/
+WORKDIR /${PROJECT_DIR}/
 COPY ./src/*.py /${PROJECT_DIR}/src/
 COPY ./src/iris_pipeline/*.py /${PROJECT_DIR}/src/iris_pipeline/
 COPY ./src/iris_pipeline/data/*.csv /${PROJECT_DIR}/src/iris_pipeline/data/
+COPY ./src/iris_pipeline/params.yaml /${PROJECT_DIR}/src/iris_pipeline/
 
 WORKDIR /${PROJECT_DIR}/src/iris_pipeline/

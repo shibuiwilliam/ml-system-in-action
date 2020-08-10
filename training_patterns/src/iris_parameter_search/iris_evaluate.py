@@ -3,7 +3,6 @@ import onnxruntime as rt
 import os
 import numpy as np
 import joblib
-import json
 from typing import Dict, Any
 import yaml
 import sys
@@ -13,15 +12,13 @@ from constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 import save_helper
 
 
-PARAMS_YAML = './params.yaml'
-
+PARAMS_YAML = './evaluate_params.yaml'
+MODEL_DIR = './models/'
 DATA_DIR = './data/'
 PREPARED_DIR = os.path.join(DATA_DIR, 'prepared')
-MODEL_DIR = os.path.join(DATA_DIR, 'trained')
 X_TEST_NPY = os.path.join(PREPARED_DIR, 'x_test.npy')
 Y_TEST_NPY = os.path.join(PREPARED_DIR, 'y_test.npy')
 DOWNSTREAM_DIR = os.path.join(DATA_DIR, 'evaluated')
-EVALUATION_SCORE = os.path.join(DOWNSTREAM_DIR, 'score.json')
 
 
 def get_params() -> Dict[str, Any]:
@@ -45,25 +42,8 @@ def get_params() -> Dict[str, Any]:
 def evaluate_sklearn_model(filepath: str, x_test: np.ndarray, y_test: np.ndarray):
     model = joblib.load(filepath)
     p = model.predict(x_test)
-    
-    accuracy = metrics.accuracy_score(y_test, p)
-    print(f'accuracy_score: {accuracy}')
-
-    precision = metrics.precision_score(y_test, p, average='micro')
-    print(f'precision_score: {precision}')
-
-    recall = metrics.recall_score(y_test, p, average='micro')
-    print(f'recall_score: {recall}')
-    
-    with open(EVALUATION_SCORE, 'w') as f:
-        json.dump(
-            {
-                'accuracy': accuracy,
-                'precision': precision,
-                'recall': recall
-            },
-            f
-        )
+    score = metrics.accuracy_score(y_test, p)
+    print(f'accuracy: {score}')
 
 
 def evaluate_onnx_model(
@@ -74,25 +54,8 @@ def evaluate_onnx_model(
     input_name = sess.get_inputs()[0].name
     output_name = sess.get_outputs()[0].name
     p = sess.run([output_name], {input_name: x_test.astype('float32')})
-
-    accuracy = metrics.accuracy_score(y_test, p[0])
-    print(f'accuracy_score: {accuracy}')
-
-    precision = metrics.precision_score(y_test, p[0], average='micro')
-    print(f'precision_score: {precision}')
-
-    recall = metrics.recall_score(y_test, p[0], average='micro')
-    print(f'recall_score: {recall}')
-
-    with open(EVALUATION_SCORE, 'w') as f:
-        json.dump(
-            {
-                'accuracy': accuracy,
-                'precision': precision,
-                'recall': recall
-            },
-            f
-        )
+    score = metrics.accuracy_score(y_test, p[0])
+    print(f'accuracy: {score}')
 
 
 def main():

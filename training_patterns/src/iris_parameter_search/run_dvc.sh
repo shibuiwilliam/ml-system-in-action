@@ -7,12 +7,12 @@ ABSOLUTE_PATH=$(pwd)
 
 IMAGE_NAME=training_patterns_train_iris_pipeline
 IMAGE_VERSION=latest
-
 LOCAL_MODEL_DIR=${ABSOLUTE_PATH}/models
 LOCAL_DATA_DIR=${ABSOLUTE_PATH}/data
 LOCAL_DATA_PREPARED_DIR=${LOCAL_DATA_DIR}/prepared
 LOCAL_DATA_TRAINED_DIR=${LOCAL_DATA_DIR}/trained
 LOCAL_DATA_EVALUATED_DIR=${LOCAL_DATA_DIR}/evaluated
+
 
 if [ -e ${DVC_FILE} ]; then
     dvc repro
@@ -30,7 +30,6 @@ else
         docker run --rm \
             --name prepare_data \
             -v ${LOCAL_MODEL_DIR}:/training_patterns/src/iris_pipeline/models \
-            -v ${LOCAL_DATA_DIR}:/training_patterns/src/iris_pipeline/data \
             -v ${LOCAL_DATA_PREPARED_DIR}:/training_patterns/src/iris_pipeline/data/prepared \
             -v ${LOCAL_DATA_TRAINED_DIR}:/training_patterns/src/iris_pipeline/data/trained \
             -v ${LOCAL_DATA_EVALUATED_DIR}:/training_patterns/src/iris_pipeline/data/evaluated \
@@ -60,9 +59,9 @@ else
         -n evaluate \
         -d ./data/prepared/x_test.npy \
         -d ./data/prepared/y_test.npy \
-        -d ./data/trained \
+        -d ./models/iris_svc.pkl \
         -p params.yaml:evaluate.evaluation_model_filename \
-        -M ./data/evaluated/score.json \
+        -o ./data/evaluated \
         docker run --rm \
             --name evaluate \
             -v ${LOCAL_MODEL_DIR}:/training_patterns/src/iris_pipeline/models \

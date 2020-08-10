@@ -9,8 +9,7 @@ sys.path.append(os.path.abspath(".."))
 import save_helper
 
 
-PARAMS_YAML = './params.yaml'
-
+PARAMS_YAML = './prepare_params.yaml'
 DATA_DIR = './data/'
 DATA_FILENAME = 'iris_data.csv'
 DATA_FILEPATH = os.path.join(DATA_DIR, DATA_FILENAME)
@@ -43,7 +42,8 @@ def split_dataset(
         data,
         target,
         shuffle=True,
-        test_size=test_size)
+        test_size=test_size,
+        stratify=target)
     x_train = np.array(x_train).astype('float32')
     y_train = np.array(y_train).astype('float32')
     x_test = np.array(x_test).astype('float32')

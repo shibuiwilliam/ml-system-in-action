@@ -1,16 +1,13 @@
-from typing import Dict, Any, List
+from typing import Dict, List
 from fastapi import BackgroundTasks
-import uuid
 import numpy as np
 import logging
 
 from src.middleware.profiler import do_cprofile
-from src.middleware.redis_client import redis_client
 from src.jobs import store_data_job
 from src.constants import PLATFORM_ENUM
 from src.configurations import _PlatformConfigurations
-from src.app.ml.active_predictor import Data, DataInterface, DataConverter, active_predictor
-from src.configurations import _CacheConfigurations
+from src.app.ml.active_predictor import Data, DataConverter, active_predictor
 
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,5 @@
-from typing import Dict, Any, List
+from typing import Dict, List
 from fastapi import BackgroundTasks
-import uuid
 import logging
 from PIL import Image
 import io
