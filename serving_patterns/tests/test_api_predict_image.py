@@ -217,7 +217,7 @@ async def test_predict_async_post(mocker, job_id):
     mocker.patch('src.jobs.store_data_job._save_data_job', return_value=job_id)
     mocker.patch('PIL.Image.open', return_value=mock_image)
     mocker.patch('io.BytesIO', return_value=mock_image)
-    result = await _predict_async_post(mock_data, mock_BackgroundTasks)
+    result = await _predict_async_post(mock_data, job_id, mock_BackgroundTasks)
     assert result['job_id'] == job_id
 
 

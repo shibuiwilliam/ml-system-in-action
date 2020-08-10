@@ -38,25 +38,5 @@ class _Constants(object):
     def MODEL_DIRECTORY():
         return '/serving_patterns/models/'
 
-    @constant
-    def DATA_DIRECTORY():
-        return '/serving_patterns/src/app/data/'
-
-    @constant
-    def DATA_FILE_DIRECTORY():
-        return '/serving_patterns/src/app/data/file/'
-
-    @constant
-    def MODEL_EXTENTIONS():
-        return ['pkl', 'h5', 'hdf5']
-
-    @constant
-    def PREDICTION_DEFAULT():
-        return -1
-
-    @constant
-    def SEPARATOR():
-        return ';'
-
 
 CONSTANTS = _Constants()

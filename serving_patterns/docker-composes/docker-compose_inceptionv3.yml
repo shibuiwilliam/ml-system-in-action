@@ -5,10 +5,10 @@ services:
     container_name: serving_patterns_prep_pred_api_inceptionv3
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_api_inceptionv3
+      dockerfile: src/app/ml/inceptionv3/Dockerfile_api_inceptionv3
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=inceptionv3.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/inceptionv3/model/inceptionv3.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - BACKLOG=64
@@ -16,7 +16,7 @@ services:
       - MAX_REQUESTS_JITTER=128
       - APP_NAME=src.app.apps.app_image:app
       - PORT=8892
-      - TFS_GRPC=prep_pred_tfs:8500
+      - TFS_GRPC=prep_pred_tfs_inceptionv3:8500
       - PROFILE=0
       - QUEUE_NAME=tfs_queue
     ports:
@@ -33,12 +33,12 @@ services:
     container_name: serving_patterns_prep_pred_tfs_inceptionv3
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_tfserving_inceptionv3
+      dockerfile: src/app/ml/inceptionv3/Dockerfile_tfserving_inceptionv3
     environment:
       - PORT=8500
       - REST_API_PORT=8501
       - MODEL_NAME=inceptionv3
-      - MODEL_BASE_PATH=/models/inceptionv3
+      - MODEL_BASE_PATH=/serving_patterns/src/app/ml/inceptionv3/model/savedmodel/inceptionv3
     ports:
       - "8500:8500"
       - "8501:8501"
@@ -48,13 +48,13 @@ services:
     container_name: serving_patterns_prep_pred_backend_inceptionv3
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_backend_inceptionv3
+      dockerfile: src/app/ml/inceptionv3/Dockerfile_backend_inceptionv3
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=inceptionv3.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/inceptionv3/model/inceptionv3.yaml
       - NUM_PROCS=4
       - BATCH_CODE=src.app.backend.prediction_batch
-      - TFS_GRPC=prep_pred_tfs:8500
+      - TFS_GRPC=prep_pred_tfs_inceptionv3:8500
       - PROFILE=0
       - PREDICTOR=src.app.api._predict_image
       - QUEUE_NAME=tfs_queue

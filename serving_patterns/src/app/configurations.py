@@ -1,6 +1,5 @@
 import os
-from src.constants import PLATFORM_ENUM
-from src.app.constants import CONSTANTS, PHYSICAL_SAVE_DATA, DATA_TYPE
+from src.app.constants import PHYSICAL_SAVE_DATA
 from src.app.ml.extract_interface import extract_interface_yaml
 import logging
 
@@ -15,21 +14,17 @@ class _FastAPIConfigurations():
 
 
 class _ModelConfigurations():
-    model_dir = os.getenv('MODEL_DIR', CONSTANTS.MODEL_DIRECTORY)
-
-    interface_filename = os.getenv('MODEL_INTERFACE')
-    if interface_filename is None:
+    interface_filepath = os.getenv('MODEL_INTERFACE')
+    if interface_filepath is None:
         logging.info('Environment variable "MODEL_INTERFACE" must be specified.')
-        interface_filename = 'iris_svc_sklearn.yaml'
-    interface_filepath = os.path.join(model_dir, interface_filename)
+        interface_filepath = './models/iris_svc_sklearn.yaml'
 
     interface_dict = extract_interface_yaml(interface_filepath)
     model_name = list(interface_dict.keys())[0]
     io = interface_dict[model_name]['data_interface']
     meta = interface_dict[model_name]['meta']
 
-    models = meta['models']
-    model_runners = [{os.path.join(os.getenv('MODEL_DIR', CONSTANTS.MODEL_DIRECTORY), k): v for k,v in m.items()} for m in models]
+    model_runners = meta['models']
     prediction_type = meta['prediction_type']
     runner = meta['runner']
 

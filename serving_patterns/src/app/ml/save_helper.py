@@ -1,5 +1,3 @@
-from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn
 from typing import Dict, List, Any
 import yaml
 import json
@@ -55,6 +53,8 @@ def dump_sklearn(model, name: str):
 
 def save_onnx(model,
               filepath: str):
+    from skl2onnx.common.data_types import FloatTensorType
+    from skl2onnx import convert_sklearn
     initial_type = [('float_input', FloatTensorType([None, 4]))]
     onx = convert_sklearn(model, initial_types=initial_type)
     with open(filepath, 'wb') as f:

@@ -1,0 +1,18 @@
+iris_tree:
+  data_interface:
+    data_type: array
+    input_shape:
+    - 1
+    - 4
+    input_type: float32
+    output_shape:
+    - 1
+    - 3
+    output_type: float32
+  meta:
+    models:
+    - ./src/app/ml/iris/model/iris_tree.onnx: onnx_runtime
+    prediction_type: classification
+    runner: src.app.ml.iris.iris_predictor_onnx
+  options:
+    label_filepath: ./src/app/ml/iris/data/iris_label.csv

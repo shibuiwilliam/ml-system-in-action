@@ -11,11 +11,15 @@ from src.app.ml.save_helper import save_interface, load_labels, dump_sklearn
 from src.app.ml.transformers import PytorchImagePreprocessTransformer, SoftmaxTransformer
 
 
-MODEL_DIR = './models/'
+WORK_DIR = './src/app/ml/resnet50_onnx/'
+
+MODEL_DIR = os.path.join(WORK_DIR, 'model')
 MODEL_FILENAME = 'resnet50v2.onnx'
-RESNET50_MODEL = os.path.join(MODEL_DIR, MODEL_FILENAME)
-SAMPLE_IMAGE = os.path.join('./src/app/ml/data', 'good_cat.jpg')
-LABEL_FILEPATH = os.path.join(MODEL_DIR, 'imagenet_labels_1000.json')
+MODEL_FILEPATH = os.path.join(MODEL_DIR, MODEL_FILENAME)
+
+DATA_DIR = os.path.join(WORK_DIR, 'data')
+SAMPLE_IMAGE = os.path.join(DATA_DIR, 'good_cat.jpg')
+LABEL_FILEPATH = os.path.join(DATA_DIR, 'imagenet_labels_1000.json')
 
 
 def main():
@@ -28,13 +32,13 @@ def main():
     torch.onnx.export(
         model,
         x_dummy,
-        RESNET50_MODEL,
+        MODEL_FILEPATH,
         export_params=True,
         opset_version=10,
         do_constant_folding=True,
         input_names=['input'],
         output_names=['output'],
-        verbose=True
+        verbose=False
     )
 
     labels = load_labels(LABEL_FILEPATH)
@@ -47,18 +51,20 @@ def main():
 
     preprocess_name = f'{modelname}_preprocess_transformer'
     preprocess_filename = f'{preprocess_name}.pkl'
-    dump_sklearn(preprocess, os.path.join(MODEL_DIR, preprocess_filename))
+    preprocess_filepath = os.path.join(MODEL_DIR, preprocess_filename)
+    dump_sklearn(preprocess, preprocess_filepath)
 
-    sess = rt.InferenceSession(RESNET50_MODEL)
+    sess = rt.InferenceSession(MODEL_FILEPATH)
     inp, out = sess.get_inputs()[0], sess.get_outputs()[0]
     print(f"input name='{inp.name}' shape={inp.shape} type={inp.type}")
     print(f"output name='{out.name}' shape={out.shape} type={out.type}")
-    pred_onx = sess.run([out], {inp.name: np_image})
+    pred_onx = sess.run([out.name], {inp.name: np_image})
 
     postprocess = SoftmaxTransformer()
     postprocess_name = f'{modelname}_softmax_transformer'
     postprocess_filename = f'{postprocess_name}.pkl'
-    dump_sklearn(postprocess, os.path.join(MODEL_DIR, postprocess_filename))
+    postprocess_filepath = os.path.join(MODEL_DIR, postprocess_filename)
+    dump_sklearn(postprocess, postprocess_filepath)
     prediction = postprocess.transform(np.array(pred_onx))
 
     print(prediction.shape)
@@ -71,9 +77,9 @@ def main():
                    [1, 1000],
                    'float32',
                    DATA_TYPE.IMAGE,
-                   [{preprocess_filename: MODEL_RUNTIME.SKLEARN},
-                    {MODEL_FILENAME: MODEL_RUNTIME.ONNX_RUNTIME},
-                    {postprocess_filename: MODEL_RUNTIME.SKLEARN}],
+                   [{preprocess_filepath: MODEL_RUNTIME.SKLEARN},
+                    {MODEL_FILEPATH: MODEL_RUNTIME.ONNX_RUNTIME},
+                    {postprocess_filepath: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
                    'src.app.ml.resnet50_onnx.resnet50_predictor',
                    label_filepath=LABEL_FILEPATH)

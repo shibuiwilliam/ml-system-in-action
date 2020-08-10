@@ -22,7 +22,9 @@ LABELS = load_labels(_ModelConfigurations().options['label_filepath'])
 
 class _Data(BaseData):
     image_data: Any = None
-    test_data: str = os.path.join('./src/app/ml/data', 'good_cat.jpg')
+    test_data: str = os.path.join(
+        './src/app/ml/resnet50_onnx/data',
+        'good_cat.jpg')
     labels: List[str] = LABELS
 
 
@@ -57,8 +59,10 @@ class _Classifier(BasePredictor):
                         'runner': v,
                         'predictor': rt.InferenceSession(k)
                     }
-                    self.input_name = self.classifiers[k]['predictor'].get_inputs()[0].name
-                    self.output_name = self.classifiers[k]['predictor'].get_outputs()[0].name
+                    self.input_name = self.classifiers[k]['predictor'].get_inputs()[
+                        0].name
+                    self.output_name = self.classifiers[k]['predictor'].get_outputs()[
+                        0].name
                 else:
                     pass
         logger.info(f'initialized {self.__class__.__name__}')

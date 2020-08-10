@@ -1,0 +1,26 @@
+inceptionv3:
+  data_interface:
+    data_type: image
+    input_shape:
+    - 1
+    - 299
+    - 299
+    - 3
+    input_type: float32
+    output_shape:
+    - 1
+    - 1001
+    output_type: float32
+  meta:
+    models:
+    - ./src/app/ml/inceptionv3/model/inceptionv3_preprocess_transformer.pkl: sklearn
+    - ./src/app/ml/inceptionv3/model/savedmodel/inceptionv3/4: tf_serving
+    - ./src/app/ml/inceptionv3/model/inceptionv3_softmax_transformer.pkl: sklearn
+    prediction_type: classification
+    runner: src.app.ml.inceptionv3.inceptionv3_predictor
+  options:
+    input_name: input_1
+    label_filepath: ./src/app/ml/inceptionv3/data/imagenet_labels_1001.json
+    model_spec_name: inceptionv3
+    model_spec_signature_name: serving_default
+    output_name: keras_layer

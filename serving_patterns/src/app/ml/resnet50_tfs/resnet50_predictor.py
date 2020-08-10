@@ -30,13 +30,19 @@ TIMEOUT_SECOND = int(os.getenv('TIMEOUT_SECOND', 5.0))
 
 class _Data(BaseData):
     image_data: Any = None
-    test_data: str = os.path.join('./src/app/ml/data', 'good_cat.jpg')
+    test_data: str = os.path.join(
+        './src/app/ml/resnet50_tfs/data',
+        'good_cat.jpg')
     labels: List[str] = LABELS
 
 
 class _DataInterface(BaseDataInterface):
-    input_name = os.getenv('INPUT_NAME', _ModelConfigurations().options['input_name'])
-    output_name = os.getenv('OUTPUT_NAME', _ModelConfigurations().options['output_name'])
+    input_name = os.getenv(
+        'INPUT_NAME',
+        _ModelConfigurations().options['input_name'])
+    output_name = os.getenv(
+        'OUTPUT_NAME',
+        _ModelConfigurations().options['output_name'])
 
 
 class _DataConverter(BaseDataConverter):
@@ -50,8 +56,12 @@ class _Classifier(BasePredictor):
         self.input_name = None
         self.channel = None
         self.stub = None
-        self.model_spec_name = os.getenv('MODEL_SPEC_NAME', _ModelConfigurations().options['model_spec_name'])
-        self.model_spec_signature_name = os.getenv('MODEL_SPEC_SIGNATURE_NAME', _ModelConfigurations().options['model_spec_signature_name'])
+        self.model_spec_name = os.getenv(
+            'MODEL_SPEC_NAME',
+            _ModelConfigurations().options['model_spec_name'])
+        self.model_spec_signature_name = os.getenv(
+            'MODEL_SPEC_SIGNATURE_NAME',
+            _ModelConfigurations().options['model_spec_signature_name'])
         self.load_model()
 
     def load_model(self):
@@ -67,7 +77,8 @@ class _Classifier(BasePredictor):
                 else:
                     self.classifiers[k] = {'runner': v, 'predictor': None}
                     self.channel = grpc.insecure_channel(TFS_GPRC)
-                    self.stub = prediction_service_pb2_grpc.PredictionServiceStub(self.channel)
+                    self.stub = prediction_service_pb2_grpc.PredictionServiceStub(
+                        self.channel)
         logger.info(f'initialized {self.__class__.__name__}')
 
     def predict(self, input_data: Image) -> np.ndarray:
@@ -80,8 +91,10 @@ class _Classifier(BasePredictor):
                 request = predict_pb2.PredictRequest()
                 request.model_spec.name = self.model_spec_name
                 request.model_spec.signature_name = self.model_spec_signature_name
-                request.inputs[_DataInterface().input_name].CopyFrom(tf.make_tensor_proto(_prediction, shape=_ModelConfigurations().io['input_shape']))
+                request.inputs[_DataInterface().input_name].CopyFrom(tf.make_tensor_proto(
+                    _prediction, shape=_ModelConfigurations().io['input_shape']))
                 result = self.stub.Predict(request, TIMEOUT_SECOND)
-                _prediction = np.array(result.outputs[_DataInterface().output_name].float_val)
+                _prediction = np.array(
+                    result.outputs[_DataInterface().output_name].float_val)
         output = _prediction
         return output

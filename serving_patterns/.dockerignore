@@ -10,3 +10,6 @@ __pycache__
 *.dvc
 dvc.yaml
 dvc.lock
+model
+data
+models

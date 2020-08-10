@@ -5,7 +5,7 @@ services:
     container_name: serving_patterns_proxy_ms_h
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_proxy
+      dockerfile: src/api_composition_proxy/Dockerfile_proxy
     environment:
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=8
@@ -29,10 +29,10 @@ services:
     container_name: serving_patterns_web_single_ms_h
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_api_iris
+      dockerfile: src/app/ml/iris/Dockerfile_api_iris
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_svc_sklearn.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_svc_sklearn.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - BACKLOG=256
@@ -52,10 +52,10 @@ services:
     container_name: serving_patterns_synchronous_ms_h
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_api_iris
+      dockerfile: src/app/ml/iris/Dockerfile_api_iris
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_svc_onnx_runtime.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_svc_onnx_runtime.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - BACKLOG=256
@@ -75,10 +75,10 @@ services:
     container_name: serving_patterns_asynchronous_ms_h
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_api_iris
+      dockerfile: src/app/ml/iris/Dockerfile_api_iris
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_tree_onnx_runtime.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_tree_onnx_runtime.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - BACKLOG=256
@@ -99,10 +99,10 @@ services:
     container_name: serving_patterns_backend_ms_h
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_backend_iris
+      dockerfile: src/app/ml/iris/Dockerfile_backend_iris
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=iris_tree_onnx_runtime.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_tree_onnx_runtime.yaml
       - NUM_PROCS=4
       - BATCH_CODE=src.app.backend.prediction_batch
       - PROFILE=0

@@ -1,0 +1,26 @@
+mobilenetv2_plant:
+  data_interface:
+    data_type: image
+    input_shape:
+    - 1
+    - 224
+    - 224
+    - 3
+    input_type: float32
+    output_shape:
+    - 1
+    - 2102
+    output_type: float32
+  meta:
+    models:
+    - ./src/app/ml/mobilenetv2_plant/model/mobilenetv2_plant_preprocess_transformer.pkl: sklearn
+    - ./src/app/ml/mobilenetv2_plant/model/savedmodel/mobilenetv2_plant/1: tf_serving
+    - ./src/app/ml/mobilenetv2_plant/model/mobilenetv2_plant_softmax_transformer.pkl: sklearn
+    prediction_type: classification
+    runner: src.app.ml.mobilenetv2_plant.mobilenetv2_predictor
+  options:
+    input_name: input_1
+    label_filepath: ./src/app/ml/mobilenetv2_plant/data/aiy_plants_V1_labelmap.csv
+    model_spec_name: mobilenetv2_plant
+    model_spec_signature_name: serving_default
+    output_name: keras_layer

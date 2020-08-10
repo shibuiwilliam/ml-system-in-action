@@ -9,13 +9,17 @@ from src.app.ml.save_helper import save_interface, load_labels, dump_sklearn
 from src.app.ml.transformers import TFImagePreprocessTransformer, SoftmaxTransformer
 from src.app.ml.extract_from_tfhub import get_model
 
-MODEL_DIR = './models/'
-MODEL_FILE_DIR = 'savedmodel/resnet_v2_50/4'
-SAVEDMODEL_DIR = os.path.join(MODEL_DIR, MODEL_FILE_DIR)
+WORK_DIR = './src/app/ml/resnet50_tfs/'
+
+MODEL_DIR = os.path.join(WORK_DIR, 'model')
+SAVEDMODEL_DIR = os.path.join(MODEL_DIR, 'savedmodel/resnet_v2_50/4')
 PB_FILE = os.path.join(SAVEDMODEL_DIR, 'saved_model.pb')
+
 HUB_URL = 'https://tfhub.dev/google/imagenet/resnet_v2_50/classification/4'
-SAMPLE_IMAGE = os.path.join('./src/app/ml/data', 'good_cat.jpg')
-LABEL_FILEPATH = os.path.join(MODEL_DIR, 'imagenet_labels_1001.json')
+
+DATA_DIR = os.path.join(WORK_DIR, 'data')
+SAMPLE_IMAGE = os.path.join(DATA_DIR, 'good_cat.jpg')
+LABEL_FILEPATH = os.path.join(DATA_DIR, 'imagenet_labels_1001.json')
 LABELS = load_labels(LABEL_FILEPATH)
 
 
@@ -46,17 +50,17 @@ def main():
     postprocess = SoftmaxTransformer()
 
     image = Image.open(SAMPLE_IMAGE)
-
     validate(image, preprocess, model, postprocess)
-
     tf.saved_model.save(model, SAVEDMODEL_DIR)
 
     modelname = 'resnet50_tfs'
     interface_filename = f'{modelname}.yaml'
     preprocess_filename = f'{modelname}_preprocess_transformer.pkl'
     postprocess_filename = f'{modelname}_softmax_transformer.pkl'
-    dump_sklearn(preprocess, os.path.join(MODEL_DIR, preprocess_filename))
-    dump_sklearn(postprocess, os.path.join(MODEL_DIR, postprocess_filename))
+    preprocess_filepath = os.path.join(MODEL_DIR, preprocess_filename)
+    postprocess_filepath = os.path.join(MODEL_DIR, postprocess_filename)
+    dump_sklearn(preprocess, preprocess_filepath)
+    dump_sklearn(postprocess, postprocess_filepath)
 
     save_interface(modelname,
                    os.path.join(MODEL_DIR, interface_filename),
@@ -65,15 +69,15 @@ def main():
                    [1, 1001],
                    'float32',
                    DATA_TYPE.IMAGE,
-                   [{preprocess_filename: MODEL_RUNTIME.SKLEARN},
-                    {MODEL_FILE_DIR: MODEL_RUNTIME.TF_SERVING},
-                    {postprocess_filename: MODEL_RUNTIME.SKLEARN}],
+                   [{preprocess_filepath: MODEL_RUNTIME.SKLEARN},
+                    {SAVEDMODEL_DIR: MODEL_RUNTIME.TF_SERVING},
+                    {postprocess_filepath: MODEL_RUNTIME.SKLEARN}],
                    PREDICTION_TYPE.CLASSIFICATION,
                    'src.app.ml.resnet50_tfs.resnet50_predictor',
                    label_filepath=LABEL_FILEPATH,
                    model_spec_name='resnet_v2_50',
                    model_spec_signature_name='serving_default',
-                   input_name='keras_layer_input',
+                   input_name='input_1',
                    output_name='keras_layer')
 
 

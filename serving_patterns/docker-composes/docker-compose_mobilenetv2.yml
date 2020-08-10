@@ -5,10 +5,10 @@ services:
     container_name: serving_patterns_prep_pred_api_mobilenetv2
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_api_mobilenetv2
+      dockerfile: src/app/ml/mobilenetv2/Dockerfile_api_mobilenetv2
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=mobilenetv2.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/mobilenetv2/model/mobilenetv2.yaml
       - GUNICORN_UVICORN=GUNICORN
       - WORKERS=4
       - BACKLOG=64
@@ -33,12 +33,12 @@ services:
     container_name: serving_patterns_prep_pred_tfs_mobilenetv2
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_tfserving_mobilenetv2
+      dockerfile: src/app/ml/mobilenetv2/Dockerfile_tfserving_mobilenetv2
     environment:
       - PORT=8512
       - REST_API_PORT=8513
       - MODEL_NAME=mobilenetv2
-      - MODEL_BASE_PATH=/models/mobilenetv2
+      - MODEL_BASE_PATH=/serving_patterns/src/app/ml/mobilenetv2/model/savedmodel/mobilenetv2
     ports:
       - "8512:8512"
       - "8513:8513"
@@ -48,13 +48,13 @@ services:
     container_name: serving_patterns_prep_pred_backend_mobilenetv2
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile_backend_mobilenetv2
+      dockerfile: src/app/ml/mobilenetv2/Dockerfile_backend_mobilenetv2
     environment:
       - PLATFORM=docker_compose
-      - MODEL_INTERFACE=mobilenetv2.yaml
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/mobilenetv2/model/mobilenetv2.yaml
       - NUM_PROCS=4
       - BATCH_CODE=src.app.backend.prediction_batch
-      - TFS_GRPC=prep_pred_tfs:8512
+      - TFS_GRPC=prep_pred_tfs_mobilenetv2:8512
       - PROFILE=0
       - PREDICTOR=src.app.api._predict_image
       - QUEUE_NAME=tfs_queue
