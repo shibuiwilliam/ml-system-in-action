@@ -13,7 +13,7 @@ COPY ./src/middleware/ /${PROJECT_DIR}/src/middleware/
 COPY ./src/*.py /${PROJECT_DIR}/src/
 COPY ./logging/ /${PROJECT_DIR}/logging/
 
-COPY ./scripts/api_composition_proxy/run_proxy.sh /${PROJECT_DIR}/run_proxy.sh
+COPY ./src/api_composition_proxy/run_proxy.sh /${PROJECT_DIR}/run_proxy.sh
 RUN chmod +x run_proxy.sh
 
 CMD ./run_proxy.sh
