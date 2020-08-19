@@ -2,18 +2,18 @@ from fastapi import FastAPI
 import logging
 
 from src.api_composition_proxy.routers import proxy, health
-from src.api_composition_proxy.configurations import FastAPIConfigurations
+from src.api_composition_proxy.configurations import APIConfigurations
 from src.configurations import PlatformConfigurations
 
 
 logger = logging.getLogger(__name__)
-logger.info(f'starts {FastAPIConfigurations.title}:{FastAPIConfigurations.version}')
+logger.info(f'starts {APIConfigurations.title}:{APIConfigurations.version}')
 logger.info(f'platform: {PlatformConfigurations.platform}')
 
 app = FastAPI(
-    title=FastAPIConfigurations.title,
-    description=FastAPIConfigurations.description,
-    version=FastAPIConfigurations.version,
+    title=APIConfigurations.title,
+    description=APIConfigurations.description,
+    version=APIConfigurations.version,
 )
 
 app.include_router(

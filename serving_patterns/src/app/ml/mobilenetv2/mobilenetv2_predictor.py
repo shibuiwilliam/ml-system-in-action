@@ -77,8 +77,7 @@ class _Classifier(BasePredictor):
                 else:
                     self.classifiers[k] = {'runner': v, 'predictor': None}
                     self.channel = grpc.insecure_channel(TFS_GPRC)
-                    self.stub = prediction_service_pb2_grpc.PredictionServiceStub(
-                        self.channel)
+                    self.stub = prediction_service_pb2_grpc.PredictionServiceStub(self.channel)
         logger.info(f'initialized {self.__class__.__name__}')
 
     def predict(self, input_data: Image) -> np.ndarray:
@@ -92,7 +91,8 @@ class _Classifier(BasePredictor):
                 request.model_spec.name = self.model_spec_name
                 request.model_spec.signature_name = self.model_spec_signature_name
                 request.inputs[_DataInterface().input_name].CopyFrom(tf.make_tensor_proto(
-                    _prediction, shape=_ModelConfigurations().io['input_shape']))
+                    _prediction,
+                    shape=_ModelConfigurations().io['input_shape']))
                 result = self.stub.Predict(request, TIMEOUT_SECOND)
                 _prediction = np.array(
                     result.outputs[_DataInterface().output_name].float_val)

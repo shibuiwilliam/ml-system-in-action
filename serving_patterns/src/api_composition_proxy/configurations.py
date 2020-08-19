@@ -17,20 +17,20 @@ class _ServiceConfigurations():
     enqueue = int(os.getenv('ENQUEUE', 1))
 
 
-class _FastAPIConfigurations():
-    title = os.getenv('FASTAPI_TITLE', 'ServingProxy')
+class _APIConfigurations():
+    title = os.getenv('API_TITLE', 'ServingProxy')
     description = os.getenv(
-        'FASTAPI_DESCRIPTION',
+        'API_DESCRIPTION',
         'machine learning system serving proxy')
-    version = os.getenv('FASTAPI_VERSION', '0.1')
+    version = os.getenv('API_VERSION', '0.1')
     app_name = os.getenv(
         'APP_NAME',
         'src.api_composition_proxy.apps.proxy:app')
 
 
 ServiceConfigurations = _ServiceConfigurations()
-FastAPIConfigurations = _FastAPIConfigurations()
+APIConfigurations = _APIConfigurations()
 
-logger.info(f'fastapi configurations: {ServiceConfigurations.__dict__}')
-logger.info(f'service configurations: {FastAPIConfigurations.__dict__}')
+logger.info(f'api configurations: {ServiceConfigurations.__dict__}')
+logger.info(f'service configurations: {APIConfigurations.__dict__}')
 logger.info(f'redis cache configurations: {RedisCacheConfigurations.__dict__}')

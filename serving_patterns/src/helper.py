@@ -1,4 +1,8 @@
 import uuid
+from PIL import Image
+from typing import Union, List
+import numpy as np
+
 from src.middleware.redis_client import redis_client
 from src.constants import CONSTANTS, JOB_ID_ENUM
 from src.configurations import JobIdConfigurations
@@ -29,3 +33,13 @@ def get_job_id():
         return get_uuid_incremental_id()
     else:
         return get_uuid()
+
+
+def get_image_data(data: Union[Image.Image, np.ndarray, List, str]) -> Image.Image:
+    if isinstance(data, Image.Image):
+        return data
+    elif isinstance(data, np.ndarray):
+        return Image.fromarray(data)
+    elif isinstance(data, List):
+        return Image.fromarray(np.array(data))
+    return Image.open(data)

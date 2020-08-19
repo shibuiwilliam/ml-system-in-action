@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 from typing import List, Any, Sequence, Union
 import numpy as np
 

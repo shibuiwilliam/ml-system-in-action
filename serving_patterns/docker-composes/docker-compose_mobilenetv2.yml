@@ -9,7 +9,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=/serving_patterns/src/app/ml/mobilenetv2/model/mobilenetv2.yaml
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=4
       - BACKLOG=64
       - LIMIT_MAX_REQUESTS=1024
@@ -22,8 +22,6 @@ services:
     ports:
       - "8893:8893"
     command: ./run_api.sh
-    volumes:
-      - shared_volume:/shared_volume
     depends_on:
       - redis
       - prep_pred_tfs_mobilenetv2
@@ -59,8 +57,6 @@ services:
       - PREDICTOR=src.app.api._predict_image
       - QUEUE_NAME=tfs_queue
     command: ./run_backend.sh
-    volumes:
-      - shared_volume:/shared_volume
     depends_on:
       - redis
 
@@ -69,10 +65,3 @@ services:
     image: "redis:latest"
     ports:
       - "6379:6379"
-
-volumes:
-  shared_volume:
-    driver_opts:
-      type: none
-      device: /tmp
-      o: bind

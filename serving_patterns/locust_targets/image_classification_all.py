@@ -44,3 +44,21 @@ class APIUser(HttpUser):
             headers={'content-type': 'application/json'},
             verify=False
         )
+
+    @task(int(os.getenv('POST_PREDICT_FLASK_RATIO', 0)))
+    def post_predict_flask(self):
+        self.client.post(
+            url='/predict/image',
+            json=image_data.image_data,
+            headers={'content-type': 'application/json'},
+            verify=False
+        )
+
+    @task(int(os.getenv('POST_PREDICT_LABEL_FLASK_RATIO', 0)))
+    def post_predict_label_flask(self):
+        self.client.post(
+            url='/predict/image/label',
+            json=image_data.image_data,
+            headers={'content-type': 'application/json'},
+            verify=False
+        )

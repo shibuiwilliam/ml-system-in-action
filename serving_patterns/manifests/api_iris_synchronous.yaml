@@ -27,7 +27,7 @@ spec:
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
           value: iris_tree_onnx_runtime.yaml
-        - name: GUNICORN_UVICORN
+        - name: RUNNER
           value: GUNICORN
         - name: WORKERS
           value: "4"

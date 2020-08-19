@@ -6,7 +6,7 @@ import logging
 from src.middleware.profiler import do_cprofile
 from src.jobs import store_data_job
 from src.constants import PLATFORM_ENUM
-from src.configurations import _PlatformConfigurations
+from src.configurations import PlatformConfigurations
 from src.app.ml.active_predictor import Data, DataConverter, active_predictor
 
 
@@ -87,17 +87,17 @@ async def _predict_async_post(
 
 def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
     result = {job_id: {'prediction': []}}
-    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+    if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = store_data_job.load_data_redis(job_id)
         result[job_id]['prediction'] = data_dict['prediction']
         return result
 
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
         data_dict = store_data_job.load_data_redis(job_id)
         result[job_id]['prediction'] = data_dict['prediction']
         return result
 
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
         data_dict = store_data_job.load_data_redis(job_id)
         result[job_id]['prediction'] = data_dict['prediction']
         return result
@@ -108,7 +108,7 @@ def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
 
 def _predict_async_get_label(job_id: str) -> Dict[str, Dict[str, Dict[str, float]]]:
     result = {job_id: {'prediction': []}}
-    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+    if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         data_dict = store_data_job.load_data_redis(job_id)
         if result[job_id]['prediction'] is None:
             result[job_id]['prediction'] = data_dict['prediction']
@@ -117,7 +117,7 @@ def _predict_async_get_label(job_id: str) -> Dict[str, Dict[str, Dict[str, float
         result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
         return result
 
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
         data_dict = store_data_job.load_data_redis(job_id)
         if result[job_id]['prediction'] is None:
             result[job_id]['prediction'] = data_dict['prediction']
@@ -126,7 +126,7 @@ def _predict_async_get_label(job_id: str) -> Dict[str, Dict[str, Dict[str, float
         result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
         return result
 
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
         data_dict = store_data_job.load_data_redis(job_id)
         if result[job_id]['prediction'] is None:
             result[job_id]['prediction'] = data_dict['prediction']

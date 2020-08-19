@@ -10,9 +10,8 @@ import base64
 from PIL import Image
 
 from src.constants import PLATFORM_ENUM, CONSTANTS
-from src.configurations import _PlatformConfigurations
+from src.configurations import PlatformConfigurations, CacheConfigurations
 from src.middleware.redis_client import redis_client
-from src.configurations import _CacheConfigurations
 
 
 logger = logging.getLogger(__name__)
@@ -132,25 +131,25 @@ def _save_data_job(data: Any,
                    job_id: str,
                    background_tasks: BackgroundTasks,
                    enqueue: bool = False) -> str:
-    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+    if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
         task = SaveDataRedisJob(
             job_id=job_id,
             data=data,
-            queue_name=_CacheConfigurations().queue_name,
+            queue_name=CacheConfigurations.queue_name,
             enqueue=enqueue)
 
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
         task = SaveDataRedisJob(
             job_id=job_id,
             data=data,
-            queue_name=_CacheConfigurations().queue_name,
+            queue_name=CacheConfigurations.queue_name,
             enqueue=enqueue)
 
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.TEST.value:
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
         task = SaveDataRedisJob(
             job_id=job_id,
             data=data,
-            queue_name=_CacheConfigurations().queue_name,
+            queue_name=CacheConfigurations.queue_name,
             enqueue=enqueue)
     else:
         raise ValueError('platform must be chosen from constants.PLATFORM_ENUM')

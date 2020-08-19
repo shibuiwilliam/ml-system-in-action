@@ -2,7 +2,7 @@
 
 set -eu
 
-GUNICORN_UVICORN=${GUNICORN_UVICORN:-"GUNICORN"}
+RUNNER=${RUNNER:-"GUNICORN"}
 HOST=${HOST:-"0.0.0.0"}
 PORT=${PORT:-8888}
 WORKERS=${WORKERS:-4}
@@ -15,7 +15,7 @@ MAX_REQUESTS_JITTER=${MAX_REQUESTS_JITTER:-2048}
 APP_NAME=${APP_NAME:-"src.app.apps.app_web_single:app"}
 
 
-if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
+if [ ${RUNNER} = "GUNICORN" ]; then
     gunicorn ${APP_NAME} \
         -b ${HOST}:${PORT} \
         -w ${WORKERS} \
@@ -27,7 +27,7 @@ if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
         --max-requests-jitter ${MAX_REQUESTS_JITTER} \
         --reload
 
-else
+elif [ ${RUNNER} = "UVICORN" ]; then
     uvicorn ${APP_NAME} \
         --host ${HOST} \
         --port ${PORT} \
@@ -36,5 +36,16 @@ else
         --log-config ${LOGCONFIG} \
         --backlog ${BACKLOG} \
         --limit-max-requests ${LIMIT_MAX_REQUESTS} \
+        --reload
+
+elif [ ${RUNNER} = "FLASK" ]; then
+    gunicorn ${APP_NAME} \
+        -b ${HOST}:${PORT} \
+        -w ${WORKERS} \
+        --log-level ${LOGLEVEL} \
+        --log-config ${LOGCONFIG} \
+        --backlog ${BACKLOG} \
+        --max-requests ${LIMIT_MAX_REQUESTS} \
+        --max-requests-jitter ${MAX_REQUESTS_JITTER} \
         --reload
 fi

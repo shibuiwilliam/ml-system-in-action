@@ -9,7 +9,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_svc_sklearn.yaml
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=4
       - BACKLOG=16
       - LIMIT_MAX_REQUESTS=128
@@ -32,7 +32,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_svc_onnx_runtime.yaml
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=4
       - BACKLOG=16
       - LIMIT_MAX_REQUESTS=128
@@ -55,7 +55,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_tree_onnx_runtime.yaml
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=4
       - BACKLOG=16
       - LIMIT_MAX_REQUESTS=128

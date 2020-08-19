@@ -2,7 +2,7 @@
 
 set -eu
 
-GUNICORN_UVICORN=${GUNICORN_UVICORN:-"GUNICORN"}
+RUNNER=${RUNNER:-"GUNICORN"}
 HOST=${HOST:-"0.0.0.0"}
 PORT=${PORT:-8888}
 WORKERS=${WORKERS:-4}
@@ -15,7 +15,7 @@ MAX_REQUESTS_JITTER=${MAX_REQUESTS_JITTER:-2048}
 APP_NAME=${APP_NAME:-"src.api_composition_proxy.apps.proxy:app"}
 
 
-if [ ${GUNICORN_UVICORN} = "GUNICORN" ]; then
+if [ ${RUNNER} = "GUNICORN" ]; then
     gunicorn ${APP_NAME} \
         -b ${HOST}:${PORT} \
         -w ${WORKERS} \

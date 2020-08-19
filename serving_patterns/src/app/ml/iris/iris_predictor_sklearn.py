@@ -12,9 +12,11 @@ logger = logging.getLogger(__name__)
 
 LABELS = load_labels(_ModelConfigurations().options['label_filepath'])
 
+
 class _Data(BaseData):
     test_data: List[List[int]] = [[5.1, 3.5, 1.4, 0.2]]
     labels: List[str] = LABELS
+
 
 class _DataInterface(BaseDataInterface):
     pass

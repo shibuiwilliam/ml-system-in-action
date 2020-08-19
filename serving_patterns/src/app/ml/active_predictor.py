@@ -1,9 +1,9 @@
 import logging
 import importlib
 
-from src.app.configurations import _ModelConfigurations
+from src.app.configurations import ModelConfigurations
 
-runner = importlib.import_module(_ModelConfigurations().runner)
+runner = importlib.import_module(ModelConfigurations.runner)
 
 
 logger = logging.getLogger(__name__)
@@ -29,12 +29,12 @@ class Predictor(ActivePredictor):
     pass
 
 
-DataInterface.input_shape = _ModelConfigurations().io['input_shape']
-DataInterface.input_type = _ModelConfigurations().io['input_type']
-DataInterface.output_shape = _ModelConfigurations().io['output_shape']
-DataInterface.output_type = _ModelConfigurations().io['output_type']
-DataInterface.data_type = _ModelConfigurations().io['data_type']
+DataInterface.input_shape = ModelConfigurations.io['input_shape']
+DataInterface.input_type = ModelConfigurations.io['input_type']
+DataInterface.output_shape = ModelConfigurations.io['output_shape']
+DataInterface.output_type = ModelConfigurations.io['output_type']
+DataInterface.data_type = ModelConfigurations.io['data_type']
 
 DataConverter.data_interface = DataInterface
 
-active_predictor = Predictor(_ModelConfigurations().model_runners)
+active_predictor = Predictor(ModelConfigurations.model_runners)

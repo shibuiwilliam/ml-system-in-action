@@ -6,10 +6,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class _FastAPIConfigurations():
-    title = os.getenv('FASTAPI_TITLE', 'ServingPattern')
-    description = os.getenv('FASTAPI_DESCRIPTION', 'machine learning system serving patterns')
-    version = os.getenv('FASTAPI_VERSION', '0.1')
+class _APIConfigurations():
+    title = os.getenv('API_TITLE', 'ServingPattern')
+    description = os.getenv('API_DESCRIPTION', 'machine learning system serving patterns')
+    version = os.getenv('API_VERSION', '0.1')
     app_name = os.getenv('APP_NAME', 'src.app.apps.app_web_single:app')
 
 
@@ -33,7 +33,7 @@ class _ModelConfigurations():
     physical_save_data = os.getenv('PHYSICAL_SAVE_DATA', PHYSICAL_SAVE_DATA.SAVE)
 
 
-FastAPIConfigurations = _FastAPIConfigurations()
+APIConfigurations = _APIConfigurations()
 ModelConfigurations = _ModelConfigurations()
 logger.info(f'model configurations: {ModelConfigurations.__dict__}')
-logger.info(f'fastapi configurations: {FastAPIConfigurations.__dict__}')
+logger.info(f'api configurations: {APIConfigurations.__dict__}')

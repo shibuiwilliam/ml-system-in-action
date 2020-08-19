@@ -43,10 +43,7 @@ def main():
         print(f'saved model {SAVEDMODEL_DIR} not found')
         model = get_model(HUB_URL, (224, 224, 3))
 
-    preprocess = TFImagePreprocessTransformer(
-        image_size=(
-            224, 224), prediction_shape=(
-            1, 224, 224, 3))
+    preprocess = TFImagePreprocessTransformer(image_size=(224, 224), prediction_shape=(1, 224, 224, 3))
     postprocess = SoftmaxTransformer()
 
     image = Image.open(SAMPLE_IMAGE)

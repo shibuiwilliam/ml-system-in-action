@@ -2,20 +2,20 @@ import os
 from fastapi import FastAPI
 import logging
 
-from src.configurations import _PlatformConfigurations
+from src.configurations import PlatformConfigurations
 from src.app.routers import health, predict_asynchronous
-from src.app.configurations import _FastAPIConfigurations
+from src.app.configurations import APIConfigurations
 
 logger = logging.getLogger(__name__)
 logger.info(
-    f'starts {_FastAPIConfigurations().title}:{_FastAPIConfigurations().version}')
-logger.info(f'platform: {_PlatformConfigurations().platform}')
+    f'starts {APIConfigurations.title}:{APIConfigurations.version}')
+logger.info(f'platform: {PlatformConfigurations.platform}')
 
 
 app = FastAPI(
-    title=_FastAPIConfigurations().title,
-    description=_FastAPIConfigurations().description,
-    version=_FastAPIConfigurations().version,
+    title=APIConfigurations.title,
+    description=APIConfigurations.description,
+    version=APIConfigurations.version,
 )
 
 app.include_router(

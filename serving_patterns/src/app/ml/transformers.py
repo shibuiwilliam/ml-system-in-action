@@ -38,6 +38,7 @@ class PytorchImagePreprocessTransformer(BaseEstimator, TransformerMixin):
         norm_image_data = norm_image_data.reshape(self.prediction_shape).astype('float32')
         return norm_image_data
 
+
 class TFImagePreprocessTransformer(BaseEstimator, TransformerMixin):
     def __init__(
             self,

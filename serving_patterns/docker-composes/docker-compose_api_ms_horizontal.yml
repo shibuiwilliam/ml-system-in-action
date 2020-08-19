@@ -7,7 +7,7 @@ services:
       context: ..
       dockerfile: src/api_composition_proxy/Dockerfile_proxy
     environment:
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=8
       - BACKLOG=2048
       - LIMIT_MAX_REQUESTS=65536
@@ -33,7 +33,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_svc_sklearn.yaml
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=4
       - BACKLOG=256
       - LIMIT_MAX_REQUESTS=1024
@@ -56,7 +56,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_svc_onnx_runtime.yaml
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=4
       - BACKLOG=256
       - LIMIT_MAX_REQUESTS=1024
@@ -79,7 +79,7 @@ services:
     environment:
       - PLATFORM=docker_compose
       - MODEL_INTERFACE=/serving_patterns/src/app/ml/iris/model/iris_tree_onnx_runtime.yaml
-      - GUNICORN_UVICORN=GUNICORN
+      - RUNNER=GUNICORN
       - WORKERS=4
       - BACKLOG=256
       - LIMIT_MAX_REQUESTS=1024

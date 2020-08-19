@@ -1,10 +1,10 @@
 import redis
 
-from src.configurations import _RedisCacheConfigurations
+from src.configurations import RedisCacheConfigurations
 
 
 redis_client = redis.Redis(
-    host=_RedisCacheConfigurations().cache_host,
-    port=_RedisCacheConfigurations().cache_port,
-    db=_RedisCacheConfigurations().redis_db,
-    decode_responses=_RedisCacheConfigurations().redis_decode_responses)
+    host=RedisCacheConfigurations.cache_host,
+    port=RedisCacheConfigurations.cache_port,
+    db=RedisCacheConfigurations.redis_db,
+    decode_responses=RedisCacheConfigurations.redis_decode_responses)
