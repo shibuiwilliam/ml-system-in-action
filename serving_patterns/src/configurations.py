@@ -28,16 +28,6 @@ class _RedisCacheConfigurations(_CacheConfigurations):
     redis_decode_responses = bool(os.getenv('REDIS_DECODE_RESPONSES', True))
 
 
-class _FileConfigurations():
-    shared_volume = ''
-    if _PlatformConfigurations().platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
-        shared_volume = '/shared_volume'
-    elif _PlatformConfigurations().platform == PLATFORM_ENUM.KUBERNETES.value:
-        shared_volume = '/mnt'
-    else:
-        shared_volume = '/tmp'
-
-
 class _JobIdConfigurations():
     job_id_type = os.getenv('JOB_ID_TYPE', JOB_ID_ENUM.UUID.value)
     if job_id_type == JOB_ID_ENUM.UUID.value:
@@ -53,11 +43,9 @@ class _JobIdConfigurations():
 PlatformConfigurations = _PlatformConfigurations()
 CacheConfigurations = _CacheConfigurations()
 RedisCacheConfigurations = _RedisCacheConfigurations()
-FileConfigurations = _FileConfigurations()
 JobIdConfigurations = _JobIdConfigurations()
 
 logger.info(f'platform configurations: {PlatformConfigurations.__dict__}')
 logger.info(f'cache configurations: {CacheConfigurations.__dict__}')
 logger.info(f'redis cache configurations: {RedisCacheConfigurations.__dict__}')
-logger.info(f'file configurations: {FileConfigurations.__dict__}')
 logger.info(f'job id configurations: {JobIdConfigurations.__dict__}')

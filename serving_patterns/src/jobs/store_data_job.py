@@ -12,7 +12,6 @@ from PIL import Image
 from src.constants import PLATFORM_ENUM, CONSTANTS
 from src.configurations import _PlatformConfigurations
 from src.middleware.redis_client import redis_client
-from src.configurations import _FileConfigurations
 from src.configurations import _CacheConfigurations
 
 
