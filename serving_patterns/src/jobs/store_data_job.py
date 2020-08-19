@@ -5,7 +5,8 @@ import logging
 from pydantic import BaseModel
 import json
 import numpy as np
-import uuid
+import io
+import base64
 from PIL import Image
 
 from src.constants import PLATFORM_ENUM, CONSTANTS
@@ -16,6 +17,10 @@ from src.configurations import _CacheConfigurations
 
 
 logger = logging.getLogger(__name__)
+
+
+def make_image_key(key: str) -> str:
+    return f'{key}_image'
 
 
 def left_push_queue(queue_name: str, key: str) -> bool:
@@ -38,6 +43,28 @@ def load_data_redis(key: str) -> Dict[str, Any]:
     return data_dict
 
 
+def get_data_redis(key: str) -> Any:
+    data = redis_client.get(key)
+    return data
+
+
+def set_image_redis(key: str, image: Image.Image) -> str:
+    bytes_io = io.BytesIO()
+    image.save(bytes_io, format=image.format)
+    image_key = make_image_key(key)
+    encoded = base64.b64encode(bytes_io.getvalue())
+    redis_client.set(image_key, encoded)
+    return image_key
+
+
+def get_image_redis(key: str) -> Image.Image:
+    redis_data = get_data_redis(key)
+    decoded = base64.b64decode(redis_data)
+    io_bytes = io.BytesIO(decoded)
+    image = Image.open(io_bytes)
+    return image
+
+
 def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
     file_path = os.path.join(directory, f'{job_id}.json')
     with open(file_path, 'w') as f:
@@ -55,9 +82,8 @@ def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
         if isinstance(v, np.ndarray):
             data_dict[k] = v.tolist()
         elif isinstance(v, Image.Image):
-            filepath = os.path.join(_FileConfigurations().shared_volume, f'{job_id}.jpg')
-            v.save(filepath)
-            data_dict[k] = filepath
+            image_key = set_image_redis(job_id, v)
+            data_dict[k] = image_key
         else:
             data_dict[k] = v
     logger.info(f'job_id: {job_id}')

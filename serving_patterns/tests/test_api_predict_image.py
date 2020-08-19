@@ -108,11 +108,8 @@ def test__predict_label(mocker, prediction, expected):
     [(job_id, {'image_data': mock_image}, {'image_data': mock_image, 'prediction': [f_proba]})]
 )
 def test_predict_from_redis_cache(mocker, job_id, data, expected):
-    mock_data = MockData(
-        image_data=data['image_data'],
-        prediction=expected['prediction']
-    )
     mocker.patch('src.jobs.store_data_job.load_data_redis', return_value=data)
+    mocker.patch('src.jobs.store_data_job.get_image_redis', return_value=data['image_data'])
     mocker.patch(
         'src.app.ml.active_predictor.active_predictor.predict',
         return_value=np.array(expected['prediction']))

@@ -12,7 +12,7 @@ from src.app.ml.base_predictor import BaseData, BaseDataInterface
 
 test_job_id = '550e8400-e29b-41d4-a716-446655440000_0'
 test_uuid = '550e8400-e29b-41d4-a716-446655440000'
-mock_image = Image.new('RGB', size=(300, 300), color=(10, 10, 10))
+mock_image = Image.open('src/app/ml/data/good_cat.jpg')
 labels = ['a', 'b', 'c']
 mock_BackgroundTasks = BackgroundTasks()
 
@@ -40,6 +40,15 @@ class MockDataInterface(BaseDataInterface):
 class MockJob():
     def __call__(self):
         return True
+
+
+@pytest.mark.parametrize(
+    ('key', 'expected'),
+    [('a', 'a_image')]
+)
+def test_make_image_key(key, expected):
+    result = store_data_job.make_image_key(key)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -96,6 +105,48 @@ def test_load_data_redis(mocker, key, data):
     result = store_data_job.load_data_redis(key)
     assert result['data'] == data['data']
     assert result['prediction'] == data['prediction']
+
+
+@pytest.mark.parametrize(
+    ('key', 'data'),
+    [('a', 'b')]
+)
+def test_get_data_redis(mocker, key, data):
+    mocker.patch(
+        'src.middleware.redis_client.redis_client.get',
+        return_value=data)
+    result = store_data_job.get_data_redis(key)
+    assert result == data
+
+
+@pytest.mark.parametrize(
+    ('key', 'image', 'expected'),
+    [('a', mock_image, 'a_image')]
+)
+def test_set_image_redis(mocker, key, image, expected):
+    mocker.patch(
+        'PIL.Image.Image.format',
+        return_value='JPEG')
+    mocker.patch(
+        'src.middleware.redis_client.redis_client.set',
+        return_value=None)
+    result = store_data_job.set_image_redis(key, image)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    ('key', 'image', 'expected'),
+    [('a', mock_image, mock_image)]
+)
+def test_get_image_redis(mocker, key, image, expected):
+    mocker.patch(
+        'src.jobs.store_data_job.get_data_redis',
+        return_value=True)
+    mocker.patch('base64.b64decode', return_value=True)
+    mocker.patch('io.BytesIO', return_value=True)
+    mocker.patch('PIL.Image.open', return_value=image)
+    result = store_data_job.get_image_redis(key)
+    assert result == expected
 
 
 @pytest.mark.parametrize(

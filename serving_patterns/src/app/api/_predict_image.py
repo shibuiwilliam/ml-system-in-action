@@ -40,8 +40,11 @@ def _predict_from_redis_cache(job_id: str,
     data_dict = store_data_job.load_data_redis(job_id)
     if data_dict is None:
         return None
-    if not isinstance(data_dict['image_data'], Image.Image):
-        data_dict['image_data'] = Image.open(data_dict['image_data'])
+    if 'image_data' in data_dict.keys():
+        image_key = store_data_job.make_image_key(job_id)
+        if isinstance(data_dict['image_data'], str) and data_dict['image_data'] == image_key:
+            image_data = store_data_job.get_image_redis(image_key)
+            data_dict['image_data'] = image_data
     data = data_class(**data_dict)
     __predict(data)
     return data
