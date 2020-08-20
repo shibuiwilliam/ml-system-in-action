@@ -19,7 +19,7 @@ RUN chmod +x run_extract_resnet50_onnx.sh && \
     ./run_extract_resnet50_onnx.sh
 
 
-FROM python:3.7-slim
+FROM python:3.8.5-slim
 
 ENV PROJECT_DIR serving_patterns
 WORKDIR /${PROJECT_DIR}
