@@ -26,7 +26,7 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: resnet50_onnx.yaml
+          value: /serving_patterns/src/app/ml/resnet50_onnx/model/resnet50_onnx.yaml
         - name: RUNNER
           value: GUNICORN
         - name: WORKERS
@@ -66,13 +66,6 @@ spec:
           requests:
             cpu: "2"
             memory: "2000Mi"
-        volumeMounts:
-          - name: pvc-nfs
-            mountPath: "/mnt"
-      volumes:
-      - name: pvc-nfs
-        persistentVolumeClaim:
-          claimName: nfs
 
 ---
 

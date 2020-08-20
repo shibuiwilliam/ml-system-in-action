@@ -28,7 +28,7 @@ spec:
         - name: MODEL_NAME
           value: resnet_v2_50
         - name: MODEL_BASE_PATH
-          value: /models/resnet_v2_50
+          value: /serving_patterns/src/app/ml/resnet50_tfs/model/savedmodel/resnet_v2_50
         ports:
         - containerPort: 8514
         resources:

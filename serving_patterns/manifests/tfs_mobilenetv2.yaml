@@ -28,7 +28,7 @@ spec:
         - name: MODEL_NAME
           value: mobilenetv2
         - name: MODEL_BASE_PATH
-          value: /models/mobilenetv2
+          value: /serving_patterns/src/app/ml/mobilenetv2/model/mobilenetv2.yaml
         ports:
         - containerPort: 8512
         resources:

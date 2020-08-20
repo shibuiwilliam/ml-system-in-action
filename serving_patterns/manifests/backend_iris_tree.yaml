@@ -26,7 +26,7 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: iris_tree_onnx_runtime.yaml
+          value: /serving_patterns/src/app/ml/iris/model/iris_tree_onnx_runtime.yaml
         - name: NUM_PROCS
           value: "8"
         - name: APP_NAME

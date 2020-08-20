@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-iris-synchronous
+  name: api-resnet50-flask-onnx
   labels:
-    app: api-iris-synchronous
+    app: api-resnet50-flask-onnx
   namespace: serving-pattern
 spec:
   selector:
     matchLabels:
-      app: api-iris-synchronous
-  replicas: 3
+      app: api-resnet50-flask-onnx
+  replicas: 2
   template:
     metadata:
       labels:
-        app: api-iris-synchronous
-      name: api-iris-synchronous
+        app: api-resnet50-flask-onnx
+      name: api-resnet50-flask-onnx
     spec:
       containers:
-      - name: api-iris-synchronous
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_iris:latest
+      - name: api-resnet50-flask-onnx
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_resnet50_flask_onnx:latest
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM
@@ -26,59 +26,59 @@ spec:
         - name: CACHE_HOST
           value: redis.serving-pattern.svc.cluster.local
         - name: MODEL_INTERFACE
-          value: /serving_patterns/src/app/ml/iris/model/iris_svc_onnx_runtime.yaml
+          value: /serving_patterns/src/app/ml/resnet50_onnx/model/resnet50_onnx.yaml
         - name: RUNNER
-          value: GUNICORN
+          value: FLASK
         - name: WORKERS
-          value: "4"
+          value: "2"
         - name: BACKLOG
-          value: "128"
+          value: "32"
         - name: LIMIT_MAX_REQUESTS
-          value: "1024"
+          value: "256"
         - name: MAX_REQUESTS_JITTER
-          value: "512"
+          value: "64"
         - name: APP_NAME
-          value: "src.app.apps.app_synchronous:app"
+          value: "src.app.apps.app_flask:app"
         - name: PORT
-          value: "8889"
+          value: "8895"
         - name: PROFILE
-          value: "0"
+          value: "1"
         - name: QUEUE_NAME
-          value: tree_api_queue
+          value: resnet50_api_queue
         ports:
-        - containerPort: 8889
+        - containerPort: 8895
         livenessProbe:
           httpGet:
-            port: 8889
+            port: 8895
             path: /health
           failureThreshold: 5
           periodSeconds: 5
         readinessProbe:
           httpGet:
-            port: 8889
+            port: 8895
             path: /health
-          failureThreshold: 2
-          periodSeconds: 1
+          failureThreshold: 5
+          periodSeconds: 5
         resources:
           limits:
             cpu: "2"
-            memory: "1000Mi"
+            memory: "2000Mi"
           requests:
             cpu: "2"
-            memory: "1000Mi"
+            memory: "2000Mi"
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-iris-synchronous
+  name: api-resnet50-flask-onnx
   labels:
-    app: api-iris-synchronous
+    app: api-resnet50-flask-onnx
   namespace: serving-pattern
 spec:
   ports:
-  - port: 8889
+  - port: 8895
     protocol: TCP
   selector:
-    app: api-iris-synchronous
+    app: api-resnet50-flask-onnx

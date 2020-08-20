@@ -70,13 +70,6 @@ spec:
             path: /health
           failureThreshold: 5
           periodSeconds: 5
-        volumeMounts:
-          - name: pvc-nfs
-            mountPath: "/mnt"
-      volumes:
-      - name: pvc-nfs
-        persistentVolumeClaim:
-          claimName: nfs
 
 ---
 
