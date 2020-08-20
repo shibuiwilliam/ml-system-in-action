@@ -25,7 +25,7 @@ RUN apt-get -y update && \
 
 COPY ./src/ /${PROJECT_DIR}/src/
 COPY ./logging/ /${PROJECT_DIR}/logging/
-COPY --from=builder /${PROJECT_DIR}/src/app/ml/inceptionv3 /${PROJECT_DIR}/src/app/ml/
+COPY --from=builder /${PROJECT_DIR}/src/app/ml/inceptionv3/ /${PROJECT_DIR}/src/app/ml/inceptionv3/
 
 COPY ./scripts/run_api.sh /${PROJECT_DIR}/run_api.sh
 RUN chmod +x run_api.sh
