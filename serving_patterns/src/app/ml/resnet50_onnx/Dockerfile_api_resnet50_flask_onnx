@@ -11,7 +11,7 @@ RUN apt-get -y update && \
     conda install pytorch torchvision cpuonly -c pytorch && \
     conda clean -y --all && \
     pip install  --no-cache-dir -r requirements_pytorch.txt
-
+ 
 COPY ./src/ /${PROJECT_DIR}/src/
 COPY ./src/app/ml/resnet50_onnx/run_extract_resnet50_onnx.sh /${PROJECT_DIR}/run_extract_resnet50_onnx.sh
 
