@@ -17,6 +17,12 @@ _extract_resnet50_onnx_image_name := serving_patterns_extract_resnet50_onnx
 _extract_resnet50_onnx_image_version := latest
 _extract_resnet50_onnx_container_name := serving_patterns_extract_resnet50_onnx
 
+_extract_resnet50_onnx_server_work_dir := src/app/ml/resnet50_onnx_server
+_extract_resnet50_onnx_server_container_file := Dockerfile_extract_resnet50_onnx_server
+_extract_resnet50_onnx_server_image_name := serving_patterns_extract_resnet50_onnx_server
+_extract_resnet50_onnx_server_image_version := latest
+_extract_resnet50_onnx_server_container_name := serving_patterns_extract_resnet50_onnx_server
+
 _extract_resnet50_tfs_work_dir := src/app/ml/resnet50_tfs
 _extract_resnet50_tfs_container_file := Dockerfile_extract_resnet50_tfs
 _extract_resnet50_tfs_image_name := serving_patterns_extract_resnet50_tfs
@@ -50,6 +56,11 @@ _c_resnet50_onnx := $(_dockercompose_dir)/docker-compose_resnet50_onnx.yml
 _c_build_resnet50_onnx := docker-compose -f $(_c_resnet50_onnx) build
 _c_up_resnet50_onnx := docker-compose -f $(_c_resnet50_onnx) up -d
 _c_down_resnet50_onnx := docker-compose -f $(_c_resnet50_onnx) down
+
+_c_resnet50_onnx_server := $(_dockercompose_dir)/docker-compose_resnet50_onnx_server.yml
+_c_build_resnet50_onnx_server := docker-compose -f $(_c_resnet50_onnx_server) build
+_c_up_resnet50_onnx_server := docker-compose -f $(_c_resnet50_onnx_server) up -d
+_c_down_resnet50_onnx_server := docker-compose -f $(_c_resnet50_onnx_server) down
 
 _c_resnet50_tfs := $(_dockercompose_dir)/docker-compose_resnet50_tfs.yml
 _c_build_resnet50_tfs := docker-compose -f $(_c_resnet50_tfs) build
@@ -116,6 +127,16 @@ _extract_resnet50_onnx := \
 		-v $(_absolute_path)/$(_extract_resnet50_onnx_work_dir)/data/:/serving_patterns/$(_extract_resnet50_onnx_work_dir)/data/ \
 		-v $(_absolute_path)/$(_extract_resnet50_onnx_work_dir)/model/:/serving_patterns/$(_extract_resnet50_onnx_work_dir)/model/ \
 		$(_extract_resnet50_onnx_image_name):$(_extract_resnet50_onnx_image_version)
+
+_extract_resnet50_onnx_server := \
+	docker build \
+		-t $(_extract_resnet50_onnx_server_image_name):$(_extract_resnet50_onnx_server_image_version) \
+		-f $(_absolute_path)/$(_extract_resnet50_onnx_server_work_dir)/$(_extract_resnet50_onnx_server_container_file) . && \
+	docker run --rm \
+		--name $(_extract_resnet50_onnx_server_container_name) \
+		-v $(_absolute_path)/$(_extract_resnet50_onnx_server_work_dir)/data/:/serving_patterns/$(_extract_resnet50_onnx_server_work_dir)/data/ \
+		-v $(_absolute_path)/$(_extract_resnet50_onnx_server_work_dir)/model/:/serving_patterns/$(_extract_resnet50_onnx_server_work_dir)/model/ \
+		$(_extract_resnet50_onnx_server_image_name):$(_extract_resnet50_onnx_server_image_version)
 
 _extract_resnet50_tfs := \
 	docker build \
@@ -190,6 +211,18 @@ c_up_resnet50_onnx:
 .PHONY: c_down_resnet50_onnx
 c_down_resnet50_onnx:
 	$(_c_down_resnet50_onnx)
+
+.PHONY: c_build_resnet50_onnx_server
+c_build_resnet50_onnx_server:
+	$(_c_build_resnet50_onnx_server)
+
+.PHONY: c_up_resnet50_onnx_server
+c_up_resnet50_onnx_server:
+	$(_c_up_resnet50_onnx_server)
+
+.PHONY: c_down_resnet50_onnx_server
+c_down_resnet50_onnx_server:
+	$(_c_down_resnet50_onnx_server)
 
 .PHONY: c_build_resnet50_tfs
 c_build_resnet50_tfs:
@@ -311,6 +344,10 @@ run_locust:
 extract_resnet50_onnx:
 	$(_extract_resnet50_onnx)
 
+.PHONY: extract_resnet50_onnx_server
+extract_resnet50_onnx_server:
+	$(_extract_resnet50_onnx_server)
+
 .PHONY: extract_resnet50_tfs
 extract_resnet50_tfs:
 	$(_extract_resnet50_tfs)
@@ -328,7 +365,7 @@ extract_mobilenetv2_plant:
 	$(_extract_mobilenetv2_plant)
 
 .PHONY: extract_all
-extract_all: extract_resnet50_onnx extract_resnet50_tfs extract_inceptionv3 extract_mobilenetv2 extract_mobilenetv2_plant test_d
+extract_all: extract_resnet50_onnx extract_resnet50_tfs extract_inceptionv3 extract_mobilenetv2 extract_mobilenetv2_plant extract_resnet50_onnx_server test_d
 
 .PHONY: build_all
-build_all: extract_all c_build_api c_build_resnet50_onnx c_build_resnet50_tfs c_build_inceptionv3 c_build_mobilenetv2 c_build_api_ms_h c_build_image_ms_h build_locust
+build_all: extract_all c_build_api c_build_resnet50_onnx c_build_resnet50_tfs c_build_inceptionv3 c_build_mobilenetv2 c_build_api_ms_h c_build_image_ms_h c_build_resnet50_onnx_server build_locust

@@ -47,6 +47,49 @@ services:
     depends_on:
       - redis
 
+  api_resnet50_onnx_server:
+    container_name: api_resnet50_onnx_server
+    build:
+      context: ..
+      dockerfile: src/app/ml/resnet50_onnx_server/Dockerfile_api_resnet50_onnx_server
+    environment:
+      - PLATFORM=docker_compose
+      - MODEL_INTERFACE=/serving_patterns/src/app/ml/resnet50_onnx_server/model/resnet50_onnx_server.yaml
+      - RUNNER=GUNICORN
+      - WORKERS=4
+      - BACKLOG=64
+      - LIMIT_MAX_REQUESTS=1024
+      - MAX_REQUESTS_JITTER=128
+      - APP_NAME=src.app.apps.app_image:app
+      - ONNX_RUNTIME_SERVER_HTTP=server_resnet50_onnx_server:8001
+      - MODEL_NAME=default
+      - VERSION=1
+      - PORT=8896
+      - PROFILE=0
+      - QUEUE_NAME=image_queue
+    ports:
+      - "8896:8896"
+    command: ./run_api.sh
+    depends_on:
+      - server_resnet50_onnx_server
+      - redis
+
+  server_resnet50_onnx_server:
+    container_name: server_resnet50_onnx_server
+    build:
+      context: ..
+      dockerfile: src/app/ml/resnet50_onnx_server/Dockerfile_server_resnet50_onnx_server
+    environment:
+      - HTTP_PORT=8001
+      - GRPC_PORT=50051
+      - LOGLEVEL=debug
+      - NUM_HTTP_THREADS=4
+      - MODEL_PATH=/serving_patterns/src/app/ml/resnet50_onnx_server/model/resnet50v2.onnx
+    ports:
+      - "8001:8001"
+      - "50051:50051"
+    entrypoint: ["./onnx_runtime_server_entrypoint.sh"]
+
   api_resnet50_tfs:
     container_name: api_resnet50_tfs
     build:
