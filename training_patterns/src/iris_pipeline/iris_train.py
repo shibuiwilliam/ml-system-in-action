@@ -24,6 +24,7 @@ X_TRAIN_NPY = os.path.join(UPSTREAM_DIR, 'x_train.npy')
 Y_TRAIN_NPY = os.path.join(UPSTREAM_DIR, 'y_train.npy')
 DOWNSTREAM_DIR = os.path.join(DATA_DIR, 'trained')
 
+
 def get_params() -> Dict[str, Any]:
     params = {
         'save_model_name': 'iris_svc',

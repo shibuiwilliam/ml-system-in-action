@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-image-proxy
-  replicas: 3
+  replicas: 4
   template:
     metadata:
       labels:
@@ -28,13 +28,13 @@ spec:
         - name: RUNNER
           value: GUNICORN
         - name: WORKERS
-          value: "2"
+          value: "4"
         - name: BACKLOG
           value: "128"
         - name: LIMIT_MAX_REQUESTS
-          value: "2048"
+          value: "4096"
         - name: MAX_REQUESTS_JITTER
-          value: "256"
+          value: "1024"
         - name: APP_NAME
           value: "src.api_composition_proxy.apps.proxy:app"
         - name: PORT
@@ -43,19 +43,19 @@ spec:
           value: "0"
         - name: QUEUE_NAME
           value: resnet50_api_queue
-        - name: SERVICE_RESNET50_ONNX
-          value: api-resnet50-onnx.serving-pattern.svc.cluster.local:8891
+        - name: SERVICE_RESNET50_ONNX_SERVER
+          value: api-resnet50-onnx-server.serving-pattern.svc.cluster.local:8896
         - name: SERVICE_MOBILENETV2_TFS
           value: api-mobilenetv2.serving-pattern.svc.cluster.local:8893
-        - name: CUSTOMIZED_REDIRECT_MAP
-          value: '{"SERVICE_RESNET50_ONNX":{"predict/label":"predict/async", "predict":"predict/async"}}'
+        # - name: CUSTOMIZED_REDIRECT_MAP
+        #   value: '{"SERVICE_RESNET50_ONNX_SERVER":{"predict/label":"predict/async", "predict":"predict/async"}}'
         resources:
           limits:
             cpu: "2"
-            memory: "2000Mi"
+            memory: "8000Mi"
           requests:
             cpu: "2"
-            memory: "2000Mi"
+            memory: "8000Mi"
         ports:
         - containerPort: 8000
         livenessProbe:

@@ -88,11 +88,6 @@ class _Classifier(BasePredictor):
                 predict_request.inputs[self.input_name].CopyFrom(tensor_proto)
                 predict_request.output_filter.append(self.output_name)
                 payload = predict_request.SerializeToString()
-                # json_str = MessageToJson(tensor_proto, use_integers_for_enums=True)
-                # data = json.loads(json_str)
-                # _input_data = {self.input_name: data}
-                # _output_filters = [self.output_name]
-                # payload = {'inputs': _input_data, 'outputFilter': _output_filters}
                 response = requests.post(
                     v['predictor'],
                     data=payload,
@@ -103,7 +98,6 @@ class _Classifier(BasePredictor):
                 )
                 actual_result = predict_pb2.PredictResponse()
                 actual_result.ParseFromString(response.content)
-                # raw_data = json.loads(response.text)['outputs'][self.output_name]['rawData']
                 _prediction = np.frombuffer(actual_result.outputs[self.output_name].raw_data, dtype=np.float32)
         output = _prediction
         return output
