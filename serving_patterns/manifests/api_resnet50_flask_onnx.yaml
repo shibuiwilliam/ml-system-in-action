@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-resnet50-flask-onnx
-  replicas: 2
+  replicas: 4
   template:
     metadata:
       labels:
@@ -30,13 +30,13 @@ spec:
         - name: RUNNER
           value: FLASK
         - name: WORKERS
-          value: "2"
+          value: "16"
         - name: BACKLOG
           value: "32"
         - name: LIMIT_MAX_REQUESTS
-          value: "256"
+          value: "512"
         - name: MAX_REQUESTS_JITTER
-          value: "64"
+          value: "128"
         - name: APP_NAME
           value: "src.app.apps.app_flask:app"
         - name: PORT
@@ -61,11 +61,11 @@ spec:
           periodSeconds: 5
         resources:
           limits:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "4"
+            memory: "8000Mi"
           requests:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "4"
+            memory: "8000Mi"
 
 ---
 

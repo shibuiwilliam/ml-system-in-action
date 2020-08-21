@@ -76,7 +76,7 @@ def main():
                    label_filepath=LABEL_FILEPATH,
                    model_spec_name='mobilenetv2',
                    model_spec_signature_name='serving_default',
-                   input_name='input_1',
+                   input_name='keras_layer_input',
                    output_name='keras_layer')
 
 

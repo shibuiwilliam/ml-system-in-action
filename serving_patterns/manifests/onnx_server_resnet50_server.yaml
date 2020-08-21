@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: server-resnet50-onnx-server
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_resnet50_onnx_server:latest
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_server_resnet50_onnx_server:latest
         command: ["./onnx_runtime_server_entrypoint.sh"]
         env:
         - name: HTTP_PORT
@@ -33,6 +33,18 @@ spec:
           value: /serving_patterns/src/app/ml/resnet50_onnx_server/model/resnet50v2.onnx
         ports:
         - containerPort: 8001
+        livenessProbe:
+          httpGet:
+            port: 8001
+            path: /
+          failureThreshold: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8001
+            path: /
+          failureThreshold: 5
+          periodSeconds: 5
         resources:
           limits:
             cpu: "4"
