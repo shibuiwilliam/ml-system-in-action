@@ -17,14 +17,6 @@ logger = logging.getLogger(__name__)
 
 @do_cprofile
 def __predict(data: Data):
-    # if isinstance(data.image_data, Image.Image):
-    #     image_data = data.image_data
-    # elif isinstance(data.image_data, np.ndarray):
-    #     image_data = Image.fromarray(data.image_data)
-    # elif isinstance(data.image_data, List):
-    #     image_data = Image.fromarray(np.array(data.image_data))
-    # else:
-    #     image_data = Image.open(data.image_data)
     image_data = get_image_data(data.image_data)
     output_np = active_predictor.predict(image_data)
     reshaped_output_nps = DataConverter.reshape_output(output_np)

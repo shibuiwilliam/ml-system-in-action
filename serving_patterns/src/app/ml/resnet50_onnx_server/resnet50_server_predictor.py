@@ -15,6 +15,7 @@ from src.app.constants import MODEL_RUNTIME
 from src.app.ml.base_predictor import BaseData, BaseDataInterface, BaseDataConverter, BasePredictor
 from src.app.ml.transformers import PytorchImagePreprocessTransformer, SoftmaxTransformer
 from src.app.ml.save_helper import load_labels
+from src.app.ml.resnet50_onnx_server.proto import predict_pb2, onnx_ml_pb2
 
 import logging
 
@@ -80,18 +81,29 @@ class _Classifier(BasePredictor):
             if v['runner'] == MODEL_RUNTIME.SKLEARN.value:
                 _prediction = np.array(v['predictor'].transform(_prediction))
             elif v['runner'] == MODEL_RUNTIME.ONNX_RUNTIME_SERVER.value:
-                tensor_proto = numpy_helper.from_array(_prediction)
-                json_str = MessageToJson(tensor_proto, use_integers_for_enums=True)
-                data = json.loads(json_str)
-                _input_data = {self.input_name: data}
-                _output_filters = [self.output_name]
-                payload = {'inputs': _input_data, 'outputFilter': _output_filters}
+                _tensor_proto = numpy_helper.from_array(_prediction)
+                tensor_proto = onnx_ml_pb2.TensorProto()
+                tensor_proto.ParseFromString(_tensor_proto.SerializeToString())
+                predict_request = predict_pb2.PredictRequest()
+                predict_request.inputs[self.input_name].CopyFrom(tensor_proto)
+                predict_request.output_filter.append(self.output_name)
+                payload = predict_request.SerializeToString()
+                # json_str = MessageToJson(tensor_proto, use_integers_for_enums=True)
+                # data = json.loads(json_str)
+                # _input_data = {self.input_name: data}
+                # _output_filters = [self.output_name]
+                # payload = {'inputs': _input_data, 'outputFilter': _output_filters}
                 response = requests.post(
                     v['predictor'],
-                    json.dumps(payload),
-                    headers={'Content-Type': 'application/json', 'Accept': 'application/json'}
+                    data=payload,
+                    headers={
+                        'Content-Type': 'application/octet-stream',
+                        'Accept': 'application/x-protobuf'
+                    }
                 )
-                raw_data = json.loads(response.text)['outputs'][self.output_name]['rawData']
-                _prediction = np.frombuffer(base64.b64decode(raw_data), dtype=np.float32)
+                actual_result = predict_pb2.PredictResponse()
+                actual_result.ParseFromString(response.content)
+                # raw_data = json.loads(response.text)['outputs'][self.output_name]['rawData']
+                _prediction = np.frombuffer(actual_result.outputs[self.output_name].raw_data, dtype=np.float32)
         output = _prediction
         return output
