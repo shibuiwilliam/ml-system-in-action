@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-resnet50-onnx-server
+  labels:
+    app: server-resnet50-onnx-server
+  namespace: serving-pattern
+spec:
+  selector:
+    matchLabels:
+      app: server-resnet50-onnx-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: server-resnet50-onnx-server
+      name: server-resnet50-onnx-server
+    spec:
+      containers:
+      - name: server-resnet50-onnx-server
+        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_resnet50_onnx_server:latest
+        command: ["./onnx_runtime_server_entrypoint.sh"]
+        env:
+        - name: HTTP_PORT
+          value: "8001"
+        - name: GRPC_PORT
+          value: "50051"
+        - name: LOGLEVEL
+          value: debug
+        - name: NUM_HTTP_THREADS
+          value: "4"
+        - name: MODEL_PATH
+          value: /serving_patterns/src/app/ml/resnet50_onnx_server/model/resnet50v2.onnx
+        ports:
+        - containerPort: 8001
+        resources:
+          limits:
+            cpu: "4"
+            memory: "4000Mi"
+          requests:
+            cpu: "4"
+            memory: "4000Mi"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-resnet50-onnx-server
+  labels:
+    app: server-resnet50-onnx-server
+  namespace: serving-pattern
+spec:
+  ports:
+  - port: 8001
+    protocol: TCP
+  selector:
+    app: server-resnet50-onnx-server
