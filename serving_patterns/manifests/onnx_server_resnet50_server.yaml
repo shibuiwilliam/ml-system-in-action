@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: server-resnet50-onnx-server
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
