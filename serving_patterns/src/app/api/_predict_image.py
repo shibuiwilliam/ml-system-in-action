@@ -21,7 +21,7 @@ def __predict(data: Data):
     output_np = active_predictor.predict(image_data)
     reshaped_output_nps = DataConverter.reshape_output(output_np)
     data.prediction = reshaped_output_nps.tolist()
-    logger.info(f'job_id: {data.job_id}, prediction: {data.prediction}')
+    logger.info({'job_id': data.job_id, 'prediction': data.prediction})
 
 
 @do_cprofile

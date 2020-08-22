@@ -30,19 +30,21 @@ class _Classifier(BasePredictor):
         self.model_runners = model_runners
         self.classifier = None
         self.input_name = None
+        self.output_name = None
         self.load_model()
 
     def load_model(self):
         logger.info(f'run load model in {self.__class__.__name__}')
-        for k,v in self.model_runners[0].items():
+        for k, v in self.model_runners[0].items():
             self.classifier = rt.InferenceSession(k)
             self.input_name = self.classifier.get_inputs()[0].name
+            self.output_name = self.classifier.get_outputs()[0].name
         logger.info(f'initialized {self.__class__.__name__}')
 
     def predict(self, input: np.ndarray) -> np.ndarray:
         logger.info(f'run predict proba in {self.__class__.__name__}')
         _prediction = self.classifier.run(
-            None,
+            [self.output_name],
             {self.input_name: input.astype(np.float32)}
         )
         output = np.array(list(_prediction[1][0].values()))

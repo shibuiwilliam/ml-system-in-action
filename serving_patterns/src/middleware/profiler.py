@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def do_cprofile(func):
     def profiled_func(*args, **kwargs):
         enable_profile = int(os.getenv('PROFILE', 1))

@@ -59,10 +59,8 @@ class _Classifier(BasePredictor):
                         'runner': v,
                         'predictor': rt.InferenceSession(k)
                     }
-                    self.input_name = self.classifiers[k]['predictor'].get_inputs()[
-                        0].name
-                    self.output_name = self.classifiers[k]['predictor'].get_outputs()[
-                        0].name
+                    self.input_name = self.classifiers[k]['predictor'].get_inputs()[0].name
+                    self.output_name = self.classifiers[k]['predictor'].get_outputs()[0].name
                 else:
                     pass
         logger.info(f'initialized {self.__class__.__name__}')
