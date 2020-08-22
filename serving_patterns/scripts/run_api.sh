@@ -12,6 +12,7 @@ LOGCONFIG=${LOGCONFIG:-"./logging/logging.conf"}
 BACKLOG=${BACKLOG:-2048}
 LIMIT_MAX_REQUESTS=${LIMIT_MAX_REQUESTS:-65536}
 MAX_REQUESTS_JITTER=${MAX_REQUESTS_JITTER:-2048}
+GRACEFUL_TIMEOUT=${GRACEFUL_TIMEOUT:-10}
 APP_NAME=${APP_NAME:-"src.app.apps.app_web_single:app"}
 
 
@@ -25,6 +26,7 @@ if [ ${RUNNER} = "GUNICORN" ]; then
         --backlog ${BACKLOG} \
         --max-requests ${LIMIT_MAX_REQUESTS} \
         --max-requests-jitter ${MAX_REQUESTS_JITTER} \
+        --graceful_timeout ${GRACEFUL_TIMEOUT} \
         --reload
 
 elif [ ${RUNNER} = "UVICORN" ]; then
@@ -47,5 +49,6 @@ elif [ ${RUNNER} = "FLASK" ]; then
         --backlog ${BACKLOG} \
         --max-requests ${LIMIT_MAX_REQUESTS} \
         --max-requests-jitter ${MAX_REQUESTS_JITTER} \
+        --graceful_timeout ${GRACEFUL_TIMEOUT} \
         --reload
 fi
