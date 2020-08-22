@@ -26,7 +26,7 @@ if [ ${RUNNER} = "GUNICORN" ]; then
         --backlog ${BACKLOG} \
         --max-requests ${LIMIT_MAX_REQUESTS} \
         --max-requests-jitter ${MAX_REQUESTS_JITTER} \
-        --graceful_timeout ${GRACEFUL_TIMEOUT} \
+        --graceful-timeout ${GRACEFUL_TIMEOUT} \
         --reload
 
 elif [ ${RUNNER} = "UVICORN" ]; then
@@ -49,6 +49,6 @@ elif [ ${RUNNER} = "FLASK" ]; then
         --backlog ${BACKLOG} \
         --max-requests ${LIMIT_MAX_REQUESTS} \
         --max-requests-jitter ${MAX_REQUESTS_JITTER} \
-        --graceful_timeout ${GRACEFUL_TIMEOUT} \
+        --graceful-timeout ${GRACEFUL_TIMEOUT} \
         --reload
 fi

@@ -37,6 +37,8 @@ spec:
           value: "512"
         - name: MAX_REQUESTS_JITTER
           value: "128"
+        - name: GRACEFUL_TIMEOUT
+          value: "5"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: ONNX_RUNTIME_SERVER_HTTP
