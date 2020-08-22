@@ -34,8 +34,8 @@ def main():
         x_dummy,
         MODEL_FILEPATH,
         export_params=True,
-        # opset_version=10,
-        # do_constant_folding=True,
+        opset_version=10,
+        do_constant_folding=True,
         input_names=['input'],
         output_names=['output'],
         verbose=False
