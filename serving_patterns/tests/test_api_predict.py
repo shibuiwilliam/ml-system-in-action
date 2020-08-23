@@ -157,32 +157,34 @@ def test_test_label(mocker, output, expected):
     assert result == expected
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('output', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
-def test_predict(mocker, output, expected):
+async def test_predict(mocker, output, expected):
     mocker.patch(
         'src.app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     mocker.patch('src.jobs.store_data_job._save_data_job', return_value=job_id)
-    result = _predict(MockData(), test_uuid, mock_BackgroundTasks)
+    result = await _predict(MockData(), test_uuid, mock_BackgroundTasks)
     assert nested_floats_almost_equal(result['prediction'], expected['prediction'])
     assert result['job_id'] == test_uuid
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('output', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': {'a': 0.8}}),
      (np.array([[0.7, 0.1, 0.2]]), {'prediction': {'a': 0.7}})]
 )
-def test_predict_label(mocker, output, expected):
+async def test_predict_label(mocker, output, expected):
     mocker.patch(
         'src.app.ml.active_predictor.active_predictor.predict',
         return_value=output)
     mocker.patch('src.jobs.store_data_job._save_data_job', return_value=job_id)
-    result = _predict_label(MockData(), test_uuid, mock_BackgroundTasks)
+    result = await _predict_label(MockData(), test_uuid, mock_BackgroundTasks)
     assert result['prediction']['a'] == pytest.approx(expected['prediction']['a'])
     assert result['job_id'] == test_uuid
 

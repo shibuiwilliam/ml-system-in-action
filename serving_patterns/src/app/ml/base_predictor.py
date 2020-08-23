@@ -44,3 +44,7 @@ class BasePredictor(metaclass=ABCMeta):
     @ abstractmethod
     def predict(self, data) -> Any:
         raise NotImplementedError()
+
+    @ abstractmethod
+    async def async_predict(self, data) -> Any:
+        raise NotImplementedError()

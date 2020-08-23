@@ -30,19 +30,21 @@ spec:
         - name: RUNNER
           value: GUNICORN
         - name: WORKERS
-          value: "2"
+          value: "16"
         - name: BACKLOG
           value: "32"
         - name: LIMIT_MAX_REQUESTS
           value: "256"
         - name: MAX_REQUESTS_JITTER
-          value: "64"
+          value: "128"
+        - name: GRACEFUL_TIMEOUT
+          value: "5"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: PORT
           value: "8891"
         - name: PROFILE
-          value: "0"
+          value: "1"
         - name: QUEUE_NAME
           value: resnet50_api_queue
         ports:
@@ -61,11 +63,11 @@ spec:
           periodSeconds: 5
         resources:
           limits:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "4"
+            memory: "8000Mi"
           requests:
-            cpu: "2"
-            memory: "2000Mi"
+            cpu: "4"
+            memory: "8000Mi"
 
 ---
 

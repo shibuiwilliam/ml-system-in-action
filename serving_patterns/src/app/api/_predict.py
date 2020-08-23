@@ -23,9 +23,8 @@ def __predict(data: Data):
 
 
 @do_cprofile
-def __predict_label(data: Data,
-                    __predict_callable: callable = __predict) -> Dict[str, float]:
-    __predict_callable(data)
+def __predict_label(data: Data) -> Dict[str, float]:
+    __predict(data)
     argmax = int(np.argmax(np.array(data.prediction)[0]))
     return {data.labels[argmax]: data.prediction[0][argmax]}
 
@@ -40,10 +39,8 @@ async def __async_predict(data: Data):
 
 
 @do_cprofile
-async def __async_predict_label(
-        data: Data,
-        __async_predict_callable: callable = __async_predict) -> Dict[str, float]:
-    await __async_predict_callable(data)
+async def __async_predict_label(data: Data) -> Dict[str, float]:
+    await __async_predict(data)
     argmax = int(np.argmax(np.array(data.prediction)[0]))
     return {data.labels[argmax]: data.prediction[0][argmax]}
 
@@ -62,18 +59,15 @@ def _labels(data_class: callable = Data) -> Dict[str, List[str]]:
     return {'labels': data_class().labels}
 
 
-def _test(data: Data = Data(),
-          __predict_callable: callable = __predict) -> Dict[str, int]:
+def _test(data: Data = Data()) -> Dict[str, int]:
     data.input_data = data.test_data
-    __predict_callable(data)
+    __predict(data)
     return {'prediction': data.prediction}
 
 
-def _test_label(
-        data: Data = Data(),
-        __predict_callable: callable = __predict_label) -> Dict[str, Dict[str, float]]:
+def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
     data.input_data = data.test_data
-    label_proba = __predict_callable(data)
+    label_proba = __predict_label(data)
     return {'prediction': label_proba}
 
 

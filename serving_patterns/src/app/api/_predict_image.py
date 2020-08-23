@@ -10,7 +10,8 @@ from src.middleware.profiler import do_cprofile
 from src.jobs import store_data_job
 from src.helper import get_image_data
 from src.app.ml.active_predictor import Data, DataConverter, active_predictor
-from src.app.api import _predict as _parent_predict
+from src.constants import PLATFORM_ENUM
+from src.configurations import PlatformConfigurations
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,9 @@ def __predict(data: Data):
 
 @do_cprofile
 def __predict_label(data: Data) -> Dict[str, float]:
-    return _parent_predict.__predict_label(data, __predict)
+    __predict(data)
+    argmax = int(np.argmax(np.array(data.prediction)[0]))
+    return {data.labels[argmax]: data.prediction[0][argmax]}
 
 
 @do_cprofile
@@ -40,7 +43,9 @@ async def __async_predict(data: Data):
 
 @do_cprofile
 async def __async_predict_label(data: Data) -> Dict[str, float]:
-    return await _parent_predict.__async_predict_label(data, __async_predict)
+    await __async_predict(data)
+    argmax = int(np.argmax(np.array(data.prediction)[0]))
+    return {data.labels[argmax]: data.prediction[0][argmax]}
 
 
 def _predict_from_redis_cache(job_id: str,
@@ -59,17 +64,19 @@ def _predict_from_redis_cache(job_id: str,
 
 
 def _labels(data_class: callable = Data) -> Dict[str, List[str]]:
-    return _parent_predict._labels(data_class)
+    return {'labels': data_class().labels}
 
 
 async def _test(data: Data = Data()) -> Dict[str, int]:
     data.image_data = data.test_data
-    return _parent_predict._test(data, __predict)
+    __predict(data)
+    return {'prediction': data.prediction}
 
 
 async def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
     data.image_data = data.test_data
-    return _parent_predict._test_label(data, __predict_label)
+    label_proba = __predict_label(data)
+    return {'prediction': label_proba}
 
 
 async def _predict(
@@ -108,9 +115,55 @@ async def _predict_async_post(
 
 
 def _predict_async_get(job_id: str) -> Dict[str, List[float]]:
-    return _parent_predict._predict_async_get(job_id)
+    result = {job_id: {'prediction': []}}
+    if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        result[job_id]['prediction'] = data_dict['prediction']
+        return result
+
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        result[job_id]['prediction'] = data_dict['prediction']
+        return result
+
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        result[job_id]['prediction'] = data_dict['prediction']
+        return result
+
+    else:
+        return result
 
 
 def _predict_async_get_label(
         job_id: str) -> Dict[str, Dict[str, Dict[str, float]]]:
-    return _parent_predict._predict_async_get_label(job_id)
+    result = {job_id: {'prediction': []}}
+    if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        if result[job_id]['prediction'] is None:
+            result[job_id]['prediction'] = data_dict['prediction']
+            return result
+        argmax = int(np.argmax(np.array(data_dict['prediction'])[0]))
+        result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
+        return result
+
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        if result[job_id]['prediction'] is None:
+            result[job_id]['prediction'] = data_dict['prediction']
+            return result
+        argmax = int(np.argmax(np.array(data_dict['prediction'])[0]))
+        result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
+        return result
+
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
+        data_dict = store_data_job.load_data_redis(job_id)
+        if result[job_id]['prediction'] is None:
+            result[job_id]['prediction'] = data_dict['prediction']
+            return result
+        argmax = int(np.argmax(np.array(data_dict['prediction'])[0]))
+        result[job_id]['prediction'] = {data_dict['labels'][argmax]: data_dict['prediction'][0][argmax]}
+        return result
+
+    else:
+        return result
