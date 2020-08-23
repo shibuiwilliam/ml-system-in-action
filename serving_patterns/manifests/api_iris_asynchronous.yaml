@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-iris-asynchronous
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:

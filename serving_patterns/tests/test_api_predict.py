@@ -66,12 +66,13 @@ class MockJob():
         return True
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('prediction', 'expected'),
     [(np.array([[0.8, 0.1, 0.1]]), {'prediction': [[0.8, 0.1, 0.1]]}),
      (np.array([[0.2, 0.1, 0.7]]), {'prediction': [[0.2, 0.1, 0.7]]})]
 )
-def test__predict(mocker, prediction, expected):
+async def test__predict(mocker, prediction, expected):
     mock_data = MockData()
     mocker.patch(
         'src.app.ml.active_predictor.DataConverter.convert_input_data_to_np',
@@ -82,16 +83,17 @@ def test__predict(mocker, prediction, expected):
     mocker.patch(
         'src.app.ml.active_predictor.active_predictor.predict',
         return_value=prediction)
-    __predict(data=mock_data)
+    await __predict(data=mock_data)
     assert nested_floats_almost_equal(mock_data.prediction, expected['prediction'])
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ('prediction', 'expected'),
     [(np.array([[0.1, 0.1, 0.8]]), {'c': 0.8}),
      (np.array([[0.2, 0.1, 0.7]]), {'c': 0.7})]
 )
-def test__predict_label(mocker, prediction, expected):
+async def test__predict_label(mocker, prediction, expected):
     mock_data = MockData()
     mocker.patch(
         'src.app.ml.active_predictor.DataConverter.reshape_output',
@@ -99,7 +101,7 @@ def test__predict_label(mocker, prediction, expected):
     mocker.patch(
         'src.app.ml.active_predictor.active_predictor.predict',
         return_value=prediction)
-    result = __predict_label(data=mock_data)
+    result = await __predict_label(data=mock_data)
     assert result == expected
 
 

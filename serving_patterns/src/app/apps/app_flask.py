@@ -34,7 +34,7 @@ def health():
     return jsonify({'health': 'ok'})
 
 
-@app.route('/predict/image', methods=['GET', 'POST'])
+@app.route('/predict', methods=['GET', 'POST'])
 def predict():
     _data = Data()
     if request.method == 'GET':
@@ -62,7 +62,7 @@ def labels():
     return jsonify({'labels': labels})
 
 
-@app.route('/predict/image/label', methods=['GET', 'POST'])
+@app.route('/predict/label', methods=['GET', 'POST'])
 def predict_label():
     _data = Data()
     labels = _data.labels

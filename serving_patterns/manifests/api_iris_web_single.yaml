@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: api-iris-web-single
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:

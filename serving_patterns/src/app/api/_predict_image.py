@@ -62,12 +62,12 @@ def _labels(data_class: callable = Data) -> Dict[str, List[str]]:
     return _parent_predict._labels(data_class)
 
 
-def _test(data: Data = Data()) -> Dict[str, int]:
+async def _test(data: Data = Data()) -> Dict[str, int]:
     data.image_data = data.test_data
     return _parent_predict._test(data, __predict)
 
 
-def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
+async def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
     data.image_data = data.test_data
     return _parent_predict._test_label(data, __predict_label)
 
