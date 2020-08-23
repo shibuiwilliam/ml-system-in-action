@@ -42,3 +42,8 @@ class _Classifier(BasePredictor):
         logger.info(f'run predict proba in {self.__class__.__name__}')
         output = self.classifier.predict_proba(input)
         return output
+
+    async def async_predict(self, input: np.ndarray) -> np.ndarray:
+        logger.info(f'run predict proba in {self.__class__.__name__}')
+        output = self.predict(input)
+        return output

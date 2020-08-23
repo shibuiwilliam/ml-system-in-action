@@ -30,6 +30,24 @@ def __predict_label(data: Data,
     return {data.labels[argmax]: data.prediction[0][argmax]}
 
 
+@do_cprofile
+async def __async_predict(data: Data):
+    input_np = DataConverter.convert_input_data_to_np(data.input_data)
+    output_np = await active_predictor.async_predict(input_np)
+    reshaped_output_nps = DataConverter.reshape_output(output_np)
+    data.prediction = reshaped_output_nps.tolist()
+    logger.info({'job_id': data.job_id, 'prediction': data.prediction})
+
+
+@do_cprofile
+async def __async_predict_label(
+        data: Data,
+        __async_predict_callable: callable = __async_predict) -> Dict[str, float]:
+    await __async_predict_callable(data)
+    argmax = int(np.argmax(np.array(data.prediction)[0]))
+    return {data.labels[argmax]: data.prediction[0][argmax]}
+
+
 def _predict_from_redis_cache(job_id: str,
                               data_class: callable = Data) -> Data:
     data_dict = store_data_job.load_data_redis(job_id)
@@ -59,20 +77,20 @@ def _test_label(
     return {'prediction': label_proba}
 
 
-def _predict(
+async def _predict(
         data: Data,
         job_id: str,
         background_tasks: BackgroundTasks) -> Dict[str, List[float]]:
-    __predict(data)
+    await __async_predict(data)
     store_data_job._save_data_job(data, job_id, background_tasks, False)
     return {'prediction': data.prediction, 'job_id': job_id}
 
 
-def _predict_label(
+async def _predict_label(
         data: Data,
         job_id: str,
         background_tasks: BackgroundTasks = BackgroundTasks()) -> Dict[str, Dict[str, float]]:
-    label_proba = __predict_label(data)
+    label_proba = await __async_predict_label(data)
     store_data_job._save_data_job(data, job_id, background_tasks, False)
     return {'prediction': label_proba, 'job_id': job_id}
 

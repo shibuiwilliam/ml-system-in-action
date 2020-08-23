@@ -100,3 +100,8 @@ class _Classifier(BasePredictor):
                     result.outputs[_DataInterface().output_name].float_val)
         output = _prediction
         return output
+
+    async def async_predict(self, input_data: Image) -> np.ndarray:
+        logger.info(f'run predict proba in {self.__class__.__name__}')
+        output = self.predict(input_data)
+        return output

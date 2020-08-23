@@ -29,6 +29,20 @@ def __predict_label(data: Data) -> Dict[str, float]:
     return _parent_predict.__predict_label(data, __predict)
 
 
+@do_cprofile
+async def __async_predict(data: Data):
+    image_data = get_image_data(data.image_data)
+    output_np = await active_predictor.async_predict(image_data)
+    reshaped_output_nps = DataConverter.reshape_output(output_np)
+    data.prediction = reshaped_output_nps.tolist()
+    logger.info({'job_id': data.job_id, 'prediction': data.prediction})
+
+
+@do_cprofile
+async def __async_predict_label(data: Data) -> Dict[str, float]:
+    return await _parent_predict.__async_predict_label(data, __async_predict)
+
+
 def _predict_from_redis_cache(job_id: str,
                               data_class: callable = Data) -> Data:
     data_dict = store_data_job.load_data_redis(job_id)
@@ -48,12 +62,12 @@ def _labels(data_class: callable = Data) -> Dict[str, List[str]]:
     return _parent_predict._labels(data_class)
 
 
-async def _test(data: Data = Data()) -> Dict[str, int]:
+def _test(data: Data = Data()) -> Dict[str, int]:
     data.image_data = data.test_data
     return _parent_predict._test(data, __predict)
 
 
-async def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
+def _test_label(data: Data = Data()) -> Dict[str, Dict[str, float]]:
     data.image_data = data.test_data
     return _parent_predict._test_label(data, __predict_label)
 
@@ -65,7 +79,7 @@ async def _predict(
     image = base64.b64decode(str(data.image_data))
     io_bytes = io.BytesIO(image)
     data.image_data = Image.open(io_bytes)
-    __predict(data)
+    await __async_predict(data)
     store_data_job._save_data_job(data, job_id, background_tasks, False)
     return {'prediction': data.prediction, 'job_id': job_id}
 
@@ -77,7 +91,7 @@ async def _predict_label(
     image = base64.b64decode(str(data.image_data))
     io_bytes = io.BytesIO(image)
     data.image_data = Image.open(io_bytes)
-    label_proba = __predict_label(data)
+    label_proba = await __async_predict_label(data)
     store_data_job._save_data_job(data, job_id, background_tasks, False)
     return {'prediction': label_proba, 'job_id': job_id}
 
