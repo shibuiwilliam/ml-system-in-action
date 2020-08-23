@@ -44,7 +44,7 @@ class _Classifier(BasePredictor):
     def predict(self, input: np.ndarray) -> np.ndarray:
         logger.info(f'run predict proba in {self.__class__.__name__}')
         _prediction = self.classifier.run(
-            [self.output_name],
+            None,
             {self.input_name: input.astype(np.float32)}
         )
         output = np.array(list(_prediction[1][0].values()))
