@@ -15,10 +15,10 @@ def test():
 
 
 @router.post('')
-def predict(data: Data,
+async def predict(data: Data,
             background_tasks: BackgroundTasks):
     job_id = data.job_id if data.job_id is not None else get_job_id()
-    return _predict._predict(data, job_id, background_tasks)
+    return await _predict._predict(data, job_id, background_tasks)
 
 
 @router.get('/labels')
@@ -32,7 +32,7 @@ def test_label():
 
 
 @router.post('/label')
-def predict_label(data: Data,
+async def predict_label(data: Data,
                   background_tasks: BackgroundTasks = BackgroundTasks()):
     job_id = data.job_id if data.job_id is not None else get_job_id()
-    return _predict._predict_label(data, job_id, background_tasks)
+    return await _predict._predict_label(data, job_id, background_tasks)

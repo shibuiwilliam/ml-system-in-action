@@ -97,6 +97,11 @@ _c_build_resnet50_load_test := docker-compose -f $(_c_resnet50_load_test) build
 _c_up_resnet50_load_test := docker-compose -f $(_c_resnet50_load_test) up -d
 _c_down_resnet50_load_test := docker-compose -f $(_c_resnet50_load_test) down
 
+_c_api_ab_test := $(_dockercompose_dir)/docker-compose_api_ab_test.yml
+_c_build_api_ab_test := docker-compose -f $(_c_api_ab_test) build
+_c_up_api_ab_test := docker-compose -f $(_c_api_ab_test) up -d
+_c_down_api_ab_test := docker-compose -f $(_c_api_ab_test) down
+
 _requirements_test := requirements_test.txt
 _pip_freeze_test := pip freeze > requirements/$(_requirements_test)
 _pip_install_test := pip install  --no-cache-dir -r requirements/$(_requirements_test)
@@ -307,6 +312,18 @@ c_up_resnet50_load_test:
 .PHONY: c_down_resnet50_load_test
 c_down_resnet50_load_test:
 	$(_c_down_resnet50_load_test)
+
+.PHONY: c_build_api_ab_test
+c_build_api_ab_test:
+	$(_c_build_api_ab_test)
+
+.PHONY: c_up_api_ab_test
+c_up_api_ab_test:
+	$(_c_up_api_ab_test)
+
+.PHONY: c_down_api_ab_test
+c_down_api_ab_test:
+	$(_c_down_api_ab_test)
 
 .PHONY: test_d
 test_d:

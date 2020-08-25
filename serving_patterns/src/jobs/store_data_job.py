@@ -4,9 +4,11 @@ from fastapi import BackgroundTasks
 import logging
 from pydantic import BaseModel
 import json
+import csv
 import numpy as np
 import io
 import base64
+import datetime
 from PIL import Image
 
 from src.constants import PLATFORM_ENUM, CONSTANTS
@@ -63,6 +65,31 @@ def get_image_redis(key: str) -> Image.Image:
     return image
 
 
+def save_data_csv_job(job_id: str, filepath: str, data: Any, ab_test_group: str) -> bool:
+    if not os.path.exists(filepath):
+        with open(filepath, 'w') as f:
+            _header = ['datetime', 'job_id']
+            _header.extend([f'data_{i}' for i in range(len(data.input_data))])
+            if hasattr(data, 'labels'):
+                _label = [label for label in data.labels]
+            else:
+                _label = [f'label_{i}' for i in range(len(data.labels))]
+            _header.extend((_label))
+            _header.append('prediction')
+            _header.append('ab_test_group')
+            writer = csv.writer(f)
+            writer.writerows([_header])
+    with open(filepath, 'a') as f:
+        _data = [datetime.datetime.now(), job_id]
+        _data.extend(data.input_data)
+        _data.extend(data.prediction[0])
+        _data.append(int(np.argmax(np.array(data.prediction)[0])))
+        _data.append(ab_test_group)
+        writer = csv.writer(f)
+        writer.writerows([_data])
+    return True
+
+
 def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
     file_path = os.path.join(directory, f'{job_id}.json')
     with open(file_path, 'w') as f:
@@ -104,10 +131,20 @@ class SaveDataFileJob(SaveDataJob):
 
     def __call__(self):
         save_data_jobs[self.job_id] = self
-        logger.info(
-            f'registered job: {self.job_id} in {self.__class__.__name__}')
+        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
         self.is_completed = save_data_file_job(
             self.job_id, self.directory, self.data)
+        logger.info(f'completed save data: {self.job_id}')
+
+
+class SaveDataCSVJob(SaveDataJob):
+    filepath: str
+    ab_test_group: str
+
+    def __call__(self):
+        save_data_jobs[self.job_id] = self
+        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
+        self.is_completed = save_data_csv_job(self.job_id, self.filepath, self.data, self.ab_test_group)
         logger.info(f'completed save data: {self.job_id}')
 
 
@@ -116,8 +153,7 @@ class SaveDataRedisJob(SaveDataJob):
 
     def __call__(self):
         save_data_jobs[self.job_id] = self
-        logger.info(
-            f'registered job: {self.job_id} in {self.__class__.__name__}')
+        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
         if isinstance(self.data, Dict):
             self.is_completed = save_data_dict_redis_job(self.job_id, self.data)
         else:
@@ -151,6 +187,40 @@ def _save_data_job(data: Any,
             data=data,
             queue_name=CacheConfigurations.queue_name,
             enqueue=enqueue)
+    else:
+        raise ValueError('platform must be chosen from constants.PLATFORM_ENUM')
+    background_tasks.add_task(task)
+    return job_id
+
+
+def _save_data_csv_job(data: Any,
+                       job_id: str,
+                       background_tasks: BackgroundTasks,
+                       filepath: str,
+                       ab_test_group: str) -> str:
+    if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
+        task = SaveDataCSVJob(
+            job_id=job_id,
+            data=data,
+            queue_name=CacheConfigurations.queue_name,
+            filepath=filepath,
+            ab_test_group=ab_test_group)
+
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
+        task = SaveDataCSVJob(
+            job_id=job_id,
+            data=data,
+            queue_name=CacheConfigurations.queue_name,
+            filepath=filepath,
+            ab_test_group=ab_test_group)
+
+    elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
+        task = SaveDataCSVJob(
+            job_id=job_id,
+            data=data,
+            queue_name=CacheConfigurations.queue_name,
+            filepath=filepath,
+            ab_test_group=ab_test_group)
     else:
         raise ValueError('platform must be chosen from constants.PLATFORM_ENUM')
     background_tasks.add_task(task)
