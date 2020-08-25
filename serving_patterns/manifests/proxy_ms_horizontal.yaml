@@ -47,8 +47,8 @@ spec:
           value: api-resnet50-onnx-server.serving-pattern.svc.cluster.local:8896
         - name: SERVICE_MOBILENETV2_TFS
           value: api-mobilenetv2.serving-pattern.svc.cluster.local:8893
-        # - name: CUSTOMIZED_REDIRECT_MAP
-        #   value: '{"SERVICE_RESNET50_ONNX_SERVER":{"predict/label":"predict/async", "predict":"predict/async"}}'
+        - name: CUSTOMIZED_REDIRECT_MAP
+          value: '{"SERVICE_RESNET50_ONNX_SERVER":{"predict/label":"predict/async", "predict":"predict/async"}}'
         resources:
           limits:
             cpu: "2"

@@ -28,7 +28,7 @@ spec:
         - name: LOGLEVEL
           value: debug
         - name: NUM_HTTP_THREADS
-          value: "4"
+          value: "2"
         - name: MODEL_PATH
           value: /serving_patterns/src/app/ml/resnet50_onnx_server/model/resnet50v2.onnx
         ports:
@@ -47,11 +47,32 @@ spec:
           periodSeconds: 5
         resources:
           limits:
-            cpu: "4"
+            cpu: "2"
             memory: "4000Mi"
           requests:
-            cpu: "4"
+            cpu: "2"
             memory: "4000Mi"
+
+---
+
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: server-resnet50-onnx-server
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: server-resnet50-onnx-server
+  minReplicas: 1
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
 
 ---
 

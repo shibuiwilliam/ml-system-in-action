@@ -30,15 +30,15 @@ spec:
         - name: RUNNER
           value: GUNICORN
         - name: WORKERS
-          value: "8"
+          value: "24"
         - name: BACKLOG
-          value: "32"
+          value: "64"
         - name: LIMIT_MAX_REQUESTS
-          value: "512"
+          value: "400"
         - name: MAX_REQUESTS_JITTER
-          value: "128"
+          value: "200"
         - name: GRACEFUL_TIMEOUT
-          value: "5"
+          value: "10"
         - name: APP_NAME
           value: "src.app.apps.app_image:app"
         - name: ONNX_RUNTIME_SERVER_HTTP
@@ -74,6 +74,27 @@ spec:
           requests:
             cpu: "2"
             memory: "8000Mi"
+
+---
+
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-resnet50-onnx-server
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-resnet50-onnx-server
+  minReplicas: 1
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
 
 ---
 
