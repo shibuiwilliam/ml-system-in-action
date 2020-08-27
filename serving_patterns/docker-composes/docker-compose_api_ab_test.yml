@@ -20,6 +20,7 @@ services:
       - QUEUE_NAME=api_queue
       - ENQUEUE=1
       - CUSTOMIZED_REDIRECT_MAP={"SERVICE_AB_TEST_A":{"predict":"predict/label"},"SERVICE_AB_TEST_B":{"predict":"predict/label"}}
+      - AB_TEST_GROUP={"GROUP_A":"SERVICE_AB_TEST_A","GROUP_B":"SERVICE_AB_TEST_B","DEFAULT":"SERVICE_AB_TEST_A"}
     ports:
       - "8000:8000"
     command: ./run_proxy.sh

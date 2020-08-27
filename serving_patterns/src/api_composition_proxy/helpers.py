@@ -34,6 +34,7 @@ def customized_redirect_builder(
         redirect_path: str,
         customized_redirect_map: Dict[str, Dict[str, str]] = None) -> str:
     '''
+    customized_redirect_map
     {
         ALIAS_0:
         {

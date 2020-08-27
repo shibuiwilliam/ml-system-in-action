@@ -11,6 +11,10 @@ class APIUser(HttpUser):
     num_requests_sent = 0
     request_intervals = int(os.getenv('REQUEST_INTERVALS', 500))
 
+    def a_or_b(self):
+        ab_test_group = ['group_a', 'group_b']
+        return random.choice(ab_test_group)
+
     def get_random_data_in_time(self):
         self.num_requests_sent += 1
         if self.num_requests_sent < self.request_intervals:
@@ -176,7 +180,12 @@ class APIUser(HttpUser):
     def redirect_post_predict(self):
         self.client.post(
             url='/redirect/predict',
-            json={"data": {"input_data": self.get_random_data_in_time()}},
+            json={
+                "data": {
+                    "input_data": self.get_random_data_in_time()
+                    },
+                'ab_test': self.a_or_b()
+                },
             headers={'content-type': 'application/json'},
             verify=False
         )
@@ -185,7 +194,12 @@ class APIUser(HttpUser):
     def redirect_post_predict_label(self):
         self.client.post(
             url='/redirect/predict/label',
-            json={"data": {"input_data": self.get_random_data_in_time()}},
+            json={
+                "data": {
+                    "input_data": self.get_random_data_in_time()
+                    },
+                'ab_test': self.a_or_b()
+                },
             headers={'content-type': 'application/json'},
             verify=False
         )

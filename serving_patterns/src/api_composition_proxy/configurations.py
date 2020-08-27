@@ -14,6 +14,31 @@ class _ServiceConfigurations():
     customized_redirect_map = None
     if 'CUSTOMIZED_REDIRECT_MAP' in os.environ.keys():
         customized_redirect_map = json.loads(os.getenv('CUSTOMIZED_REDIRECT_MAP'))
+    ab_test_group = None
+    if 'AB_TEST_GROUP' in os.environ.keys():
+        ab_test_group = json.loads(os.getenv('AB_TEST_GROUP'))
+    '''
+    customized_redirect_map
+    {
+        ALIAS_0:
+        {
+            REDIRECT_PATH_0: redirect_path_0,
+            REDIRECT_PATH_1: redirect_path_1,
+        },
+        ALIAS_1:
+        {
+            REDIRECT_PATH_0: redirect_path_0,
+            REDIRECT_PATH_2: redirect_path_2,
+        }
+    }
+
+    ab_test_group
+    {
+        GROUP_A: ALIAS_0,
+        GROUP_B: ALIAS_1,
+        DEFAULT: ALIAS_0,
+    }
+    '''
     enqueue = int(os.getenv('ENQUEUE', 1))
 
 
