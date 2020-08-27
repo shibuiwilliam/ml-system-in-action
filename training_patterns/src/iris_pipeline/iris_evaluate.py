@@ -45,7 +45,7 @@ def get_params() -> Dict[str, Any]:
 def evaluate_sklearn_model(filepath: str, x_test: np.ndarray, y_test: np.ndarray):
     model = joblib.load(filepath)
     p = model.predict(x_test)
-    
+
     accuracy = metrics.accuracy_score(y_test, p)
     print(f'accuracy_score: {accuracy}')
 
@@ -54,7 +54,7 @@ def evaluate_sklearn_model(filepath: str, x_test: np.ndarray, y_test: np.ndarray
 
     recall = metrics.recall_score(y_test, p, average='micro')
     print(f'recall_score: {recall}')
-    
+
     with open(EVALUATION_SCORE, 'w') as f:
         json.dump(
             {
