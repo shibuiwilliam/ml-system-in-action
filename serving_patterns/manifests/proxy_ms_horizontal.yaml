@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api-image-proxy
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_proxy:latest
+        image: shibui/ml-system-in-action:serving_patterns_proxy
         command: ["./run_proxy.sh"]
         env:
         - name: PLATFORM

@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: backend-resnet50-onnx-server
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_backend_resnet50_onnx_server:latest
+        image: shibui/ml-system-in-action:serving_patterns_backend_resnet50_onnx_server
         command: ["./run_backend.sh"]
         env:
         - name: PLATFORM

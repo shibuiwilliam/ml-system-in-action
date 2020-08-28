@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api-mobilenetv2-tfs-sidecar
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_mobilenetv2:latest
+        image: shibui/ml-system-in-action:serving_patterns_api_mobilenetv2
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM
@@ -69,7 +69,7 @@ spec:
             cpu: "2"
             memory: "8000Mi"
       - name: tfs-mobilenetv2
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_tfs_mobilenetv2:latest
+        image: shibui/ml-system-in-action:serving_patterns_tfs_mobilenetv2
         command: ["/usr/bin/tf_serving_entrypoint.sh"]
         env:
         - name: PORT

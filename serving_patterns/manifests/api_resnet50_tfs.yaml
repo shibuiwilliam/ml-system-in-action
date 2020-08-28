@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api-resnet50-tfs
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_resnet50_tfs:latest
+        image: shibui/ml-system-in-action:serving_patterns_api_resnet50_tfs
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM

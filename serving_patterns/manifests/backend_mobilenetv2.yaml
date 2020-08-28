@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: backend-mobilenetv2
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_backend_mobilenetv2:latest
+        image: shibui/ml-system-in-action:serving_patterns_backend_mobilenetv2
         command: ["./run_backend.sh"]
         env:
         - name: PLATFORM

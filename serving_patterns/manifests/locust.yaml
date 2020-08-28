@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: load-test-locust
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/load_test_locust:latest
+        image: shibui/ml-system-in-action:load_test_locust
         command: ["locust"]
         args: ["-f", "$(TARGET_FILE)"]
         env:

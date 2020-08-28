@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: server-resnet50-onnx-server
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_server_resnet50_onnx_server:latest
+        image: shibui/ml-system-in-action:serving_patterns_server_resnet50_onnx_server
         command: ["./onnx_runtime_server_entrypoint.sh"]
         env:
         - name: HTTP_PORT

@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api-iris-web-single
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_api_iris:latest
+        image: shibui/ml-system-in-action:serving_patterns_api_iris
         command: ["./run_api.sh"]
         env:
         - name: PLATFORM

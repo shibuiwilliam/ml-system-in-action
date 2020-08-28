@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: tfs-mobilenetv2
-        image: gcr.io/newagent-16e99/github.com/shibuiwilliam/ml-system-in-action/serving_patterns_tfs_mobilenetv2:latest
+        image: shibui/ml-system-in-action:serving_patterns_tfs_mobilenetv2
         command: ["/usr/bin/tf_serving_entrypoint.sh"]
         env:
         - name: PORT
