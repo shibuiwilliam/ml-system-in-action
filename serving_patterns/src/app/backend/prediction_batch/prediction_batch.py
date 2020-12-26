@@ -9,9 +9,9 @@ from src.configurations import _CacheConfigurations
 from src.jobs import store_data_job
 from src.middleware.profiler import do_cprofile
 
-_predictor = importlib.import_module(os.getenv('PREDICTOR', 'src.app.api._predict'))
+_predictor = importlib.import_module(os.getenv("PREDICTOR", "src.app.api._predict"))
 
-logger = logging.getLogger('prediction_batch')
+logger = logging.getLogger("prediction_batch")
 
 
 @do_cprofile
@@ -25,7 +25,7 @@ def _run_prediction(job_id: str) -> bool:
 
 def _trigger_prediction_if_queue():
     job_id = store_data_job.right_pop_queue(_CacheConfigurations().queue_name)
-    logger.info(f'predict job_id: {job_id}')
+    logger.info(f"predict job_id: {job_id}")
     if job_id is not None:
         _run_prediction(job_id)
 

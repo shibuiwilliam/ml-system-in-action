@@ -2,16 +2,16 @@ iris_svc:
   data_interface:
     data_type: array
     input_shape:
-    - 1
-    - 4
+      - 1
+      - 4
     input_type: float32
     output_shape:
-    - 1
-    - 3
+      - 1
+      - 3
     output_type: float32
   meta:
     models:
-    - ./src/app/ml/iris/model/iris_svc.onnx: onnx_runtime
+      - ./src/app/ml/iris/model/iris_svc.onnx: onnx_runtime
     prediction_type: classification
     runner: src.app.ml.iris.iris_predictor_onnx
   options:

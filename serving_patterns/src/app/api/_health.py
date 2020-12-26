@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 @do_cprofile
 def health() -> Dict[str, str]:
-    return {'health': 'ok'}
+    return {"health": "ok"}
 
 
 def health_sync() -> Dict[str, str]:

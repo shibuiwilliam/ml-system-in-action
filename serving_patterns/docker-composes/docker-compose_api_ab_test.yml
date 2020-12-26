@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   proxy_ab_test:
@@ -96,7 +96,7 @@ services:
     image: "redis:latest"
     ports:
       - "6379:6379"
-  
+
 volumes:
   shared_volume:
     driver_opts:

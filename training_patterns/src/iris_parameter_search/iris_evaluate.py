@@ -12,23 +12,21 @@ from constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 import save_helper
 
 
-PARAMS_YAML = './evaluate_params.yaml'
-MODEL_DIR = './models/'
-DATA_DIR = './data/'
-PREPARED_DIR = os.path.join(DATA_DIR, 'prepared')
-X_TEST_NPY = os.path.join(PREPARED_DIR, 'x_test.npy')
-Y_TEST_NPY = os.path.join(PREPARED_DIR, 'y_test.npy')
-DOWNSTREAM_DIR = os.path.join(DATA_DIR, 'evaluated')
+PARAMS_YAML = "./evaluate_params.yaml"
+MODEL_DIR = "./models/"
+DATA_DIR = "./data/"
+PREPARED_DIR = os.path.join(DATA_DIR, "prepared")
+X_TEST_NPY = os.path.join(PREPARED_DIR, "x_test.npy")
+Y_TEST_NPY = os.path.join(PREPARED_DIR, "y_test.npy")
+DOWNSTREAM_DIR = os.path.join(DATA_DIR, "evaluated")
 
 
 def get_params() -> Dict[str, Any]:
-    params = {
-        'evaluation_model_filename': 'iris_svc.pkl'
-    }
+    params = {"evaluation_model_filename": "iris_svc.pkl"}
     if os.path.exists(PARAMS_YAML):
-        with open(PARAMS_YAML, 'r') as f:
+        with open(PARAMS_YAML, "r") as f:
             _params = yaml.load(f, Loader=yaml.SafeLoader)
-        for k, v in _params['evaluate'].items():
+        for k, v in _params["evaluate"].items():
             if isinstance(v, int):
                 params[k] = int(os.getenv(k.upper(), v))
             elif isinstance(v, float):
@@ -43,19 +41,16 @@ def evaluate_sklearn_model(filepath: str, x_test: np.ndarray, y_test: np.ndarray
     model = joblib.load(filepath)
     p = model.predict(x_test)
     score = metrics.accuracy_score(y_test, p)
-    print(f'accuracy: {score}')
+    print(f"accuracy: {score}")
 
 
-def evaluate_onnx_model(
-        filepath: str,
-        x_test: np.ndarray,
-        y_test: np.ndarray):
+def evaluate_onnx_model(filepath: str, x_test: np.ndarray, y_test: np.ndarray):
     sess = rt.InferenceSession(filepath)
     input_name = sess.get_inputs()[0].name
     output_name = sess.get_outputs()[0].name
-    p = sess.run([output_name], {input_name: x_test.astype('float32')})
+    p = sess.run([output_name], {input_name: x_test.astype("float32")})
     score = metrics.accuracy_score(y_test, p[0])
-    print(f'accuracy: {score}')
+    print(f"accuracy: {score}")
 
 
 def main():
@@ -66,13 +61,13 @@ def main():
     x_test = np.load(X_TEST_NPY)
     y_test = np.load(Y_TEST_NPY)
 
-    model_filename = params['evaluation_model_filename']
+    model_filename = params["evaluation_model_filename"]
 
-    if model_filename.endswith('.pkl'):
+    if model_filename.endswith(".pkl"):
         evaluate_sklearn_model(os.path.join(MODEL_DIR, model_filename), x_test, y_test)
-    if model_filename.endswith('.onnx'):
+    if model_filename.endswith(".onnx"):
         evaluate_onnx_model(os.path.join(MODEL_DIR, model_filename), x_test, y_test)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

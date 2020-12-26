@@ -21,7 +21,7 @@ def get_incremental_id():
 def get_uuid_incremental_id():
     _uuid = get_uuid()
     _incremental_id = get_incremental_id()
-    return f'{_uuid}_{_incremental_id}'
+    return f"{_uuid}_{_incremental_id}"
 
 
 def get_job_id():

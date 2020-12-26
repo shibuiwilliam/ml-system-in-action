@@ -29,11 +29,11 @@ class Predictor(ActivePredictor):
     pass
 
 
-DataInterface.input_shape = ModelConfigurations.io['input_shape']
-DataInterface.input_type = ModelConfigurations.io['input_type']
-DataInterface.output_shape = ModelConfigurations.io['output_shape']
-DataInterface.output_type = ModelConfigurations.io['output_type']
-DataInterface.data_type = ModelConfigurations.io['data_type']
+DataInterface.input_shape = ModelConfigurations.io["input_shape"]
+DataInterface.input_type = ModelConfigurations.io["input_type"]
+DataInterface.output_shape = ModelConfigurations.io["output_shape"]
+DataInterface.output_type = ModelConfigurations.io["output_type"]
+DataInterface.data_type = ModelConfigurations.io["data_type"]
 
 DataConverter.data_interface = DataInterface
 

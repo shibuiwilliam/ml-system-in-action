@@ -7,17 +7,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get('')
+@router.get("")
 def health():
     return _health.health()
 
 
-@router.get('/sync')
+@router.get("/sync")
 def health_sync():
     return _health.health_sync()
 
 
-@router.get('/async')
+@router.get("/async")
 async def health_async():
     result = await _health.health_async()
     return result

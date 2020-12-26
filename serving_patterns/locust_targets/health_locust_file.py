@@ -6,4 +6,4 @@ class APIUser(HttpUser):
 
     @task(1)
     def health(self):
-        self.client.get('/health', verify=False)
+        self.client.get("/health", verify=False)

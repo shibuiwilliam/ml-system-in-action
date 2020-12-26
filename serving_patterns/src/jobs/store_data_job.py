@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def make_image_key(key: str) -> str:
-    return f'{key}_image'
+    return f"{key}_image"
 
 
 def left_push_queue(queue_name: str, key: str) -> bool:
@@ -67,19 +67,19 @@ def get_image_redis(key: str) -> Image.Image:
 
 def save_data_csv_job(job_id: str, filepath: str, data: Any, ab_test_group: str) -> bool:
     if not os.path.exists(filepath):
-        with open(filepath, 'w') as f:
-            _header = ['datetime', 'job_id']
-            _header.extend([f'data_{i}' for i in range(len(data.input_data))])
-            if hasattr(data, 'labels'):
+        with open(filepath, "w") as f:
+            _header = ["datetime", "job_id"]
+            _header.extend([f"data_{i}" for i in range(len(data.input_data))])
+            if hasattr(data, "labels"):
                 _label = [label for label in data.labels]
             else:
-                _label = [f'label_{i}' for i in range(len(data.labels))]
+                _label = [f"label_{i}" for i in range(len(data.labels))]
             _header.extend((_label))
-            _header.append('prediction')
-            _header.append('ab_test_group')
+            _header.append("prediction")
+            _header.append("ab_test_group")
             writer = csv.writer(f)
             writer.writerows([_header])
-    with open(filepath, 'a') as f:
+    with open(filepath, "a") as f:
         _data = [datetime.datetime.now(), job_id]
         _data.extend(data.input_data)
         _data.extend(data.prediction[0])
@@ -91,8 +91,8 @@ def save_data_csv_job(job_id: str, filepath: str, data: Any, ab_test_group: str)
 
 
 def save_data_file_job(job_id: str, directory: str, data: Any) -> bool:
-    file_path = os.path.join(directory, f'{job_id}.json')
-    with open(file_path, 'w') as f:
+    file_path = os.path.join(directory, f"{job_id}.json")
+    with open(file_path, "w") as f:
         json.dump(data, f)
     return True
 
@@ -111,7 +111,7 @@ def save_data_dict_redis_job(job_id: str, data: Dict[str, Any]) -> bool:
             data_dict[k] = image_key
         else:
             data_dict[k] = v
-    logger.info(f'job_id: {job_id}')
+    logger.info(f"job_id: {job_id}")
     redis_client.set(job_id, json.dumps(data_dict))
     return True
 
@@ -131,10 +131,9 @@ class SaveDataFileJob(SaveDataJob):
 
     def __call__(self):
         save_data_jobs[self.job_id] = self
-        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
-        self.is_completed = save_data_file_job(
-            self.job_id, self.directory, self.data)
-        logger.info(f'completed save data: {self.job_id}')
+        logger.info(f"registered job: {self.job_id} in {self.__class__.__name__}")
+        self.is_completed = save_data_file_job(self.job_id, self.directory, self.data)
+        logger.info(f"completed save data: {self.job_id}")
 
 
 class SaveDataCSVJob(SaveDataJob):
@@ -143,9 +142,9 @@ class SaveDataCSVJob(SaveDataJob):
 
     def __call__(self):
         save_data_jobs[self.job_id] = self
-        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
+        logger.info(f"registered job: {self.job_id} in {self.__class__.__name__}")
         self.is_completed = save_data_csv_job(self.job_id, self.filepath, self.data, self.ab_test_group)
-        logger.info(f'completed save data: {self.job_id}')
+        logger.info(f"completed save data: {self.job_id}")
 
 
 class SaveDataRedisJob(SaveDataJob):
@@ -153,76 +152,42 @@ class SaveDataRedisJob(SaveDataJob):
 
     def __call__(self):
         save_data_jobs[self.job_id] = self
-        logger.info(f'registered job: {self.job_id} in {self.__class__.__name__}')
+        logger.info(f"registered job: {self.job_id} in {self.__class__.__name__}")
         if isinstance(self.data, Dict):
             self.is_completed = save_data_dict_redis_job(self.job_id, self.data)
         else:
             self.is_completed = save_data_redis_job(self.job_id, self.data)
         if self.enqueue:
             self.is_completed = left_push_queue(self.queue_name, self.job_id)
-        logger.info(f'completed save data: {self.job_id}')
+        logger.info(f"completed save data: {self.job_id}")
 
 
-def _save_data_job(data: Any,
-                   job_id: str,
-                   background_tasks: BackgroundTasks,
-                   enqueue: bool = False) -> str:
+def _save_data_job(data: Any, job_id: str, background_tasks: BackgroundTasks, enqueue: bool = False) -> str:
     if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
-        task = SaveDataRedisJob(
-            job_id=job_id,
-            data=data,
-            queue_name=CacheConfigurations.queue_name,
-            enqueue=enqueue)
+        task = SaveDataRedisJob(job_id=job_id, data=data, queue_name=CacheConfigurations.queue_name, enqueue=enqueue)
 
     elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
-        task = SaveDataRedisJob(
-            job_id=job_id,
-            data=data,
-            queue_name=CacheConfigurations.queue_name,
-            enqueue=enqueue)
+        task = SaveDataRedisJob(job_id=job_id, data=data, queue_name=CacheConfigurations.queue_name, enqueue=enqueue)
 
     elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
-        task = SaveDataRedisJob(
-            job_id=job_id,
-            data=data,
-            queue_name=CacheConfigurations.queue_name,
-            enqueue=enqueue)
+        task = SaveDataRedisJob(job_id=job_id, data=data, queue_name=CacheConfigurations.queue_name, enqueue=enqueue)
     else:
-        raise ValueError('platform must be chosen from constants.PLATFORM_ENUM')
+        raise ValueError("platform must be chosen from constants.PLATFORM_ENUM")
     background_tasks.add_task(task)
     return job_id
 
 
-def _save_data_csv_job(data: Any,
-                       job_id: str,
-                       background_tasks: BackgroundTasks,
-                       filepath: str,
-                       ab_test_group: str) -> str:
+def _save_data_csv_job(data: Any, job_id: str, background_tasks: BackgroundTasks, filepath: str, ab_test_group: str) -> str:
     if PlatformConfigurations.platform == PLATFORM_ENUM.DOCKER_COMPOSE.value:
-        task = SaveDataCSVJob(
-            job_id=job_id,
-            data=data,
-            queue_name=CacheConfigurations.queue_name,
-            filepath=filepath,
-            ab_test_group=ab_test_group)
+        task = SaveDataCSVJob(job_id=job_id, data=data, queue_name=CacheConfigurations.queue_name, filepath=filepath, ab_test_group=ab_test_group)
 
     elif PlatformConfigurations.platform == PLATFORM_ENUM.KUBERNETES.value:
-        task = SaveDataCSVJob(
-            job_id=job_id,
-            data=data,
-            queue_name=CacheConfigurations.queue_name,
-            filepath=filepath,
-            ab_test_group=ab_test_group)
+        task = SaveDataCSVJob(job_id=job_id, data=data, queue_name=CacheConfigurations.queue_name, filepath=filepath, ab_test_group=ab_test_group)
 
     elif PlatformConfigurations.platform == PLATFORM_ENUM.TEST.value:
-        task = SaveDataCSVJob(
-            job_id=job_id,
-            data=data,
-            queue_name=CacheConfigurations.queue_name,
-            filepath=filepath,
-            ab_test_group=ab_test_group)
+        task = SaveDataCSVJob(job_id=job_id, data=data, queue_name=CacheConfigurations.queue_name, filepath=filepath, ab_test_group=ab_test_group)
     else:
-        raise ValueError('platform must be chosen from constants.PLATFORM_ENUM')
+        raise ValueError("platform must be chosen from constants.PLATFORM_ENUM")
     background_tasks.add_task(task)
     return job_id
 

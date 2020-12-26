@@ -17,30 +17,29 @@ spec:
       name: tfs-resnet50
     spec:
       containers:
-      - name: tfs-resnet50
-        image: shibui/ml-system-in-action:serving_patterns_tfs_resnet50
-        command: ["/usr/bin/tf_serving_entrypoint.sh"]
-        env:
-        - name: PORT
-          value: "8514"
-        - name: REST_API_PORT
-          value: "8515"
-        - name: MODEL_NAME
-          value: resnet_v2_50
-        - name: MODEL_BASE_PATH
-          value: /serving_patterns/src/app/ml/resnet50_tfs/model/savedmodel/resnet_v2_50
-        ports:
-        - containerPort: 8514
-        resources:
-          limits:
-            cpu: "2"
-            memory: "4000Mi"
-          requests:
-            cpu: "2"
-            memory: "4000Mi"
+        - name: tfs-resnet50
+          image: shibui/ml-system-in-action:serving_patterns_tfs_resnet50
+          command: ["/usr/bin/tf_serving_entrypoint.sh"]
+          env:
+            - name: PORT
+              value: "8514"
+            - name: REST_API_PORT
+              value: "8515"
+            - name: MODEL_NAME
+              value: resnet_v2_50
+            - name: MODEL_BASE_PATH
+              value: /serving_patterns/src/app/ml/resnet50_tfs/model/savedmodel/resnet_v2_50
+          ports:
+            - containerPort: 8514
+          resources:
+            limits:
+              cpu: "2"
+              memory: "4000Mi"
+            requests:
+              cpu: "2"
+              memory: "4000Mi"
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -50,7 +49,7 @@ metadata:
   namespace: serving-pattern
 spec:
   ports:
-  - port: 8514
-    protocol: TCP
+    - port: 8514
+      protocol: TCP
   selector:
     app: tfs-resnet50

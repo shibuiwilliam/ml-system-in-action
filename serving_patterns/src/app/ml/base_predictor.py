@@ -23,28 +23,24 @@ class BaseDataConverter(BaseModel):
 
     @classmethod
     def convert_input_data_to_np(cls, input_data: Any) -> np.ndarray:
-        np_data = np.array(input_data).astype(
-            cls.data_interface.input_type).reshape(
-            cls.data_interface.input_shape)
+        np_data = np.array(input_data).astype(cls.data_interface.input_type).reshape(cls.data_interface.input_shape)
         return np_data
 
     @classmethod
     def reshape_output(cls, output: np.ndarray) -> np.ndarray:
-        np_data = output.astype(
-            cls.data_interface.output_type).reshape(
-            cls.data_interface.output_shape)
+        np_data = output.astype(cls.data_interface.output_type).reshape(cls.data_interface.output_shape)
         return np_data
 
 
 class BasePredictor(metaclass=ABCMeta):
-    @ abstractmethod
+    @abstractmethod
     def load_model(self):
         raise NotImplementedError()
 
-    @ abstractmethod
+    @abstractmethod
     def predict(self, data) -> Any:
         raise NotImplementedError()
 
-    @ abstractmethod
+    @abstractmethod
     async def async_predict(self, data) -> Any:
         raise NotImplementedError()

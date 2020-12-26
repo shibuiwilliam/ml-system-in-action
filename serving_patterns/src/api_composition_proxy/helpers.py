@@ -5,20 +5,20 @@ logger = logging.getLogger(__name__)
 
 
 def path_builder(url: str, path: str) -> str:
-    if path == '' or path is None:
+    if path == "" or path is None:
         return url
-    if path.startswith('/'):
+    if path.startswith("/"):
         path = path[1:]
-    if url.endswith('/'):
-        url = f'{url}{path}'
+    if url.endswith("/"):
+        url = f"{url}{path}"
     else:
-        url = f'{url}/{path}'
+        url = f"{url}/{path}"
     return url
 
 
 def url_builder(hostname: str, https: bool = False) -> str:
-    if not (hostname.startswith('http://') or hostname.startswith('https://')):
-        hostname = f'https://{hostname}' if https else f'http://{hostname}'
+    if not (hostname.startswith("http://") or hostname.startswith("https://")):
+        hostname = f"https://{hostname}" if https else f"http://{hostname}"
     return hostname
 
 
@@ -28,12 +28,8 @@ def url_path_builder(hostname: str, path: str, https: bool = False) -> str:
     return url
 
 
-def customized_redirect_builder(
-        alias: str,
-        url: str,
-        redirect_path: str,
-        customized_redirect_map: Dict[str, Dict[str, str]] = None) -> str:
-    '''
+def customized_redirect_builder(alias: str, url: str, redirect_path: str, customized_redirect_map: Dict[str, Dict[str, str]] = None) -> str:
+    """
     customized_redirect_map
     {
         ALIAS_0:
@@ -47,7 +43,7 @@ def customized_redirect_builder(
             REDIRECT_PATH_2: redirect_path_2,
         }
     }
-    '''
+    """
 
     path = path_builder(url, redirect_path)
     if customized_redirect_map is None:

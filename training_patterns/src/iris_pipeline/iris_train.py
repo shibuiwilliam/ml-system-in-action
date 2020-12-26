@@ -13,28 +13,24 @@ from constants import PREDICTION_TYPE, MODEL_RUNTIME, DATA_TYPE
 import save_helper
 
 
-PARAMS_YAML = './params.yaml'
+PARAMS_YAML = "./params.yaml"
 
-MODEL_DIR = './models/'
-DATA_DIR = './data/'
-LABEL_FILENAME = 'iris_label.csv'
-UPSTREAM_DIR = os.path.join(DATA_DIR, 'prepared')
+MODEL_DIR = "./models/"
+DATA_DIR = "./data/"
+LABEL_FILENAME = "iris_label.csv"
+UPSTREAM_DIR = os.path.join(DATA_DIR, "prepared")
 LABEL_FILEPATH = os.path.join(DATA_DIR, LABEL_FILENAME)
-X_TRAIN_NPY = os.path.join(UPSTREAM_DIR, 'x_train.npy')
-Y_TRAIN_NPY = os.path.join(UPSTREAM_DIR, 'y_train.npy')
-DOWNSTREAM_DIR = os.path.join(DATA_DIR, 'trained')
+X_TRAIN_NPY = os.path.join(UPSTREAM_DIR, "x_train.npy")
+Y_TRAIN_NPY = os.path.join(UPSTREAM_DIR, "y_train.npy")
+DOWNSTREAM_DIR = os.path.join(DATA_DIR, "trained")
 
 
 def get_params() -> Dict[str, Any]:
-    params = {
-        'save_model_name': 'iris_svc',
-        'save_format': 'sklearn',
-        'ml_model': 'svc'
-    }
+    params = {"save_model_name": "iris_svc", "save_format": "sklearn", "ml_model": "svc"}
     if os.path.exists(PARAMS_YAML):
-        with open(PARAMS_YAML, 'r') as f:
+        with open(PARAMS_YAML, "r") as f:
             _params = yaml.load(f, Loader=yaml.SafeLoader)
-        for k, v in _params['train'].items():
+        for k, v in _params["train"].items():
             if isinstance(v, int):
                 params[k] = int(os.getenv(k.upper(), v))
             elif isinstance(v, float):
@@ -46,19 +42,13 @@ def get_params() -> Dict[str, Any]:
 
 
 def define_svc_pipeline() -> Pipeline:
-    steps = [
-        ('normalize', StandardScaler()),
-        ('svc', svm.SVC(probability=True))
-    ]
+    steps = [("normalize", StandardScaler()), ("svc", svm.SVC(probability=True))]
     pipeline = Pipeline(steps=steps)
     return pipeline
 
 
 def define_tree_pipeline() -> Pipeline:
-    steps = [
-        ('normalize', StandardScaler()),
-        ('tree', tree.DecisionTreeClassifier())
-    ]
+    steps = [("normalize", StandardScaler()), ("tree", tree.DecisionTreeClassifier())]
     pipeline = Pipeline(steps=steps)
     return pipeline
 
@@ -75,60 +65,64 @@ def main():
     x_train = np.load(X_TRAIN_NPY)
     y_train = np.load(Y_TRAIN_NPY)
 
-    if params['ml_model'] == 'svc':
+    if params["ml_model"] == "svc":
         pipeline = define_svc_pipeline()
-    elif params['ml_model'] == 'tree':
+    elif params["ml_model"] == "tree":
         pipeline = define_tree_pipeline()
     else:
         pass
 
     train_model(pipeline, x_train, y_train)
 
-    modelname = params['save_model_name']
+    modelname = params["save_model_name"]
 
-    if params['save_format'] == 'sklearn':
-        sklearn_filename = f'{modelname}.pkl'
+    if params["save_format"] == "sklearn":
+        sklearn_filename = f"{modelname}.pkl"
         sklearn_filepath = os.path.join(DOWNSTREAM_DIR, sklearn_filename)
         sklearn_modelpath = os.path.join(MODEL_DIR, sklearn_filename)
         save_helper.dump_sklearn(pipeline, sklearn_filepath)
         save_helper.dump_sklearn(pipeline, sklearn_modelpath)
 
-        sklearn_interface_filename = f'{modelname}_sklearn.yaml'
-        save_helper.save_interface(modelname,
-                                   os.path.join(MODEL_DIR, sklearn_interface_filename),
-                                   [1, 4],
-                                   str(x_train.dtype).split('.')[-1],
-                                   [1, 3],
-                                   'float32',
-                                   DATA_TYPE.ARRAY,
-                                   [{sklearn_filepath: MODEL_RUNTIME.SKLEARN}],
-                                   PREDICTION_TYPE.CLASSIFICATION,
-                                   'src.app.ml.iris.iris_predictor_sklearn',
-                                   label_filepath=os.path.join(DOWNSTREAM_DIR, LABEL_FILENAME))
-    elif params['save_format'] == 'onnx':
-        onnx_filename = f'{modelname}.onnx'
+        sklearn_interface_filename = f"{modelname}_sklearn.yaml"
+        save_helper.save_interface(
+            modelname,
+            os.path.join(MODEL_DIR, sklearn_interface_filename),
+            [1, 4],
+            str(x_train.dtype).split(".")[-1],
+            [1, 3],
+            "float32",
+            DATA_TYPE.ARRAY,
+            [{sklearn_filepath: MODEL_RUNTIME.SKLEARN}],
+            PREDICTION_TYPE.CLASSIFICATION,
+            "src.app.ml.iris.iris_predictor_sklearn",
+            label_filepath=os.path.join(DOWNSTREAM_DIR, LABEL_FILENAME),
+        )
+    elif params["save_format"] == "onnx":
+        onnx_filename = f"{modelname}.onnx"
         onnx_filepath = os.path.join(DOWNSTREAM_DIR, onnx_filename)
         onnx_modelpath = os.path.join(MODEL_DIR, onnx_filename)
         save_helper.save_onnx(pipeline, onnx_filepath)
         save_helper.save_onnx(pipeline, onnx_modelpath)
 
-        onnx_interface_filename = f'{modelname}_onnx_runtime.yaml'
-        save_helper.save_interface(modelname,
-                                   os.path.join(MODEL_DIR, onnx_interface_filename),
-                                   [1, 4],
-                                   str(x_train.dtype).split('.')[-1],
-                                   [1, 3],
-                                   'float32',
-                                   DATA_TYPE.ARRAY,
-                                   [{onnx_filepath: MODEL_RUNTIME.ONNX_RUNTIME}],
-                                   PREDICTION_TYPE.CLASSIFICATION,
-                                   'src.app.ml.iris.iris_predictor_onnx',
-                                   label_filepath=os.path.join(DOWNSTREAM_DIR, LABEL_FILENAME))
+        onnx_interface_filename = f"{modelname}_onnx_runtime.yaml"
+        save_helper.save_interface(
+            modelname,
+            os.path.join(MODEL_DIR, onnx_interface_filename),
+            [1, 4],
+            str(x_train.dtype).split(".")[-1],
+            [1, 3],
+            "float32",
+            DATA_TYPE.ARRAY,
+            [{onnx_filepath: MODEL_RUNTIME.ONNX_RUNTIME}],
+            PREDICTION_TYPE.CLASSIFICATION,
+            "src.app.ml.iris.iris_predictor_onnx",
+            label_filepath=os.path.join(DOWNSTREAM_DIR, LABEL_FILENAME),
+        )
     else:
         pass
 
     shutil.copy2(LABEL_FILEPATH, os.path.join(DOWNSTREAM_DIR, LABEL_FILENAME))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -7,9 +7,8 @@ from src.app.routers import health, predict_image
 from src.app.configurations import APIConfigurations
 
 logger = logging.getLogger(__name__)
-logger.info(
-    f'starts {APIConfigurations.title}:{APIConfigurations.version}')
-logger.info(f'platform: {PlatformConfigurations.platform}')
+logger.info(f"starts {APIConfigurations.title}:{APIConfigurations.version}")
+logger.info(f"platform: {PlatformConfigurations.platform}")
 
 
 app = FastAPI(
@@ -18,14 +17,6 @@ app = FastAPI(
     version=APIConfigurations.version,
 )
 
-app.include_router(
-    health.router,
-    prefix='/health',
-    tags=['health']
-)
+app.include_router(health.router, prefix="/health", tags=["health"])
 
-app.include_router(
-    predict_image.router,
-    prefix='/predict',
-    tags=['predict']
-)
+app.include_router(predict_image.router, prefix="/predict", tags=["predict"])

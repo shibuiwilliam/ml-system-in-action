@@ -23,70 +23,47 @@ class Data(BaseModel):
 async def _get_redirect(session, url: str, alias: str) -> Dict[str, Any]:
     async with session.get(url) as response:
         response_json = await response.json()
-        resp = {
-            alias: {
-                'response': response_json,
-                'status_code': response.status
-            }
-        }
-        logger.info(f'response: {resp}')
+        resp = {alias: {"response": response_json, "status_code": response.status}}
+        logger.info(f"response: {resp}")
         return resp
 
 
-@router.get('/{redirect_path:path}')
+@router.get("/{redirect_path:path}")
 async def get_redirect(redirect_path: str) -> Dict[str, Any]:
-    logger.info(f'GET redirect to: /{redirect_path}')
+    logger.info(f"GET redirect to: /{redirect_path}")
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
             asyncio.ensure_future(
-                _get_redirect(
-                    session,
-                    helpers.customized_redirect_builder(
-                        k,
-                        v,
-                        redirect_path,
-                        ServiceConfigurations.customized_redirect_map),
-                    k)
-            ) for k, v in ServiceConfigurations.urls.items()]
+                _get_redirect(session, helpers.customized_redirect_builder(k, v, redirect_path, ServiceConfigurations.customized_redirect_map), k)
+            )
+            for k, v in ServiceConfigurations.urls.items()
+        ]
         responses = await asyncio.gather(*tasks)
-        logger.info(f'responses: {responses}')
+        logger.info(f"responses: {responses}")
         return responses
 
 
 async def _post_redirect(session, url: str, data: Dict[Any, Any], alias: str) -> Dict[str, Any]:
     async with session.post(url, json=data) as response:
         response_json = await response.json()
-        resp = {
-            alias: {
-                'response': response_json,
-                'status_code': response.status
-            }
-        }
-        logger.info(f'response: {resp}')
+        resp = {alias: {"response": response_json, "status_code": response.status}}
+        logger.info(f"response: {resp}")
         return resp
 
 
-@router.post('/{redirect_path:path}')
-async def post_redirect(redirect_path: str,
-                        data: Data,
-                        background_tasks: BackgroundTasks) -> Dict[str, Any]:
-    data.data['job_id'] = get_job_id()
+@router.post("/{redirect_path:path}")
+async def post_redirect(redirect_path: str, data: Data, background_tasks: BackgroundTasks) -> Dict[str, Any]:
+    data.data["job_id"] = get_job_id()
     logger.info(f'POST redirect to: /{redirect_path} as {data.data["job_id"]}')
     if ServiceConfigurations.enqueue:
-        store_data_job._save_data_job(data.data, data.data['job_id'], background_tasks, True)
+        store_data_job._save_data_job(data.data, data.data["job_id"], background_tasks, True)
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=2)) as session:
         tasks = [
             asyncio.ensure_future(
-                _post_redirect(
-                    session,
-                    helpers.customized_redirect_builder(
-                        k,
-                        v,
-                        redirect_path,
-                        ServiceConfigurations.customized_redirect_map),
-                    data.data,
-                    k)
-            ) for k, v in ServiceConfigurations.urls.items()]
+                _post_redirect(session, helpers.customized_redirect_builder(k, v, redirect_path, ServiceConfigurations.customized_redirect_map), data.data, k)
+            )
+            for k, v in ServiceConfigurations.urls.items()
+        ]
         responses = await asyncio.gather(*tasks)
-        logger.info(f'responses: {responses}')
+        logger.info(f"responses: {responses}")
         return responses

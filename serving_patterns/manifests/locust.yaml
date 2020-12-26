@@ -17,29 +17,28 @@ spec:
       name: load-test-locust
     spec:
       containers:
-      - name: load-test-locust
-        image: shibui/ml-system-in-action:load_test_locust
-        command: ["locust"]
-        args: ["-f", "$(TARGET_FILE)"]
-        env:
-        - name: PLATFORM
-          value: kubernetes
-        - name: TARGET_FILE
-          value: image_classification_all.py
-        - name: POST_PREDICT_LABEL_RATIO
-          value: "1"
-        ports:
-        - containerPort: 8089
-        resources:
-          limits:
-            cpu: "2"
-            memory: "2000Mi"
-          requests:
-            cpu: "2"
-            memory: "2000Mi"
+        - name: load-test-locust
+          image: shibui/ml-system-in-action:load_test_locust
+          command: ["locust"]
+          args: ["-f", "$(TARGET_FILE)"]
+          env:
+            - name: PLATFORM
+              value: kubernetes
+            - name: TARGET_FILE
+              value: image_classification_all.py
+            - name: POST_PREDICT_LABEL_RATIO
+              value: "1"
+          ports:
+            - containerPort: 8089
+          resources:
+            limits:
+              cpu: "2"
+              memory: "2000Mi"
+            requests:
+              cpu: "2"
+              memory: "2000Mi"
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -49,7 +48,7 @@ metadata:
   namespace: serving-pattern
 spec:
   ports:
-  - port: 8089
-    protocol: TCP
+    - port: 8089
+      protocol: TCP
   selector:
     app: load-test-locust
